@@ -1,0 +1,237 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================= */
+/* NutriFlow Design System - Global Styles       */
+/* ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700&display=swap');
+
+:root {
+  /* Colors */
+  --color-primary: #8b5cf6;
+  --color-primary-light: #a78bfa;
+  --color-primary-dark: #7c3aed;
+  --color-accent: #10b981;
+  --color-background: #fafafa;
+  --color-surface: #ffffff;
+  --color-text: #18181b;
+  --color-text-secondary: #71717a;
+  --color-border: #e4e4e7;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  --gradient-accent: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --gradient-hero: linear-gradient(180deg, #f5f3ff 0%, #ffffff 100%);
+
+  /* Shadows */
+  --shadow-soft: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.3);
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+/* Dark mode support (VS Code inspired) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #1e1e1e;
+    /* VS Code Main Bg */
+    --color-surface: #252526;
+    /* VS Code Sidebar/Panel Bg */
+    --color-text: #d4d4d4;
+    /* VS Code Default Text */
+    --color-text-secondary: #a1a1aa;
+    --color-border: #3f3f46;
+  }
+}
+
+/* ============================================= */
+/* Base Styles                                   */
+/* ============================================= */
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ============================================= */
+/* Utility Classes                               */
+/* ============================================= */
+
+@layer utilities {
+  .text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .glass-dark {
+    background: rgba(39, 39, 42, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white font-medium px-6 py-3 rounded-xl hover:bg-primary-700 transition-all duration-200 shadow-soft hover:shadow-glow;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-primary-600 font-medium px-6 py-3 rounded-xl border border-primary-200 hover:bg-primary-50 transition-all duration-200;
+    @apply dark:bg-surface-800 dark:text-primary-400 dark:border-surface-600 dark:hover:bg-surface-700;
+  }
+
+  .card {
+    @apply bg-white dark:bg-surface-800 rounded-2xl shadow-soft p-6 border border-surface-100 dark:border-surface-700 transition-colors duration-300;
+  }
+
+  .input {
+    @apply w-full px-4 py-3 rounded-xl border border-surface-200 bg-white text-surface-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all duration-200;
+    @apply dark:bg-surface-800 dark:border-surface-600 dark:text-white dark:focus:border-primary-400 dark:focus:ring-primary-800;
+    display: flex;
+    align-items: center;
+    line-height: 1.5;
+    min-height: 48px;
+  }
+
+  .input::placeholder {
+    @apply text-surface-400 dark:text-surface-500;
+    opacity: 1;
+    line-height: inherit;
+    vertical-align: middle;
+  }
+
+  /* Input with icon - aumenta padding izquierdo para el icono */
+  .input-icon {
+    @apply w-full pl-12 pr-4 py-3 rounded-xl border border-surface-200 bg-white text-surface-900 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all duration-200;
+    @apply dark:bg-surface-800 dark:border-surface-600 dark:text-white dark:focus:border-primary-400 dark:focus:ring-primary-800;
+    display: flex;
+    align-items: center;
+    line-height: 1.5;
+    min-height: 48px;
+  }
+
+  .input-icon::placeholder {
+    @apply text-surface-400 dark:text-surface-500;
+    opacity: 1;
+    line-height: inherit;
+    vertical-align: middle;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2;
+  }
+
+  .nav-link {
+    @apply text-surface-600 dark:text-surface-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium flex items-center;
+  }
+
+  .bg-page-gradient {
+    @apply bg-gradient-to-b from-primary-100 via-primary-50 to-white dark:from-vscode dark:to-[#121212] transition-colors duration-300;
+  }
+}
+
+/* ============================================= */
+/* Animations                                    */
+/* ============================================= */
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-soft {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* ============================================= */
+/* Scrollbar Styling                             */
+/* ============================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
