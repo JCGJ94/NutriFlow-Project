@@ -31,6 +31,8 @@ export const metadata: Metadata = {
 
 import { UserProvider } from '../context/UserContext';
 
+import { PlansProvider } from '../context/PlansContext';
+
 export default function RootLayout({
   children,
 }: {
@@ -46,6 +48,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <UserProvider>
+            <PlansProvider>
             <LanguageProvider>
               <ToastProvider>
               <Navbar />
@@ -54,6 +57,7 @@ export default function RootLayout({
               <ToastContainer />
             </ToastProvider>
             </LanguageProvider>
+            </PlansProvider>
           </UserProvider>
         </ThemeProvider>
       </body>

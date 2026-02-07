@@ -25,12 +25,13 @@ import {
 import { IngredientCategory } from '@nutriflow/shared';
 import { formatGrams } from '@/lib/utils';
 import { useLanguage } from '@/context/LanguageContext';
+import { usePlans } from '@/context/PlansContext';
 
 interface ShoppingListItem {
   id: string;
   ingredientId: string | null;
   ingredientName: string;
-  category: IngredientCategory;
+  category: IngredientCategory | string;
   totalGrams?: number;
   isChecked: boolean;
   isCustom: boolean;
@@ -73,44 +74,37 @@ export default function ShoppingListPage() {
   const params = useParams();
   const router = useRouter();
   const { t } = useLanguage();
+  const { getShoppingList, updateShoppingListCache } = usePlans();
   const planId = params.id as string;
 
   const [shoppingList, setShoppingList] = useState<ShoppingList | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
   const [newItemName, setNewItemName] = useState('');
 
   useEffect(() => {
-    loadShoppingList();
-  }, [planId]);
-
-  const loadShoppingList = async () => {
-    try {
-      const response = await fetch(`/api/shopping-list/${planId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setShoppingList(data);
-      }
-    } catch (error) {
-      console.error('Error loading shopping list:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const init = async () => {
+        setIsLoading(true);
+        const data = await getShoppingList(planId);
+        if (data) setShoppingList(data);
+        setIsLoading(false);
+    };
+    init();
+  }, [planId, getShoppingList]);
 
   const toggleItem = async (itemId: string, currentChecked: boolean) => {
-    try {
-      // Optimistic update
-      setShoppingList(prev => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          items: prev.items.map(item => 
-            item.id === itemId ? { ...item, isChecked: !currentChecked } : item
-          )
-        };
-      });
+    if (!shoppingList) return;
 
+    // Optimistic update
+    const updatedList = {
+        ...shoppingList,
+        items: shoppingList.items.map(item => 
+            item.id === itemId ? { ...item, isChecked: !currentChecked } : item
+        )
+    };
+    setShoppingList(updatedList);
+    updateShoppingListCache(planId, updatedList);
+
+    try {
       const response = await fetch('/api/shopping-list/items/toggle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -118,12 +112,15 @@ export default function ShoppingListPage() {
       });
 
       if (!response.ok) {
-        // Rollback on error
-        loadShoppingList();
+        // Rollback on error - re-fetch original
+        const data = await getShoppingList(planId);
+         if (data) setShoppingList(data);
       }
     } catch (error) {
       console.error('Error toggling item:', error);
-      loadShoppingList();
+      // Rollback
+      const data = await getShoppingList(planId);
+      if (data) setShoppingList(data);
     }
   };
 
@@ -133,7 +130,7 @@ export default function ShoppingListPage() {
 
   const handleAddCustomItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newItemName.trim()) return;
+    if (!newItemName.trim() || !shoppingList) return;
     
     const name = newItemName.trim();
     setNewItemName('');
@@ -146,7 +143,13 @@ export default function ShoppingListPage() {
       });
 
       if (response.ok) {
-        loadShoppingList();
+        await response.json(); // Consume body
+        // If API returns item, we need to add it. If it returns list, we set list.
+        // Usually better to re-fetch or if we know the structure, add it. 
+        // Let's assume re-fetch for safety or better yet, if the context handles background update, we call it.
+        // Actually, let's just re-fetch to be safe and consistent with previous implementation
+        const data = await getShoppingList(planId); // This triggers background fetch and cache update
+        if (data) setShoppingList(data);
       }
     } catch (error) {
       console.error('Error adding custom item:', error);
@@ -154,22 +157,29 @@ export default function ShoppingListPage() {
   };
 
   const deleteItem = async (itemId: string) => {
+      if (!shoppingList) return;
+      
+    // Optimistic approach
+    const updatedList = {
+        ...shoppingList,
+        items: shoppingList.items.filter(item => item.id !== itemId)
+    };
+    setShoppingList(updatedList);
+    updateShoppingListCache(planId, updatedList);
+
     try {
       const response = await fetch(`/api/shopping-list/items/${itemId}`, {
         method: 'DELETE'
       });
 
-      if (response.ok) {
-        setShoppingList(prev => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            items: prev.items.filter(item => item.id !== itemId)
-          };
-        });
+      if (!response.ok) {
+         const data = await getShoppingList(planId);
+         if (data) setShoppingList(data);
       }
     } catch (error) {
       console.error('Error deleting item:', error);
+      const data = await getShoppingList(planId);
+      if (data) setShoppingList(data);
     }
   };
 
@@ -233,7 +243,7 @@ export default function ShoppingListPage() {
     }
     acc[category].push(item);
     return acc;
-  }, {} as Record<IngredientCategory, ShoppingListItem[]>);
+  }, {} as Record<string, ShoppingListItem[]>);
 
   const customItems = (shoppingList.items || []).filter(item => item.isCustom);
 

@@ -8,6 +8,10 @@ dist
 .next
 .turbo
 out
+build_output.txt
+playwright-report/
+test-results/
+bin/ms-playwright/
 
 # Environment variables
 .env

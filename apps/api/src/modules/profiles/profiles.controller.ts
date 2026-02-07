@@ -44,7 +44,15 @@ export class ProfilesController {
         @User() user: AuthUser,
         @Body() dto: UpsertProfileDto,
     ): Promise<ProfileResponseDto> {
-        return this.profilesService.upsertProfile(user.id, dto);
+        try {
+            return await this.profilesService.upsertProfile(user.id, dto);
+        } catch (error) {
+            console.error('Error in upsertProfile controller:', error);
+            if (error instanceof Error) {
+                console.error('Stack:', error.stack);
+            }
+            throw error; // Rethrow to let global filter handle it, but now we have logs
+        }
     }
 
     @Get('allergens')

@@ -16,6 +16,7 @@ import {
   Shield,
   Check,
   AlertTriangle,
+  ShieldCheck,
 } from 'lucide-react';
 import { Sex, ActivityLevel, DietPattern } from '@nutriflow/shared';
 import { createClient } from '@/lib/supabase/client';
@@ -69,6 +70,7 @@ export default function OnboardingPage() {
     formState: { errors },
     watch,
     trigger,
+    setValue,
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -431,6 +433,55 @@ export default function OnboardingPage() {
                 <p className="text-surface-600 dark:text-surface-300 mb-4">
                   {t('onboarding.allergens_desc')}
                 </p>
+
+                {/* Modern "No Allergies" Card */}
+                <label 
+                  className={`relative flex items-center p-5 rounded-2xl cursor-pointer transition-all duration-300 border-2 overflow-hidden group mb-6 ${
+                    selectedAllergens?.length === 0
+                      ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10 shadow-[0_0_20px_rgba(16,185,129,0.15)]'
+                      : 'border-surface-200 dark:border-surface-700 hover:border-emerald-200 dark:hover:border-emerald-800 hover:bg-surface-50 dark:hover:bg-surface-800'
+                  }`}
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent transition-opacity duration-300 ${
+                    selectedAllergens?.length === 0 ? 'opacity-100' : 'opacity-0'
+                  }`} />
+                  
+                  <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 mr-4 transition-transform duration-300 group-hover:scale-110">
+                      {selectedAllergens?.length === 0 ? <ShieldCheck className="w-6 h-6" /> : <Shield className="w-6 h-6" />}
+                  </div>
+
+                  <div className="relative z-10 flex-1">
+                    <span className={`block font-heading font-bold text-lg mb-0.5 transition-colors ${
+                      selectedAllergens?.length === 0
+                        ? 'text-emerald-800 dark:text-emerald-300'
+                        : 'text-surface-700 dark:text-surface-200'
+                    }`}>
+                      {t('onboarding.allergens_none_label')}
+                    </span>
+                    <p className="text-sm text-surface-500 dark:text-surface-400 font-medium">
+                      {t('onboarding.allergens_plan_confirm')}
+                    </p>
+                  </div>
+
+                  <div className={`relative z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
+                     selectedAllergens?.length === 0
+                       ? 'border-emerald-500 bg-emerald-500 scale-110'
+                       : 'border-surface-300 dark:border-surface-600'
+                  }`}>
+                     {selectedAllergens?.length === 0 && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+                  </div>
+
+                  <input
+                    type="checkbox"
+                    className="sr-only"
+                    checked={selectedAllergens?.length === 0}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setValue('allergenIds', []);
+                      }
+                    }}
+                  />
+                </label>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {allergens.length === 0 && (

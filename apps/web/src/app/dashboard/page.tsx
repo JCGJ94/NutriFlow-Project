@@ -17,86 +17,25 @@ import { createClient } from '@/lib/supabase/client';
 import { SmartRecommendations } from '@/components/dashboard/SmartRecommendations';
 import { useToast } from '@/context/ToastContext';
 import { useLanguage } from '@/context/LanguageContext';
-
-interface PlanSummary {
-  id: string;
-  weekStart: string;
-  targetKcal: number;
-  status: string;
-  createdAt: string;
-}
+import { useUser } from '@/context/UserContext';
+import { usePlans } from '@/context/PlansContext';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const { t, language } = useLanguage();
-  const [plans, setPlans] = useState<PlanSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { profile, isLoading: isUserLoading } = useUser();
+  const { plans, isLoadingPlans, refreshPlans } = usePlans();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        router.push('/login');
-        return;
-      }
-
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-
-      if (!token) return;
-
-      const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      };
-
-      console.log('Verifying profile exists...');
-      const profileResponse = await fetch('/api/me/profile', { headers });
-      
-      if (!profileResponse.ok) {
-        const errorText = await profileResponse.text();
-        console.error('Failed to fetch profile:', profileResponse.status, errorText);
-        showToast(t('dash.profile_error'), 'error');
-        return;
-      }
-
-      const profileData = await profileResponse.json().catch(() => null);
-      
-      if (!profileData || !profileData.id) {
-        console.log('Profile missing or incomplete, redirecting to onboarding...');
+    if (!isUserLoading && (!profile || !profile.id)) {
+        console.log('Profile missing, redirecting to onboarding...');
         showToast(t('dash.welcome_new'), 'info');
         router.push('/onboarding');
-        return;
-      }
-
-      console.log('Profile verified successfully.');
-
-      const response = await fetch('/api/plans', { headers });
-      if (response.ok) {
-        const text = await response.text();
-        if (text) {
-          const data = JSON.parse(text);
-          setPlans(data);
-        }
-      } else {
-        console.error('Failed to fetch plans:', response.status);
-      }
-    } catch (error) {
-      console.error('Error loading data:', error);
-      showToast(t('common.error'), 'error');
-    } finally {
-      setIsLoading(false);
     }
-  };
+  }, [isUserLoading, profile, router, t, showToast]);
 
   const generateNewPlan = async () => {
     setIsGenerating(true);
@@ -123,6 +62,7 @@ export default function DashboardPage() {
         const text = await response.text();
         if (text) {
           const plan = JSON.parse(text);
+          await refreshPlans(); // Refresh global context
           showToast(t('dash.gen_success'), 'success');
           router.push(`/plan/${plan.id}`);
         }
@@ -156,7 +96,7 @@ export default function DashboardPage() {
         });
 
         if (response.ok) {
-            setPlans(plans.filter(p => p.id !== planId));
+            await refreshPlans(); // Refresh context
             showToast(t('dash.delete_success'), 'success');
         } else {
             showToast(t('dash.delete_error'), 'error');
@@ -169,7 +109,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (isLoading) {
+  if (isUserLoading || isLoadingPlans) {
     return (
       <div className="min-h-screen bg-surface-50 flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />

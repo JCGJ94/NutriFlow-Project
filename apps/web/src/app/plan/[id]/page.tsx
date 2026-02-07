@@ -17,7 +17,6 @@ import { MealCard } from '@/components/plan/MealCard';
 import { ExerciseDayCard, ExerciseDetail } from '@/components/exercise/ExerciseCards';
 import { DayOfWeek } from '@nutriflow/shared';
 import { getDayName, cn } from '@/lib/utils';
-import { createClient } from '@/lib/supabase/client';
 
 // Types
 interface MealItem {
@@ -87,12 +86,25 @@ interface ExercisePlan {
 
 type TabType = 'diet' | 'exercise';
 
+import { usePlans } from '@/context/PlansContext';
+
+// ... (Types remain here or can be removed if imported, but let's keep for safety/simplicity of this tool call)
+
 export default function CombinedPlanPage() {
     const params = useParams();
     const planId = params.id as string;
+    const { 
+        getPlanDetails, 
+        getExercisePlan, 
+        cachedPlanDetails, 
+        cachedExercisePlans,
+        updateExercisePlanCache 
+    } = usePlans();
 
-    const [dietPlan, setDietPlan] = useState<Plan | null>(null);
-    const [exercisePlan, setExercisePlan] = useState<ExercisePlan | null>(null);
+    // Derived state from context
+    const dietPlan = cachedPlanDetails[planId] || null;
+    const exercisePlan = cachedExercisePlans[planId] || null;
+
     const [isLoading, setIsLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<TabType>('diet');
     const [selectedDietDay, setSelectedDietDay] = useState<number>(0);
@@ -100,40 +112,34 @@ export default function CombinedPlanPage() {
     const [regeneratingMeal, setRegeneratingMeal] = useState<string | null>(null);
 
     useEffect(() => {
-        loadPlans();
-    }, [planId]);
+        const init = async () => {
+             // If we already have data, we're not "loading" in the blocking sense
+             if (dietPlan && exercisePlan) {
+                 setIsLoading(false);
+             } else {
+                 setIsLoading(true);
+             }
 
-    const loadPlans = async () => {
-        try {
-            const supabase = createClient();
-            const { data: { session } } = await supabase.auth.getSession();
-            const token = session?.access_token;
+             // Trigger fetches (will load from cache or network)
+             const [_, exercise] = await Promise.all([
+                 getPlanDetails(planId),
+                 getExercisePlan(planId)
+             ]);
+             
+             // If no exercise plan found (and not in cache), fallback to mock
+             if (!exercise && !exercisePlan) {
+                 const mock = generateMockExercisePlan();
+                 updateExercisePlanCache(planId, mock);
+             }
 
-            const headers: HeadersInit = token 
-                ? { 'Authorization': `Bearer ${token}` }
-                : {};
+             setIsLoading(false);
+        };
+        init();
+    }, [planId, getPlanDetails, getExercisePlan, updateExercisePlanCache]); // Removed dietPlan/exercisePlan from deps to avoid loops
 
-            // Load diet plan
-            const dietResponse = await fetch(`/api/plans/${planId}`, { headers });
-            if (dietResponse.ok) {
-                const data = await dietResponse.json();
-                setDietPlan(data);
-            }
-
-            // Load or generate exercise plan
-            const exerciseResponse = await fetch(`/api/exercise-plans/${planId}`, { headers });
-            if (exerciseResponse.ok) {
-                const data = await exerciseResponse.json();
-                setExercisePlan(data);
-            } else {
-                // Generate a mock exercise plan for now
-                setExercisePlan(generateMockExercisePlan());
-            }
-        } catch (error) {
-            console.error('Error loading plans:', error);
-        } finally {
-            setIsLoading(false);
-        }
+    // Helper to trigger background refresh
+    const reloadDietPlan = async () => {
+        await getPlanDetails(planId); 
     };
 
     // Temporary mock data until backend is connected
@@ -233,6 +239,9 @@ export default function CombinedPlanPage() {
     const regenerateMeal = async (mealId: string) => {
         setRegeneratingMeal(mealId);
         try {
+            // Note: In real app, we should probably call an API that returns the new meal 
+            // and we update the local state + cache directly. 
+            // For now, we just call the API then reload the whole plan.
             const response = await fetch(`/api/plans/${planId}/regenerate-meal`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -240,7 +249,7 @@ export default function CombinedPlanPage() {
             });
 
             if (response.ok) {
-                await loadPlans();
+                await reloadDietPlan(); 
             }
         } catch (error) {
             console.error('Error regenerating meal:', error);
@@ -251,12 +260,13 @@ export default function CombinedPlanPage() {
 
     const toggleMealLock = async (mealId: string, isLocked: boolean) => {
         try {
+           // Optimistic update could be done here too
             await fetch(`/api/plans/${planId}/lock-meal`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ mealId, isLocked: !isLocked }),
             });
-            await loadPlans();
+            await reloadDietPlan();
         } catch (error) {
             console.error('Error toggling lock:', error);
         }
