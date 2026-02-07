@@ -1,181 +1,109 @@
-# NutriFlow MVP
+# 🍎 NutriFlow - Intelligent Nutrition Platform
 
-> Aplicación web full-stack para generación de **dietas semanales personalizadas** orientadas a pérdida de peso.
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-11.0-e0234e?style=for-the-badge&logo=nestjs)](https://nestjs.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?style=for-the-badge&logo=supabase)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.0-38b2ac?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Turborepo](https://img.shields.io/badge/Turborepo-Monorepo-ef4444?style=for-the-badge&logo=turborepo)](https://turbo.build/)
 
-## 🚀 Stack Tecnológico
+> **NutriFlow** is a cutting-edge, full-stack web application designed to revolutionize personal nutrition. It leverages advanced algorithms and AI to generate personalized weekly diet plans, managing everything from macro-nutrient distribution to automated shopping lists.
 
-| Capa | Tecnología |
-|------|------------|
-| **Frontend** | Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS |
-| **Backend** | Nest.js, TypeScript, Class Validator |
-| **Base de datos** | Supabase (PostgreSQL + Auth + RLS) |
-| **Monorepo** | Turborepo + pnpm |
+## 🏗️ Architecture & Design Philosophy
 
-## 📁 Estructura del Proyecto
+This project is built with a **Monorepo** architecture using Turborepo, ensuring high performance, scalability, and code sharing between the frontend and backend. 
 
-```
+We strictly follow **Software Engineering Best Practices**:
+- **SOLID Principles**: Adhered to in both backend services and frontend components.
+- **Atomic Design**: UI components are organized atomically (Atoms, Molecules, Organisms) for maximum reusability.
+- **Type Safety**: End-to-end type safety with TypeScript and shared DTOs.
+- **Clean Architecture**: Separation of concerns with distinct layers for logic, data, and presentation.
+
+## 🚀 Tech Stack
+
+### Frontend (`apps/web`)
+- **Framework**: Next.js 16 (App Router)
+- **Styling**: Tailwind CSS + Shadcn/UI (Premium customized)
+- **State Management**: React Context + Hooks
+- **Testing**: Vitest + Playwright (E2E)
+
+### Backend (`apps/api`)
+- **Framework**: NestJS 11
+- **Language**: TypeScript
+- **AI Integration**: Google Gemini / Vertex AI
+- **Validation**: Class-validator + Zod
+
+### Data & Infrastructure
+- **Database**: PostgreSQL (managed by Supabase)
+- **Auth**: Supabase Auth (JWT + RLS)
+- **ORM/Query**: Supabase JS Client (Type-safe)
+
+## 📂 Project Structure
+
+```bash
 nutriflow/
 ├── apps/
-│   ├── api/          # Backend Nest.js (port 3001)
-│   └── web/          # Frontend Next.js (port 3000)
+│   ├── api/          # 🧠 Backend logic (NestJS)
+│   └── web/          # 🎨 Frontend Interface (Next.js)
 ├── packages/
-│   └── shared/       # Tipos y DTOs compartidos
+│   └── shared/       # 📦 Shared Types, DTOs, and Utilities
 ├── infra/
-│   └── supabase/     # Migraciones SQL y seeds
-├── docs/
-│   └── runbooks/     # Guías de configuración
-└── turbo.json        # Configuración Turborepo
+│   └── supabase/     # 🗄️ SQL Migrations & Seeds
+└── docs/             # 📚 Documentation & Architecture Records
 ```
 
-## 🏁 Inicio Rápido
+## ✨ Key Features
 
-### Prerrequisitos
+- **🥗 AI-Powered Diet Engine**: Generates meal plans based on BMR, activity level, and goals.
+- **🛍️ Smart Shopping List**: Automatically aggregates ingredients from your weekly plan.
+- **👤 User Profiling**: Detailed inputs for height, weight, allergies, and dietary preferences.
+- **🔐 Secure Authentication**: Robust RLS policies ensuring user data privacy.
+- **📱 Responsive Design**: Mobile-first approach for nutrition on the go.
 
-- Node.js 18+
+## 🏁 Getting Started
+
+### Prerequisites
+- Node.js 20+
 - pnpm 9+
-- Cuenta en [Supabase](https://supabase.com)
+- A Supabase project
 
-### 1. Clonar e Instalar
+### Installation
 
-```bash
-git clone <repo-url>
-cd nutriflow
-pnpm install
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/JCGJ94/NutriFlow-Project.git
+   cd nutriflow
+   pnpm install
+   ```
 
-### 2. Configurar Supabase
+2. **Environment Setup**
+   Duplicate `.env.example` to `.env.local` and fill in your Supabase credentials.
+   ```bash
+   cp .env.example .env.local
+   ```
 
-1. Crea un proyecto en [Supabase Dashboard](https://supabase.com/dashboard)
-2. Ejecuta las migraciones SQL en orden:
-   - `infra/supabase/migrations/001_initial_schema.sql`
-   - `infra/supabase/migrations/002_rls_policies.sql`
-   - `infra/supabase/seed/001_initial_seed.sql`
-3. Copia las credenciales (ver [Guía completa](docs/runbooks/supabase-setup.md))
+### Running the App
 
-### 3. Variables de Entorno
-
-```bash
-cp .env.example .env.local
-```
-
-Edita `.env.local`:
-
-```env
-# Supabase
-SUPABASE_URL=https://[tu-project-id].supabase.co
-SUPABASE_ANON_KEY=[tu-anon-key]
-SUPABASE_SERVICE_KEY=[tu-service-role-key]
-SUPABASE_JWT_SECRET=[tu-jwt-secret]
-
-# Frontend (Next.js)
-NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
-NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
-
-# API
-API_PORT=3001
-```
-
-### 4. Ejecutar
+The project uses Turbo to run scripts in parallel.
 
 ```bash
-# Desarrollo (ambos apps)
+# Start both Frontend and Backend in development mode
 pnpm dev
 
-# Solo backend
-pnpm --filter @nutriflow/api dev
-
-# Solo frontend
+# Run only Frontend
 pnpm --filter @nutriflow/web dev
+
+# Run only Backend
+pnpm --filter @nutriflow/api dev
 ```
 
-- **Frontend:** http://localhost:3000
-- **API:** http://localhost:3001
-- **Swagger:** http://localhost:3001/api/docs
+- **Frontend**: [http://localhost:3000](http://localhost:3000)
+- **Backend**: [http://localhost:3001](http://localhost:3001)
 
-## 🔧 Comandos Principales
+## 🤝 Contributing
 
-| Comando | Descripción |
-|---------|-------------|
-| `pnpm dev` | Inicia todos los apps en desarrollo |
-| `pnpm build` | Compila todos los apps |
-| `pnpm lint` | Ejecuta ESLint |
-| `pnpm test` | Ejecuta tests |
-| `pnpm clean` | Limpia builds y node_modules |
+Contributions are welcome! Please stick to the established code style and commit message conventions.
 
-## 📚 Documentación
+## 📄 License
 
-| Documento | Descripción |
-|-----------|-------------|
-| [Supabase Setup](docs/runbooks/supabase-setup.md) | Guía paso a paso para configurar Supabase |
-
-## 🔐 Autenticación
-
-NutriFlow usa **Supabase Auth** con email/password:
-
-- Los usuarios se registran con email y contraseña
-- El backend valida JWT tokens de Supabase
-- RLS (Row Level Security) protege los datos por usuario
-
-## 🍽️ Módulos Principales
-
-### Diet Engine (Algoritmo de Generación)
-
-1. **BMR Calculator**: Fórmula Mifflin-St Jeor para metabolismo basal
-2. **Macros Calculator**: Distribución 30P/40C/30F con déficit calórico
-3. **Ingredient Selector**: Selección por categoría con control de porciones
-4. **Rules**: Filtrado por alérgenos y patrón de dieta
-
-### API Endpoints
-
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| POST | `/api/auth/login` | Iniciar sesión |
-| POST | `/api/auth/register` | Crear cuenta |
-| GET/PUT | `/api/me/profile` | Perfil nutricional |
-| GET/PUT | `/api/me/allergens` | Restricciones alimentarias |
-| POST | `/api/plans/generate-week` | Generar plan semanal |
-| GET | `/api/plans/:id` | Detalle del plan |
-| POST | `/api/plans/:id/regenerate-meal` | Regenerar comida |
-| GET | `/api/shopping-list/:planId` | Lista de compra |
-| GET | `/api/ingredients` | Catálogo de ingredientes |
-
-## 📱 Páginas Frontend
-
-| Ruta | Descripción |
-|------|-------------|
-| `/` | Landing page |
-| `/login` | Inicio de sesión |
-| `/register` | Registro |
-| `/onboarding` | Configuración inicial del perfil |
-| `/dashboard` | Panel principal |
-| `/plan/:id` | Detalle del plan semanal |
-| `/shopping-list/:id` | Lista de compra |
-| `/settings` | Configuración del perfil |
-
-## 📊 Base de Datos
-
-### Tablas Principales
-
-- `profiles` - Perfil nutricional del usuario
-- `allergens` - Catálogo de 14 alérgenos EU
-- `profile_allergens` - Restricciones por usuario
-- `ingredients` - ~80 ingredientes con macros
-- `ingredient_allergens` - Relaciones ingrediente-alérgeno
-- `plans` - Planes semanales
-- `plan_meals` - Comidas por día
-- `plan_meal_items` - Ingredientes por comida
-
-### RLS (Row Level Security)
-
-Todas las tablas tienen políticas RLS que aseguran:
-- Usuarios solo acceden a sus propios datos
-- Ingredientes y alérgenos son públicos (lectura)
-- Admin puede gestionar catálogos
-
-## ⚠️ Aviso Legal
-
-Las recomendaciones nutricionales de NutriFlow son **orientativas** y no sustituyen el consejo de un profesional de la salud. Consulta con tu médico antes de iniciar cualquier plan dietético.
-
-## 📄 Licencia
-
-MIT
+This project is licensed under the **MIT License**.

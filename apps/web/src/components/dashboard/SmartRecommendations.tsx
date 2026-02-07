@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Sparkles, ShieldCheck, Activity, Info, ChevronRight, Loader2, Database } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Recommendation {
   doc_id: string;
@@ -12,32 +13,32 @@ interface Recommendation {
   reason: string;
 }
 
-const getCardVisuals = (category: string, reason: string) => {
+const getCardVisuals = (category: string, reason: string, t: (key: string) => string) => {
   const c = category.toLowerCase();
   const r = reason.toLowerCase();
 
-  if (c.includes('seguridad') || r.includes('seguridad')) {
+  if (c.includes('seguridad') || r.includes('seguridad') || c.includes('security') || r.includes('security')) {
     return {
-      image: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=2676&auto=format&fit=crop', // Tech/Abstract Security
+      image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2670&auto=format&fit=crop', // High-tech security/cyber
       icon: ShieldCheck,
       color: 'amber',
-      label: 'Protocolo de Seguridad'
+      label: t('rec.protocol_security')
     };
   }
-  if (r.includes('imc') || r.includes('peso') || c.includes('metab')) {
+  if (r.includes('imc') || r.includes('peso') || c.includes('metab') || r.includes('weight') || r.includes('bmi')) {
     return {
-      image: 'https://images.unsplash.com/photo-1550989460-a5fb975ba699?q=80&w=2670&auto=format&fit=crop', // Health/Scale (Updated)
+      image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=2670&auto=format&fit=crop', // Medical/Analysis
       icon: Activity,
       color: 'blue',
-      label: 'Análisis Biométrico'
+      label: t('rec.biometric_analysis')
     };
   }
-  if (c.includes('base') || r.includes('sistema')) {
+  if (c.includes('base') || r.includes('sistema') || c.includes('data') || r.includes('system')) {
     return {
-      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop', // Data visualization / tech abstract
+      image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop', // Data visualization
       icon: Database,
       color: 'purple',
-      label: 'Base de Conocimiento'
+      label: t('rec.knowledge_base')
     };
   }
   
@@ -46,13 +47,14 @@ const getCardVisuals = (category: string, reason: string) => {
     image: 'https://images.unsplash.com/photo-1490818387583-1baba5e638af?q=80&w=2532&auto=format&fit=crop',
     icon: Info,
     color: 'emerald',
-    label: 'Recomendación General'
+    label: t('rec.general_recommendation')
   };
 };
 
 export function SmartRecommendations() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     async function fetchRecommendations() {
@@ -70,7 +72,6 @@ export function SmartRecommendations() {
         });
 
         if (error) {
-          // If profile doesn't exist, just show no recommendations
           console.log('No recommendations available:', error.message);
           setRecommendations([]);
         } else {
@@ -91,7 +92,9 @@ export function SmartRecommendations() {
     return (
       <div className="flex flex-col sm:flex-row items-center justify-center p-8 sm:p-12 bg-white dark:bg-surface-800 rounded-2xl border border-surface-100 dark:border-surface-700 shadow-sm mb-6 sm:mb-8">
         <Loader2 className="w-8 h-8 text-primary-600 animate-spin mb-2 sm:mb-0 sm:mr-3" />
-        <span className="text-sm sm:text-base text-surface-600 dark:text-surface-300 font-medium text-center">Analizando tu perfil con NutriFlow IA...</span>
+        <span className="text-sm sm:text-base text-surface-600 dark:text-surface-300 font-medium text-center">
+          {t('rec.loading')}
+        </span>
       </div>
     );
   }
@@ -106,15 +109,15 @@ export function SmartRecommendations() {
         </div>
         <div>
             <h2 className="text-lg sm:text-xl md:text-2xl font-heading font-bold text-surface-900 dark:text-white leading-none mb-1">
-            Recomendaciones <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-indigo-600 dark:from-primary-400 dark:to-indigo-400">Inteligentes</span>
+              {t('rec.title')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-indigo-600 dark:from-primary-400 dark:to-indigo-400">{t('rec.title_highlight')}</span>
             </h2>
-            <p className="text-xs sm:text-sm text-surface-500 dark:text-surface-400">Basadas en tus biomarcadores y objetivos actuales</p>
+            <p className="text-xs sm:text-sm text-surface-500 dark:text-surface-400">{t('rec.subtitle')}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {recommendations.map((rec) => {
-          const visuals = getCardVisuals(rec.category, rec.reason);
+          const visuals = getCardVisuals(rec.category, rec.reason, t);
           const Icon = visuals.icon;
           
           return (
@@ -163,13 +166,13 @@ export function SmartRecommendations() {
 
                 <div className="mt-auto pt-4 border-t border-surface-100 dark:border-surface-700/50 flex items-center justify-between">
                     <span className="text-xs font-semibold text-surface-400 uppercase tracking-wider">
-                        NutriFlow AI Engine
+                        {t('rec.ai_engine')}
                     </span>
                     <Link 
                     href={`/protocols/${rec.doc_id}`}
                     className="flex items-center text-sm font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors group/btn"
                     >
-                    Leer detalle
+                    {t('rec.read_more')}
                     <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover/btn:translate-x-1" />
                     </Link>
                 </div>

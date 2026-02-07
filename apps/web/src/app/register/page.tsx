@@ -9,16 +9,17 @@ import { useRouter } from 'next/navigation';
 import { Utensils, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 const registerSchema = z.object({
-  email: z.string().email('Email inválido'),
+  email: z.string().email('email_invalid'),
   password: z
     .string()
-    .min(8, 'La contraseña debe tener al menos 8 caracteres')
-    .regex(/[!@#$%^&*(),.?":{}|<>]/, 'Debe incluir al menos un carácter especial'),
+    .min(8, 'pwd_min')
+    .regex(/[!@#$%^&*(),.?":{}|<>]/, 'pwd_special'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: 'Las contraseñas no coinciden',
+  message: 'pwd_match',
   path: ['confirmPassword'],
 });
 
@@ -27,6 +28,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function RegisterPage() {
   const router = useRouter();
   const { showToast } = useToast();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -53,7 +55,7 @@ export default function RegisterPage() {
             authError.message.toLowerCase().includes('too many requests') ||
             authError.status === 429) {
           showToast(
-            'Se ha excedido el límite de registros. Por favor, espera unos minutos e intenta nuevamente.', 
+            t('reg.error_rate_limit'), 
             'warning',
             8000
           );
@@ -63,7 +65,7 @@ export default function RegisterPage() {
         // User already exists
         if (authError.message.toLowerCase().includes('already registered') || 
             authError.message.toLowerCase().includes('user already exists')) {
-          showToast('Este email ya está registrado. Te redirigimos al login.', 'info');
+          showToast(t('reg.error_exists'), 'info');
           setTimeout(() => router.push('/login'), 2000);
           return;
         }
@@ -75,18 +77,21 @@ export default function RegisterPage() {
 
       // Registration successful - always redirect to login
       if (authData?.user) {
+        // Force sign out to ensure user logs in manually
+        await supabase.auth.signOut();
+
         // Check if email confirmation is required
         if (!authData.session) {
           // Email confirmation required
           showToast(
-            '¡Cuenta creada! Revisa tu email para verificar tu cuenta antes de iniciar sesión.', 
+            t('reg.success_confirm'), 
             'success',
             6000
           );
         } else {
-          // Auto-login enabled (no email confirmation required)
+          // Auto-login enabled (but we signed out manually)
           showToast(
-            '¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.', 
+            t('reg.success_direct'), 
             'success',
             4000
           );
@@ -100,12 +105,12 @@ export default function RegisterPage() {
       if (err.message?.toLowerCase().includes('rate limit') || 
           err.message?.toLowerCase().includes('too many requests')) {
         showToast(
-          'Se ha excedido el límite de registros. Por favor, espera unos minutos e intenta nuevamente.', 
+          t('reg.error_rate_limit'), 
           'warning',
           8000
         );
       } else {
-        showToast(err.message || 'Error inesperado al registrarse.', 'error');
+        showToast(err.message || t('common.error'), 'error');
       }
     } finally {
       setIsLoading(false);
@@ -128,17 +133,17 @@ export default function RegisterPage() {
         {/* Card */}
         <div className="card animate-scale-in">
           <h1 className="text-xl sm:text-2xl font-heading font-bold text-surface-900 dark:text-white text-center mb-2">
-            Crea tu cuenta
+            {t('reg.title')}
           </h1>
           <p className="text-sm sm:text-base text-surface-600 dark:text-surface-300 text-center mb-6 sm:mb-8">
-            Empieza a generar tu plan nutricional personalizado
+            {t('reg.subtitle')}
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
             {/* Email */}
             <div>
               <label htmlFor="email" className="label">
-                Email
+                {t('auth.login_input_placeholder').split(' o ')[0].split(' or ')[0] || 'Email'}
               </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400 pointer-events-none" />
@@ -146,19 +151,20 @@ export default function RegisterPage() {
                   {...register('email')}
                   type="email"
                   id="email"
-                  placeholder="ejemplo@correo.com"
+                  placeholder="email@example.com"
                   className="input-icon"
+                  autoComplete="email"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-600">{t(`errors.${errors.email.message}`)}</p>
               )}
             </div>
 
             {/* Password */}
             <div>
               <label htmlFor="password" className="label">
-                Contraseña
+                {t('auth.password_label')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400 pointer-events-none" />
@@ -166,19 +172,20 @@ export default function RegisterPage() {
                   {...register('password')}
                   type="password"
                   id="password"
-                  placeholder="Mín. 8 caracteres y un símbolo"
+                  placeholder={t('reg.password_placeholder')}
                   className="input-icon"
+                  autoComplete="new-password"
                 />
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-600">{t(`errors.${errors.password.message}`)}</p>
               )}
             </div>
 
             {/* Confirm Password */}
             <div>
               <label htmlFor="confirmPassword" className="label">
-                Confirmar contraseña
+                {t('reg.confirm_password')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400 pointer-events-none" />
@@ -186,12 +193,13 @@ export default function RegisterPage() {
                   {...register('confirmPassword')}
                   type="password"
                   id="confirmPassword"
-                  placeholder="Repite tu contraseña"
+                  placeholder={t('reg.confirm_placeholder')}
                   className="input-icon"
+                  autoComplete="new-password"
                 />
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+                <p className="mt-1 text-sm text-red-600">{t(`errors.${errors.confirmPassword.message}`)}</p>
               )}
             </div>
 
@@ -205,7 +213,7 @@ export default function RegisterPage() {
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  Crear cuenta
+                  {t('reg.submit')}
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}
@@ -214,15 +222,14 @@ export default function RegisterPage() {
 
           {/* Terms */}
           <p className="mt-6 text-center text-surface-500 dark:text-surface-400 text-sm">
-            Al registrarte, aceptas que las recomendaciones son orientativas 
-            y no sustituyen consejo médico profesional.
+            {t('reg.terms')}
           </p>
 
           {/* Login Link */}
           <p className="mt-4 text-center text-surface-600 dark:text-surface-300">
-            ¿Ya tienes cuenta?{' '}
+            {t('reg.have_account')}{' '}
             <Link href="/login" className="text-primary-600 dark:text-primary-400 font-medium hover:underline">
-              Inicia sesión
+              {t('reg.login_link')}
             </Link>
           </p>
         </div>

@@ -2,6 +2,8 @@
 const nextConfig = {
     reactStrictMode: true,
 
+    typedRoutes: true,
+
     // API rewrites to backend
     async rewrites() {
         return [
@@ -12,10 +14,7 @@ const nextConfig = {
         ];
     },
 
-    // Experimental features
-    experimental: {
-        typedRoutes: true,
-    },
+
 };
 
 module.exports = nextConfig;

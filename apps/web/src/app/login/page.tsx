@@ -9,10 +9,11 @@ import { useRouter } from 'next/navigation';
 import { Utensils, User, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 const loginSchema = z.object({
-  emailOrUsername: z.string().min(3, 'Ingresa tu email o nombre de usuario'),
-  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+  emailOrUsername: z.string().min(3, 'login_input'),
+  password: z.string().min(6, 'login_pwd_min'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -20,6 +21,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function LoginPage() {
   const router = useRouter();
   const { showToast } = useToast();
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -43,7 +45,7 @@ export default function LoginPage() {
           .rpc('get_email_by_username', { p_username: data.emailOrUsername });
 
         if (lookupError || !emailResult) {
-          showToast('Usuario no encontrado. Verifica tu nombre de usuario.', 'error');
+          showToast(t('auth.error_user_not_found'), 'error');
           setIsLoading(false);
           return;
         }
@@ -56,14 +58,14 @@ export default function LoginPage() {
       });
 
       if (authError) {
-        showToast('Credenciales incorrectas. Revisa tu email/usuario y contraseña.', 'error');
+        showToast(t('auth.error_invalid'), 'error');
         return;
       }
 
-      showToast('¡Hola de nuevo! Iniciando sesión...', 'success');
+      showToast(t('common.success'), 'success');
       router.push('/dashboard');
     } catch (err) {
-      showToast('Error inesperado al iniciar sesión.', 'error');
+      showToast(t('common.error'), 'error');
     } finally {
       setIsLoading(false);
     }
@@ -85,17 +87,17 @@ export default function LoginPage() {
         {/* Card */}
         <div className="card animate-scale-in">
           <h1 className="text-xl sm:text-2xl font-heading font-bold text-surface-900 dark:text-white text-center mb-2">
-            Bienvenido de nuevo
+            {t('auth.login_title')}
           </h1>
           <p className="text-sm sm:text-base text-surface-600 dark:text-surface-300 text-center mb-6 sm:mb-8">
-            Inicia sesión para acceder a tu plan
+            {t('auth.login_subtitle')}
           </p>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 sm:space-y-6">
             {/* Email or Username */}
             <div>
               <label htmlFor="emailOrUsername" className="label">
-                Email o nombre de usuario
+                {t('auth.login_input_label')}
               </label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
@@ -103,19 +105,20 @@ export default function LoginPage() {
                   {...register('emailOrUsername')}
                   type="text"
                   id="emailOrUsername"
-                  placeholder="tu@email.com o @username"
+                  placeholder={t('auth.login_input_placeholder')}
                   className="input-icon"
+                  autoComplete="username"
                 />
               </div>
               {errors.emailOrUsername && (
-                <p className="mt-1 text-sm text-red-600">{errors.emailOrUsername.message}</p>
+                <p className="mt-1 text-sm text-red-600">{t(`errors.${errors.emailOrUsername.message}`)}</p>
               )}
             </div>
 
             {/* Password */}
             <div>
               <label htmlFor="password" className="label">
-                Contraseña
+                {t('auth.password_label')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-surface-400" />
@@ -123,12 +126,13 @@ export default function LoginPage() {
                   {...register('password')}
                   type="password"
                   id="password"
-                  placeholder="••••••••"
+                  placeholder={t('auth.password_placeholder')}
                   className="input-icon"
+                  autoComplete="current-password"
                 />
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-600">{t(`errors.${errors.password.message}`)}</p>
               )}
             </div>
 
@@ -142,7 +146,7 @@ export default function LoginPage() {
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 <>
-                  Iniciar sesión
+                  {t('auth.login_submit')}
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}
@@ -151,9 +155,9 @@ export default function LoginPage() {
 
           {/* Footer */}
           <p className="mt-6 text-center text-surface-600 dark:text-surface-300">
-            ¿No tienes cuenta?{' '}
+            {t('auth.no_account')}{' '}
             <Link href="/register" className="text-primary-600 dark:text-primary-400 font-medium hover:underline">
-              Regístrate gratis
+              {t('auth.register_link')}
             </Link>
           </p>
         </div>

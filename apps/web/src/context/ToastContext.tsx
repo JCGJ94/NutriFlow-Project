@@ -12,7 +12,7 @@ export interface Toast {
 }
 
 interface ToastContextType {
-    showToast: (message: string, type: ToastType, duration?: number) => void;
+    showToast: (message: string | string[], type: ToastType, duration?: number) => void;
     hideToast: (id: string) => void;
     toasts: Toast[];
 }
@@ -26,9 +26,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, []);
 
-    const showToast = useCallback((message: string, type: ToastType, duration = 4000) => {
+    const showToast = useCallback((message: string | string[], type: ToastType, duration = 4000) => {
+        const text = Array.isArray(message) ? message.join(', ') : message;
+        // Prevent duplicate toasts
+        const isDuplicate = toasts.some(t => t.message === text && t.type === type);
+        if (isDuplicate) return;
+
         const id = Math.random().toString(36).substring(2, 9);
-        const newToast: Toast = { id, message, type, duration };
+        const newToast: Toast = { id, message: text, type, duration };
 
         setToasts((prev) => [...prev, newToast]);
 
@@ -37,7 +42,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 hideToast(id);
             }, duration);
         }
-    }, [hideToast]);
+    }, [toasts, hideToast]);
 
     return (
         <ToastContext.Provider value={{ showToast, hideToast, toasts }}>

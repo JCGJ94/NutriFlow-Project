@@ -36,7 +36,10 @@ const floatAnimation = {
   }
 };
 
+import { useLanguage } from '@/context/LanguageContext';
+
 export default function LandingPage() {
+  const { t } = useLanguage();
   const { scrollYProgress } = useScroll();
   const heroRef = useRef(null);
   const heroY = useTransform(scrollYProgress, [0, 0.2], [0, -50]);
@@ -64,19 +67,18 @@ export default function LandingPage() {
             <div className="relative z-20 text-center lg:text-left">
               <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 text-sm font-semibold mb-6 border border-primary-100 dark:border-primary-800">
                 <Star className="w-4 h-4 fill-primary-600 dark:fill-primary-300" />
-                <span>La app de nutrición #1 basada en IA</span>
+                <span>{t('landing.hero_badge')}</span>
               </motion.div>
               
               <motion.h1 variants={itemVariants} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-zinc-900 dark:text-white leading-[1.1] tracking-tight mb-6">
-                Tu dieta perfecta,<br />
+                {t('landing.hero_title_1')}<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-indigo-600 dark:from-primary-400 dark:to-indigo-400">
-                  sin complicaciones
+                  {t('landing.hero_title_2')}
                 </span>
               </motion.h1>
               
               <motion.p variants={itemVariants} className="text-base sm:text-lg md:text-xl text-zinc-600 dark:text-zinc-300 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                Genera planes de alimentación, <span className="text-zinc-900 dark:text-white font-medium">rutinas de ejercicio</span> y listas de compra 
-                adaptados a tus objetivos. Todo sincronizado en una plataforma.
+                {t('landing.hero_subtitle')}
               </motion.p>
               
               <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
@@ -84,12 +86,12 @@ export default function LandingPage() {
                   href="/register"
                   className="btn-primary w-full sm:w-auto text-lg px-8 py-4 shadow-lg shadow-primary-500/25 hover:shadow-primary-600/30 flex items-center justify-center gap-2 group"
                 >
-                  Empezar gratis
+                  {t('landing.hero_cta')}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <div className="flex flex-col items-center sm:items-start">
                     <span className="text-xs text-zinc-500 dark:text-zinc-400 mt-2 sm:mt-0 font-medium px-4">
-                        Sin tarjeta de crédito requerida
+                        {t('landing.hero_no_credit')}
                     </span>
                 </div>
               </motion.div>
@@ -111,7 +113,7 @@ export default function LandingPage() {
                         <Star className="w-4 h-4 fill-current" />
                         <Star className="w-4 h-4 fill-current" />
                     </div>
-                    <span>Más de 10,000 usuarios felices</span>
+                    <span>{t('landing.hero_users')}</span>
                  </div>
               </motion.div>
             </div>
@@ -146,7 +148,7 @@ export default function LandingPage() {
                                  <Utensils className="w-4 h-4" />
                              </div>
                              <div>
-                                 <div className="text-xs text-zinc-500">Almuerzo</div>
+                                 <div className="text-xs text-zinc-500">{t('landing.hero_lunch')}</div>
                                  <div className="text-sm font-bold text-zinc-900 dark:text-white">Poke Bowl</div>
                              </div>
                         </div>
@@ -162,8 +164,8 @@ export default function LandingPage() {
                      {/* Floating UI Card 2 - Macros */}
                      <div className="absolute bottom-12 left-8 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-md p-4 rounded-xl shadow-lg border border-zinc-100 dark:border-zinc-700 w-56 animate-float" style={{ animationDelay: '1.5s' }}>
                         <div className="flex justify-between items-end mb-2">
-                             <div className="text-sm font-bold text-zinc-900 dark:text-white">Macros Diarios</div>
-                             <div className="text-xs text-emerald-600 font-medium">+ Perfecto</div>
+                             <div className="text-sm font-bold text-zinc-900 dark:text-white">{t('landing.hero_macros')}</div>
+                             <div className="text-xs text-emerald-600 font-medium">{t('landing.hero_perfect')}</div>
                         </div>
                         <div className="flex gap-2">
                             {['Prot', 'Carbs', 'Grasas'].map((macro, i) => (
@@ -195,7 +197,7 @@ export default function LandingPage() {
                 transition={{ delay: 1, duration: 2, repeat: Infinity }}
                 className="absolute bottom-8 left-1/2 -translate-x-1/2 text-zinc-400 hidden lg:flex flex-col items-center gap-2 cursor-pointer hover:text-primary-600 transition-colors"
             >
-                <span className="text-xs uppercase tracking-widest">Descubre más</span>
+                <span className="text-xs uppercase tracking-widest">{t('landing.hero_discover')}</span>
                 <ChevronDown className="w-4 h-4" />
             </motion.div>
         </Link>
@@ -206,10 +208,10 @@ export default function LandingPage() {
            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                <div className="text-center max-w-3xl mx-auto mb-16">
                    <h2 className="text-3xl font-heading font-bold text-zinc-900 dark:text-white mb-4">
-                       Mucho más que un plan de comidas
+                       {t('landing.features_title')}
                    </h2>
                    <p className="text-lg text-zinc-600 dark:text-zinc-400">
-                       NutriFlow integra <span className="text-primary-600 font-medium">nutrición, ejercicio y organización</span> en una sola plataforma inteligente.
+                       {t('landing.features_subtitle_1')}<span className="text-primary-600 font-medium">{t('landing.features_subtitle_2')}</span>{t('landing.features_subtitle_3')}
                    </p>
                </div>
                
@@ -218,20 +220,17 @@ export default function LandingPage() {
                        {
                            image: "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?q=80&w=2070&auto=format&fit=crop",
                            icon: Target,
-                           title: "Ciencia Nutricional",
-                           desc: "Cálculo preciso de macros y calorías basado en tus datos biométricos reales.",
+                           key: "science"
                        },
                        {
                            image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2070&auto=format&fit=crop",
-                           icon: RefreshCw, // Changed icon to generic refresh or activity
-                           title: "Entrenamiento Inteligente",
-                           desc: "Rutinas de ejercicio generadas por IA que potencian los resultados de tu dieta.",
+                           icon: RefreshCw,
+                           key: "training"
                        },
                        {
                            image: "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1974&auto=format&fit=crop",
                            icon: CheckCircle2,
-                           title: "Lista de Compra",
-                           desc: "Olvídate de listas manuales. Genera tu carrito de supermercado en un clic.",
+                           key: "shopping"
                        }
                    ].map((feature, i) => (
                        <motion.div 
@@ -247,14 +246,14 @@ export default function LandingPage() {
                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
                                <motion.img 
                                    src={feature.image} 
-                                   alt={feature.title}
+                                   alt={t(`landing.feat_${feature.key}_title`)}
                                    className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                                />
                                <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2 text-white">
                                     <div className="p-2 bg-white/20 backdrop-blur-md rounded-lg">
                                         <feature.icon className="w-5 h-5" />
                                     </div>
-                                    <span className="font-bold text-lg">{feature.title}</span>
+                                    <span className="font-bold text-lg">{t(`landing.feat_${feature.key}_title`)}</span>
                                </div>
                            </div>
                            
@@ -264,12 +263,12 @@ export default function LandingPage() {
                                     <feature.icon className="w-24 h-24 text-primary-500" />
                                 </div>
                                 <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed relative z-10">
-                                    {feature.desc}
+                                    {t(`landing.feat_${feature.key}_desc`)}
                                 </p>
                                 
                                 <div className="mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-700 relative z-10">
                                     <span className="text-sm font-semibold text-primary-600 dark:text-primary-400 group-hover:translate-x-2 transition-transform inline-flex items-center gap-1 cursor-pointer">
-                                        Saber más <ArrowRight className="w-4 h-4" />
+                                        {t('landing.feat_learn_more')} <ArrowRight className="w-4 h-4" />
                                     </span>
                                 </div>
                            </div>
@@ -299,9 +298,9 @@ export default function LandingPage() {
                               <div className="text-white">
                                   <div className="flex items-center gap-2 mb-2">
                                       <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                                      <span className="font-semibold">Lista de compra generada</span>
+                                      <span className="font-semibold">{t('landing.how_img_badge')}</span>
                                   </div>
-                                  <p className="text-white/80 text-sm">Ahorra tiempo en el supermercado con tu lista automática.</p>
+                                  <p className="text-white/80 text-sm">{t('landing.how_img_desc')}</p>
                               </div>
                           </div>
                       </div>
@@ -314,32 +313,27 @@ export default function LandingPage() {
                     className="order-1 lg:order-2"
                   >
                       <h2 className="text-3xl lg:text-4xl font-heading font-bold text-zinc-900 dark:text-white mb-6">
-                          Planifica tu éxito,<br/>
-                          <span className="text-primary-600">comida a comida.</span>
+                          {t('landing.how_title_1')}<br/>
+                          <span className="text-primary-600">{t('landing.how_title_2')}</span>
                       </h2>
-                      <p className="text-lg text-zinc-600 dark:text-zinc-400 mb-8">
-                          No dejes tu nutrición al azar. NutriFlow te da el control total sobre tus ingredientes, 
-                          tiempos de comida y preferencias culinarias.
+                      <p className="text-lg text-zinc-600 dark:text-zinc-300 mb-8">
+                          {t('landing.how_desc')}
                       </p>
                       
                       <ul className="space-y-4">
-                          {[
-                              "Lista de ingredientes detallada y exportable",
-                              "Instrucciones de preparación paso a paso",
-                              "Alternativas saludables sugeridas por IA"
-                          ].map((item, i) => (
+                          {[1, 2, 3].map((i) => (
                               <li key={i} className="flex items-center gap-3">
                                   <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center flex-shrink-0">
                                       <CheckCircle2 className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                                   </div>
-                                  <span className="text-zinc-700 dark:text-zinc-300">{item}</span>
+                                  <span className="text-zinc-700 dark:text-zinc-300">{t(`landing.how_item_${i}`)}</span>
                               </li>
                           ))}
                       </ul>
                       
                       <div className="mt-10">
                           <Link href="/register" className="text-primary-600 dark:text-primary-400 font-semibold hover:text-primary-700 flex items-center gap-2 group">
-                              Ver todas las funcionalidades
+                              {t('landing.how_cta')}
                               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                           </Link>
                       </div>
@@ -364,20 +358,20 @@ export default function LandingPage() {
 
               <div className="relative z-10">
                   <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold mb-6">
-                      ¿Listo para transformar tu vida?
+                      {t('landing.cta_title')}
                   </h2>
                   <p className="text-xl text-primary-100 mb-10 max-w-2xl mx-auto">
-                      Únete hoy y obtén tu primer plan nutricional completo en menos de 2 minutos.
+                      {t('landing.cta_desc')}
                   </p>
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                       <Link 
                         href="/register" 
                         className="btn bg-white text-primary-700 hover:bg-zinc-50 font-bold px-8 py-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 w-full sm:w-auto text-lg"
                       >
-                          Crear cuenta gratuita
+                          {t('landing.cta_button')}
                       </Link>
                       <span className="text-sm text-primary-200">
-                          No requiere tarjeta de crédito
+                          {t('landing.cta_no_credit')}
                       </span>
                   </div>
               </div>

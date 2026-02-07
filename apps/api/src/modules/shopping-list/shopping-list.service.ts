@@ -17,7 +17,7 @@ export class ShoppingListService {
         return this.repository.removeItem(itemId);
     }
 
-    async addItem(planId: string, ingredientId: string, grams: number): Promise<void> {
-        return this.repository.addItem(planId, { ingredientId, grams });
+    async addItem(planId: string, item: { ingredientId?: string; customName?: string; grams?: number }): Promise<void> {
+        return this.repository.addItem(planId, item);
     }
 }

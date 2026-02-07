@@ -13,12 +13,14 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useUser } from '@/context/UserContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { ThemeToggle } from './ThemeToggle';
 
 export function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const { user, profile, signOut } = useUser();
+  const { t, language, setLanguage } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -57,18 +59,18 @@ export function Navbar() {
           <nav className="hidden md:flex items-center gap-6">
             {!isDashboard ? (
               <>
-                <a href="/#features" className="nav-link">Características</a>
-                <a href="/#how-it-works" className="nav-link">Cómo funciona</a>
+                <a href="/#features" className="nav-link">{t('nav.features')}</a>
+                <a href="/#how-it-works" className="nav-link">{t('nav.howItWorks')}</a>
               </>
             ) : (
               <>
                 <Link href="/dashboard" className={`nav-link ${pathname === '/dashboard' ? 'text-primary-600 dark:text-primary-400' : ''}`}>
                   <LayoutDashboard className="w-4 h-4 inline mr-1" />
-                  Panel
+                  {t('nav.dashboard')}
                 </Link>
                 <Link href="/plans" className={`nav-link ${pathname.startsWith('/plans') ? 'text-primary-600 dark:text-primary-400' : ''}`}>
                   <Calendar className="w-4 h-4 inline mr-1" />
-                  Planes
+                  {t('nav.plans')}
                 </Link>
               </>
             )}
@@ -76,6 +78,30 @@ export function Navbar() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-3">
+            {/* Premium Language Toggle */}
+            <div className="flex bg-surface-100 dark:bg-surface-800 p-1 rounded-xl items-center relative gap-1 border border-surface-200 dark:border-surface-700 shadow-inner">
+              <button
+                onClick={() => setLanguage('es')}
+                className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold transition-all duration-300 z-10 ${
+                  language === 'es' 
+                    ? 'bg-white dark:bg-surface-700 text-primary-600 dark:text-primary-400 shadow-sm scale-110' 
+                    : 'text-surface-400 hover:text-surface-600 dark:text-surface-500 dark:hover:text-surface-300'
+                }`}
+              >
+                ES
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold transition-all duration-300 z-10 ${
+                  language === 'en' 
+                    ? 'bg-white dark:bg-surface-700 text-primary-600 dark:text-primary-400 shadow-sm scale-110' 
+                    : 'text-surface-400 hover:text-surface-600 dark:text-surface-500 dark:hover:text-surface-300'
+                }`}
+              >
+                EN
+              </button>
+            </div>
+
             <ThemeToggle />
             
             {user ? (
@@ -111,7 +137,7 @@ export function Navbar() {
                         onClick={() => setIsProfileOpen(false)}
                       >
                         <LayoutDashboard className="w-4 h-4" />
-                        Panel
+                        {t('nav.dashboard')}
                       </Link>
                       <Link 
                         href="/settings"
@@ -119,7 +145,7 @@ export function Navbar() {
                         onClick={() => setIsProfileOpen(false)}
                       >
                         <Settings className="w-4 h-4" />
-                        Configuración
+                        {t('nav.settings')}
                       </Link>
                       
                       <div className="h-px bg-surface-50 dark:bg-surface-800 my-2" />
@@ -129,7 +155,7 @@ export function Navbar() {
                         className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
-                        Cerrar sesión
+                        {t('nav.logout')}
                       </button>
                     </div>
                   </>
@@ -138,10 +164,10 @@ export function Navbar() {
             ) : (
               <div className="hidden sm:flex items-center gap-4">
                 <Link href="/login" className="text-sm font-medium text-surface-600 dark:text-surface-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
-                  Entrar
+                  {t('nav.login')}
                 </Link>
                 <Link href="/register" className="btn-primary py-2 px-5 text-sm">
-                  Empezar gratis
+                  {t('nav.startFree')}
                 </Link>
               </div>
             )}
@@ -163,30 +189,30 @@ export function Navbar() {
           <div className="px-4 py-6 space-y-4">
             {!isDashboard ? (
               <>
-                <a href="#features" className="block text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>Características</a>
-                <a href="#how-it-works" className="block text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>Cómo funciona</a>
+                <a href="#features" className="block text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>{t('nav.features')}</a>
+                <a href="#how-it-works" className="block text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>{t('nav.howItWorks')}</a>
               </>
             ) : (
               <>
                 <Link href="/dashboard" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>
                   <LayoutDashboard className="w-5 h-5" />
-                  Panel
+                  {t('nav.dashboard')}
                 </Link>
                  <Link href="/plans" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>
                   <Calendar className="w-5 h-5" />
-                  Planes
+                  {t('nav.plans')}
                 </Link>
                 <Link href="/settings" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>
                   <Settings className="w-5 h-5" />
-                  Configuración
+                  {t('nav.settings')}
                 </Link>
               </>
             )}
             
             {!user && (
               <div className="pt-4 flex flex-col gap-3">
-                <Link href="/login" className="btn-secondary w-full text-center py-3" onClick={() => setIsMenuOpen(false)}>Iniciar sesión</Link>
-                <Link href="/register" className="btn-primary w-full text-center py-3" onClick={() => setIsMenuOpen(false)}>Crear cuenta gratis</Link>
+                <Link href="/login" className="btn-secondary w-full text-center py-3" onClick={() => setIsMenuOpen(false)}>{t('nav.login_mobile')}</Link>
+                <Link href="/register" className="btn-primary w-full text-center py-3" onClick={() => setIsMenuOpen(false)}>{t('nav.register_mobile')}</Link>
               </div>
             )}
           </div>

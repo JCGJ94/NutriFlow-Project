@@ -24,7 +24,11 @@ export class PlansService {
         // Check plan limit (Max 3 plans total)
         const existingPlans = await this.repository.findAllByUser(userId);
         if (existingPlans.length >= 3) {
-            throw new BadRequestException('Has alcanzado el límite máximo de 3 planes. Por favor, elimina uno antes de generar uno nuevo.');
+            // Auto-archive the oldest one to allow new generation
+            const sorted = existingPlans.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            if (sorted.length > 0) {
+                await this.archivePlan(userId, sorted[0].id);
+            }
         }
 
         // Get user profile
@@ -49,6 +53,7 @@ export class PlansService {
             dietPattern: profile.dietPattern,
             weightGoalKg: profile.weightGoalKg,
             allergenIds,
+            language: profile.language,
         };
 
         // Calculate weekStart (must be Monday)
@@ -80,9 +85,12 @@ export class PlansService {
                 );
             }
         } catch (error: any) {
-            console.error('❌ Error generating plan:', error.message);
-            console.error('Stack:', error.stack);
-            throw new BadRequestException(`Error generando el plan: ${error.message}`);
+            console.error('❌ Error generating plan [PlansService]:', error);
+            console.error('Payload:', JSON.stringify(userProfile));
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+            throw new BadRequestException(`Error interno generando el plan: ${error.message || error}`);
         }
 
         // Persist plan

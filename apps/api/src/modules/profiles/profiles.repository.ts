@@ -9,17 +9,31 @@ export class ProfilesRepository {
     constructor(@Inject(SUPABASE_ADMIN) private readonly supabase: SupabaseClient) { }
 
     async findByUserId(userId: string): Promise<ProfileResponseDto | null> {
-        const { data, error } = await this.supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', userId)
-            .single();
+        try {
+            const { data, error } = await this.supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
 
-        if (error || !data) {
-            return null;
+            if (error) {
+                // PGRST116 is "The result contains 0 rows" which is expected if profile doesn't exist
+                if (error.code !== 'PGRST116') {
+                    console.error('Supabase error in findByUserId:', error);
+                }
+                return null;
+            }
+
+            if (!data) {
+                return null;
+            }
+
+            console.log('Raw profile data found:', data);
+            return this.mapToDto(data);
+        } catch (err) {
+            console.error('Unexpected error in findByUserId:', err);
+            throw err;
         }
-
-        return this.mapToDto(data);
     }
 
     async create(userId: string, dto: UpsertProfileDto): Promise<ProfileResponseDto> {
@@ -37,6 +51,7 @@ export class ProfilesRepository {
                 meals_per_day: dto.mealsPerDay ?? 3,
                 diet_pattern: dto.dietPattern ?? DietPattern.OMNIVORE,
                 weight_goal_kg: dto.weightGoalKg,
+                language: dto.language ?? 'es',
             })
             .select()
             .single();
@@ -62,6 +77,7 @@ export class ProfilesRepository {
                 meals_per_day: dto.mealsPerDay,
                 diet_pattern: dto.dietPattern,
                 weight_goal_kg: dto.weightGoalKg,
+                language: dto.language,
                 updated_at: new Date().toISOString(),
             })
             .eq('id', userId)
@@ -140,6 +156,10 @@ export class ProfilesRepository {
     }
 
     private mapToDto(data: any): ProfileResponseDto {
+        if (!data || !data.id) {
+            console.error('Invalid profile data structure:', data);
+            throw new Error('Invalid profile data: missing ID');
+        }
         return {
             id: data.id,
             username: data.username,
@@ -152,6 +172,7 @@ export class ProfilesRepository {
             mealsPerDay: data.meals_per_day,
             dietPattern: data.diet_pattern,
             weightGoalKg: data.weight_goal_kg,
+            language: data.language || 'es',
             createdAt: new Date(data.created_at),
             updatedAt: new Date(data.updated_at),
         };

@@ -30,14 +30,29 @@ export class GeminiService {
         }
     }
 
+    private async withRetry<T>(operation: () => Promise<T>, retries = 3, delay = 2000): Promise<T> {
+        try {
+            return await operation();
+        } catch (error: any) {
+            if (retries > 0 && error.message?.includes('429')) {
+                console.warn(`⚠️ Gemini API Rate Limit (429). Retrying in ${delay}ms... (${retries} attempts left)`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+                return this.withRetry(operation, retries - 1, delay * 2);
+            }
+            throw error;
+        }
+    }
+
     /**
      * Generate text from a prompt
      */
     async generateText(prompt: string): Promise<string> {
         this.checkApiKey();
-        const result = await this.model!.generateContent(prompt);
-        const response = await result.response;
-        return response.text();
+        return this.withRetry(async () => {
+            const result = await this.model!.generateContent(prompt);
+            const response = await result.response;
+            return response.text();
+        });
     }
 
     /**
@@ -46,8 +61,10 @@ export class GeminiService {
      */
     async generateEmbedding(text: string): Promise<number[]> {
         this.checkApiKey();
-        const result = await this.embeddingModel!.embedContent(text);
-        const embedding = result.embedding;
-        return embedding.values;
+        return this.withRetry(async () => {
+            const result = await this.embeddingModel!.embedContent(text);
+            const embedding = result.embedding;
+            return embedding.values;
+        });
     }
 }

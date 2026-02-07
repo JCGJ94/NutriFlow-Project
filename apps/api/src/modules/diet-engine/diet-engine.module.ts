@@ -12,6 +12,12 @@ import { AiDietService } from './ai-diet.service';
 import { NotebooklmMcpService } from './notebooklm-mcp.service';
 
 import { AiDietController } from './ai-diet.controller';
+import { DietNarrationService } from './diet-narration.service';
+import { TranslationBridgeService } from './translation-bridge.service';
+import { LLMRouter } from './llm/llm.router';
+import { GeminiProvider } from './llm/providers/gemini.provider';
+import { OllamaProvider } from './llm/providers/ollama.provider';
+import { NullProvider } from './llm/providers/null.provider';
 
 @Module({
     imports: [IngredientsModule, ProfilesModule, AiModule],
@@ -25,7 +31,14 @@ import { AiDietController } from './ai-diet.controller';
         IngredientSelector,
         AllergenRule,
         DietPatternRule,
+        // ADR-004: Generative AI decoupling
+        DietNarrationService,
+        LLMRouter,
+        GeminiProvider,
+        OllamaProvider,
+        NullProvider,
+        TranslationBridgeService,
     ],
-    exports: [DietEngineService, AiDietService],
+    exports: [DietEngineService, AiDietService, DietNarrationService, TranslationBridgeService],
 })
 export class DietEngineModule { }

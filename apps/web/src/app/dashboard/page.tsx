@@ -16,6 +16,7 @@ import {
 import { createClient } from '@/lib/supabase/client';
 import { SmartRecommendations } from '@/components/dashboard/SmartRecommendations';
 import { useToast } from '@/context/ToastContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface PlanSummary {
   id: string;
@@ -28,6 +29,7 @@ interface PlanSummary {
 export default function DashboardPage() {
   const router = useRouter();
   const { showToast } = useToast();
+  const { t, language } = useLanguage();
   const [plans, setPlans] = useState<PlanSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -57,24 +59,27 @@ export default function DashboardPage() {
         'Content-Type': 'application/json'
       };
 
-      // Check if profile exists first
-      const profileResponse = await fetch('/api/profiles', { headers });
+      console.log('Verifying profile exists...');
+      const profileResponse = await fetch('/api/me/profile', { headers });
       
-      if (profileResponse.status === 404 || profileResponse.status === 406) {
-        // Profile doesn't exist - redirect to onboarding
-        console.log('Profile not found, redirecting to onboarding...');
-        showToast('Por favor, completa tu perfil para continuar.', 'info');
+      if (!profileResponse.ok) {
+        const errorText = await profileResponse.text();
+        console.error('Failed to fetch profile:', profileResponse.status, errorText);
+        showToast(t('dash.profile_error'), 'error');
+        return;
+      }
+
+      const profileData = await profileResponse.json().catch(() => null);
+      
+      if (!profileData || !profileData.id) {
+        console.log('Profile missing or incomplete, redirecting to onboarding...');
+        showToast(t('dash.welcome_new'), 'info');
         router.push('/onboarding');
         return;
       }
 
-      if (!profileResponse.ok) {
-        console.error('Failed to fetch profile:', profileResponse.status);
-        showToast('Error al cargar tu perfil. Por favor, intenta nuevamente.', 'error');
-        return;
-      }
+      console.log('Profile verified successfully.');
 
-      // Fetch plans
       const response = await fetch('/api/plans', { headers });
       if (response.ok) {
         const text = await response.text();
@@ -87,7 +92,7 @@ export default function DashboardPage() {
       }
     } catch (error) {
       console.error('Error loading data:', error);
-      showToast('Error al cargar el dashboard.', 'error');
+      showToast(t('common.error'), 'error');
     } finally {
       setIsLoading(false);
     }
@@ -101,7 +106,7 @@ export default function DashboardPage() {
       const token = session?.access_token;
 
       if (!token) {
-        showToast('No se encontró sesión activa', 'error');
+        showToast(t('auth.error_invalid'), 'error');
         return;
       }
 
@@ -118,22 +123,22 @@ export default function DashboardPage() {
         const text = await response.text();
         if (text) {
           const plan = JSON.parse(text);
-          showToast('Plan generado con éxito', 'success');
+          showToast(t('dash.gen_success'), 'success');
           router.push(`/plan/${plan.id}`);
         }
       } else {
-        showToast('Error al generar el plan', 'error');
+        showToast(t('dash.gen_error'), 'error');
       }
     } catch (error) {
       console.error('Error generating plan:', error);
-      showToast('Ocurrió un error inesperado', 'error');
+      showToast(t('common.error'), 'error');
     } finally {
       setIsGenerating(false);
     }
   };
 
   const deletePlan = async (planId: string) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este plan?')) return;
+    if (!confirm(t('dash.delete_confirm'))) return;
     
     setIsDeleting(planId);
     try {
@@ -152,13 +157,13 @@ export default function DashboardPage() {
 
         if (response.ok) {
             setPlans(plans.filter(p => p.id !== planId));
-            showToast('Plan eliminado correctamente', 'success');
+            showToast(t('dash.delete_success'), 'success');
         } else {
-            showToast('Error al eliminar el plan', 'error');
+            showToast(t('dash.delete_error'), 'error');
         }
     } catch (error) {
         console.error('Error deleting plan:', error);
-        showToast('Ocurrió un error al eliminar', 'error');
+        showToast(t('common.error'), 'error');
     } finally {
         setIsDeleting(null);
     }
@@ -179,10 +184,10 @@ export default function DashboardPage() {
         {/* Welcome */}
         <div className="mb-6 sm:mb-8">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-surface-900 dark:text-white mb-2">
-            ¡Bienvenido a tu panel!
+            {t('dash.welcome')}
           </h1>
           <p className="text-sm sm:text-base text-surface-600 dark:text-surface-300">
-            Gestiona tus planes de dieta y listas de compra
+            {t('dash.subtitle')}
           </p>
         </div>
         <SmartRecommendations />
@@ -206,10 +211,10 @@ export default function DashboardPage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-heading font-semibold text-surface-900 dark:text-white mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                  Generar con NutriFlow IA
+                  {t('dash.generate_plan')}
                 </h3>
                 <p className="text-surface-600 dark:text-surface-300 text-sm">
-                  Crea un plan inteligente adaptado a tus metas
+                  {t('dash.generate_subtitle')}
                 </p>
               </div>
               <ChevronRight className="w-5 h-5 text-surface-400 group-hover:text-primary-600 transition-colors" />
@@ -229,10 +234,10 @@ export default function DashboardPage() {
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-heading font-semibold text-surface-900 dark:text-white mb-1 group-hover:text-surface-700 dark:group-hover:text-surface-200 transition-colors">
-                  Configurar perfil
+                  {t('dash.configure_profile')}
                 </h3>
                 <p className="text-surface-600 dark:text-surface-300 text-sm">
-                  Actualiza tus datos y preferencias
+                  {t('dash.configure_subtitle')}
                 </p>
               </div>
               <ChevronRight className="w-5 h-5 text-surface-400 group-hover:text-surface-600 transition-colors" />
@@ -245,13 +250,13 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-heading font-semibold text-surface-900 dark:text-white flex items-center gap-2">
               <Calendar className="w-5 h-5 text-primary-500" />
-              Plan Activo
+              {t('dash.active_plan')}
             </h2>
             <Link 
               href="/plans"
               className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 flex items-center gap-1"
             >
-              Ver historial <ChevronRight className="w-4 h-4" />
+              {t('dash.view_history')} <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
 
@@ -261,10 +266,10 @@ export default function DashboardPage() {
                   <Calendar className="w-8 h-8 text-surface-400" />
               </div>
               <h3 className="text-lg font-medium text-surface-700 dark:text-surface-200 mb-2">
-                No tienes un plan activo
+                {t('dash.no_active_plan')}
               </h3>
               <p className="text-surface-500 dark:text-surface-400 mb-6 max-w-sm mx-auto">
-                Genera tu primer plan nutricional inteligente para comenzar tu transformación.
+                {t('dash.no_plan_subtitle')}
               </p>
               <button
                 onClick={generateNewPlan}
@@ -276,73 +281,92 @@ export default function DashboardPage() {
                 ) : (
                   <Sparkles className="w-4 h-4" />
                 )}
-                Generar mi primer plan
+                {t('dash.generate_plan')}
               </button>
             </div>
           ) : (
             <div className="space-y-4">
-              {plans.filter(p => p.status === 'active').map((plan) => (
+               {plans.filter(p => p.status === 'active').map((plan) => (
                 <div
                   key={plan.id}
                   onClick={() => router.push(`/plan/${plan.id}`)}
-                  className="group relative overflow-hidden card p-0 flex flex-col md:flex-row cursor-pointer border-primary-200 dark:border-primary-800 hover:border-primary-400 dark:hover:border-primary-600 transition-all bg-white dark:bg-surface-800"
+                  className="group relative overflow-hidden rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 p-6 md:p-8 transition-all hover:shadow-xl hover:border-primary-200 dark:hover:border-primary-800 cursor-pointer"
                 >
-                  <div className="absolute top-0 left-0 w-full h-1 md:w-1 md:h-full bg-primary-500"></div>
-                  
-                  <div className="p-6 flex-1 flex items-center gap-6">
-                      <div className="w-16 h-16 rounded-2xl bg-primary-50 dark:bg-primary-900/20 flex flex-col items-center justify-center text-primary-600 dark:text-primary-400 flex-shrink-0">
-                        <span className="text-xs font-bold uppercase tracking-wider">Semana</span>
-                        <span className="text-lg font-bold">{new Date(plan.weekStart).getDate()}</span>
-                      </div>
-                      
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-heading font-bold text-lg text-surface-900 dark:text-white">
-                                Plan Nutricional Inteligente
-                            </h3>
-                            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
-                                En curso
-                            </span>
-                        </div>
-                        <p className="text-surface-600 dark:text-surface-400 text-sm flex items-center gap-4">
-                            <span className="flex items-center gap-1"><Target className="w-3 h-3" /> {plan.targetKcal} kcal</span>
-                            <span className="hidden sm:inline text-surface-300">|</span>
-                            <span>Creado el {new Date(plan.createdAt).toLocaleDateString()}</span>
-                        </p>
-                      </div>
-                  </div>
+                  {/* Subtle Background Decoration */}
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-primary-50 dark:bg-primary-900/10 rounded-full blur-3xl -mr-32 -mt-32 opacity-50 pointer-events-none"></div>
 
-                  <div className="bg-surface-50 dark:bg-surface-900/50 p-4 md:px-6 flex items-center justify-between md:justify-end gap-3 border-t md:border-t-0 md:border-l border-surface-100 dark:border-surface-700">
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            router.push(`/shopping-list/${plan.id}`);
-                        }}
-                        className="btn-secondary text-xs py-2 flex items-center gap-2"
-                    >
-                        <ShoppingCart className="w-4 h-4" />
-                        Lista
-                    </button>
-                    
-                     <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            deletePlan(plan.id);
-                        }}
-                        disabled={isDeleting === plan.id}
-                        className="p-2 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                        title="Eliminar plan"
-                    >
-                        {isDeleting === plan.id ? (
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                            <Trash2 className="w-5 h-5" />
-                        )}
-                    </button>
-                    
-                    <div className="hidden md:block text-surface-300">
-                        <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                    </div>
+                  <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                      <div className="flex items-start gap-6">
+                           {/* Date Box */}
+                          <div className="flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-surface-50 dark:bg-surface-700 border border-surface-100 dark:border-surface-600 shadow-sm text-surface-900 dark:text-white">
+                             <span className="text-[10px] font-bold uppercase tracking-wider text-surface-500">
+                               {t('dash.week')}
+                             </span>
+                             <span className="text-2xl font-bold font-heading">{new Date(plan.weekStart).getDate()}</span>
+                          </div>
+                          
+                          <div>
+                            <div className="flex items-center gap-3 mb-2">
+                                <h3 className="font-heading font-bold text-xl md:text-2xl text-surface-900 dark:text-white">
+                                    {t('dash.smart_plan_title')}
+                                </h3>
+                                <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800">
+                                    <span className="relative flex h-2 w-2">
+                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    </span>
+                                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                                      {t('dash.in_progress')}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-surface-500 dark:text-surface-400">
+                                <span className="flex items-center gap-2">
+                                    <Target className="w-4 h-4 text-primary-500" />
+                                    <span className="font-medium text-surface-700 dark:text-surface-300">{plan.targetKcal} kcal</span> {t('dash.daily')}
+                                </span>
+                                <span className="hidden sm:inline w-1 h-1 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+                                <span>
+                                  {t('dash.created')} {new Date(plan.createdAt).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                </span>
+                            </div>
+                          </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 mt-2 md:mt-0 pl-22 md:pl-0">
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(`/shopping-list/${plan.id}`);
+                            }}
+                            className="relative overflow-hidden inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-200 font-medium shadow-sm hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-all group/btn"
+                        >
+                            <span className="absolute inset-0 bg-primary-50 dark:bg-primary-900/20 opacity-0 group-hover/btn:opacity-100 transition-opacity"></span>
+                            <ShoppingCart className="w-4 h-4" />
+                            <span>{t('dash.shopping_list')}</span>
+                        </button>
+                        
+                         <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                deletePlan(plan.id);
+                            }}
+                            disabled={isDeleting === plan.id}
+                            className="p-2.5 rounded-xl text-surface-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                            title={t('common.delete')}
+                        >
+                            {isDeleting === plan.id ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                                <Trash2 className="w-5 h-5" />
+                            )}
+                        </button>
+                        
+                        <div className="hidden lg:flex items-center justify-center w-10 h-10 rounded-full border border-transparent group-hover:border-surface-200 dark:group-hover:border-surface-700 text-surface-300 group-hover:text-primary-600 transition-all">
+                            <ChevronRight className="w-5 h-5" />
+                        </div>
+                      </div>
                   </div>
                 </div>
               ))}

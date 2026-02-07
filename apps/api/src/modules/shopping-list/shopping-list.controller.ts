@@ -23,8 +23,8 @@ export class ShoppingListController {
     @Post(':planId/items')
     async addItem(
         @Param('planId') planId: string,
-        @Body() body: { ingredientId: string; grams: number },
+        @Body() body: { ingredientId?: string; customName?: string; grams?: number },
     ) {
-        return this.shoppingListService.addItem(planId, body.ingredientId, body.grams);
+        return this.shoppingListService.addItem(planId, body);
     }
 }

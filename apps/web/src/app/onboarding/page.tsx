@@ -13,14 +13,26 @@ import {
   User,
   Activity,
   Target,
+  Shield,
+  Check,
   AlertTriangle,
 } from 'lucide-react';
 import { Sex, ActivityLevel, DietPattern } from '@nutriflow/shared';
 import { createClient } from '@/lib/supabase/client';
+import { useToast } from '@/context/ToastContext';
+import { useUser } from '@/context/UserContext';
+import { useLanguage } from '@/context/LanguageContext';
+
+interface Allergen {
+  id: string;
+  name: string;
+  description?: string;
+}
 
 const profileSchema = z.object({
-  fullName: z.string().min(2, 'Escribe tu nombre'),
-  age: z.number().min(18, 'Debes tener al menos 18 años').max(100),
+  username: z.string().min(3, 'username_short').max(20)
+    .regex(/^[a-zA-Z0-9_]+$/, 'username_chars'),
+  age: z.number().min(18, 'age_min').max(100),
   sex: z.nativeEnum(Sex),
   weightKg: z.number().min(30).max(300),
   heightCm: z.number().min(100).max(250),
@@ -28,21 +40,28 @@ const profileSchema = z.object({
   mealsPerDay: z.number().min(2).max(6),
   dietPattern: z.nativeEnum(DietPattern),
   weightGoalKg: z.number().min(30).max(300).optional(),
+  allergenIds: z.array(z.string()).default([]),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-const STEPS = [
-  { id: 'basics', title: 'Datos básicos', icon: User },
-  { id: 'activity', title: 'Actividad', icon: Activity },
-  { id: 'goals', title: 'Objetivos', icon: Target },
-];
-
 export default function OnboardingPage() {
   const router = useRouter();
+  const { showToast } = useToast();
+  const { refreshProfile } = useUser();
+  const { t } = useLanguage();
+
+  const STEPS = [
+    { id: 'basics', title: t('onboarding.step_basics'), icon: User },
+    { id: 'activity', title: t('onboarding.step_activity'), icon: Activity },
+    { id: 'goals', title: t('onboarding.step_goals'), icon: Target },
+    { id: 'allergens', title: t('onboarding.step_allergens'), icon: Shield },
+  ];
+
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [defaultUsername, setDefaultUsername] = useState<string>('');
+  const [allergens, setAllergens] = useState<Allergen[]>([]);
+  const [loadingStep, setLoadingStep] = useState<string>('');
 
   const {
     register,
@@ -56,48 +75,57 @@ export default function OnboardingPage() {
       mealsPerDay: 3,
       dietPattern: DietPattern.OMNIVORE,
       activityLevel: ActivityLevel.MODERATELY_ACTIVE,
+      allergenIds: [],
     },
   });
-
+  
   const currentWeight = watch('weightKg');
+  const selectedAllergens = watch('allergenIds');
 
-  // Generate default username from email
+  // Load allergens and generate username
   useEffect(() => {
-    async function generateUsername() {
+    async function init() {
+      // 1. Fetch Allergens
+      try {
+        const res = await fetch('/api/allergens');
+        if (res.ok) {
+           const data = await res.json();
+           setAllergens(data);
+        }
+      } catch (err) {
+        console.error('Error loading allergens', err);
+      }
+
+      // 2. Generate Username Suggestion (if empty)
       try {
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user?.email) {
-          // Extract username from email (part before @)
           const emailPrefix = user.email.split('@')[0];
-          // Clean and format: remove special chars, lowercase
           const cleanUsername = emailPrefix
             .replace(/[^a-zA-Z0-9]/g, '_')
             .toLowerCase()
-            .substring(0, 20); // Limit length
+            .substring(0, 15);
           
-          // Add random suffix to ensure uniqueness
           const randomSuffix = Math.floor(Math.random() * 1000);
-          const username = `${cleanUsername}${randomSuffix}`;
-          
-          setDefaultUsername(username);
+          const usernameSuggestion = `${cleanUsername}${randomSuffix}`;
+          console.log('Username suggestion:', usernameSuggestion);
         }
       } catch (error) {
-        console.error('Error generating username:', error);
-        setDefaultUsername(`user${Math.floor(Math.random() * 10000)}`);
+        console.error('Error getting user', error);
       }
     }
-
-    generateUsername();
+    init();
   }, []);
 
   const nextStep = async () => {
     // Validate current step fields
     const fieldsToValidate: (keyof ProfileFormData)[][] = [
-      ['fullName', 'age', 'sex', 'weightKg', 'heightCm'],
+      ['username', 'age', 'sex', 'weightKg', 'heightCm'],
       ['activityLevel', 'mealsPerDay'],
       ['dietPattern', 'weightGoalKg'],
+      ['allergenIds'],
     ];
 
     const isValid = await trigger(fieldsToValidate[currentStep]);
@@ -112,27 +140,98 @@ export default function OnboardingPage() {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && currentStep < STEPS.length - 1) {
+      e.preventDefault();
+      nextStep();
+    }
+  };
+
   const onSubmit = async (data: ProfileFormData) => {
     setIsLoading(true);
+    setLoadingStep(t('onboarding.loading_profile'));
+    
     try {
-      const response = await fetch('/api/me/profile', {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) throw new Error('No session');
+
+      const headers = { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      };
+
+      // 1. Save Profile (Sanitize data to exclude fields not in DTO)
+      const { allergenIds, ...profileData } = data;
+      
+      console.log('Saving profile data:', profileData);
+      
+      const profileRes = await fetch('/api/me/profile', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...data,
-          username: defaultUsername, // Include generated username
-        }),
+        headers,
+        body: JSON.stringify(profileData),
       });
 
-      if (response.ok) {
-        router.push('/dashboard');
-      } else {
-        console.error('Failed to save profile:', response.status);
+      if (!profileRes.ok) {
+        const errorData = await profileRes.json().catch(() => ({}));
+        console.error('Profile save error:', errorData);
+        throw new Error(errorData.message || 'Error saving profile');
       }
-    } catch (error) {
-      console.error('Error saving profile:', error);
+
+      // Sync Navbar / Profile immediately
+      await refreshProfile();
+
+      // 2. Save Allergens (if any)
+      if (allergenIds && allergenIds.length > 0) {
+        setLoadingStep(t('onboarding.loading_allergens'));
+        console.log('Saving allergens:', allergenIds);
+        const allergensRes = await fetch('/api/me/allergens', {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ allergenIds }),
+        });
+        
+        if (!allergensRes.ok) {
+          console.warn('Error saving allergens, but continuing...');
+        }
+      }
+
+      // 3. Generate Plan
+      setLoadingStep(t('onboarding.loading_plan'));
+      const planRes = await fetch('/api/plans/generate-week', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ useAi: true }),
+      });
+
+      if (planRes.ok) {
+        const plan = await planRes.json();
+        showToast(t('onboarding.success'), 'success');
+        router.push(`/plan/${plan.id}`);
+      } else {
+        // Detect Quota Error (429 or nested in 400/500)
+        const errorData = await planRes.json().catch(() => ({}));
+        const isQuotaError = planRes.status === 429 || 
+                           JSON.stringify(errorData).toLowerCase().includes('quota');
+
+        if (isQuotaError) {
+          showToast(t('onboarding.quota_error'), 'warning');
+        } else {
+          showToast(t('onboarding.gen_error'), 'warning');
+        }
+        
+        console.warn('Plan generation non-ideal response:', planRes.status, errorData);
+        router.push('/dashboard'); 
+      }
+
+    } catch (error: any) {
+      console.error('Error in onboarding:', error);
+      showToast(error.message || 'Error al completar el registro.', 'error');
     } finally {
       setIsLoading(false);
+      setLoadingStep('');
     }
   };
 
@@ -148,10 +247,10 @@ export default function OnboardingPage() {
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-heading font-bold text-surface-900 dark:text-white mb-2">
-            Configura tu perfil
+            {t('onboarding.title')}
           </h1>
           <p className="text-sm sm:text-base text-surface-600 dark:text-surface-300">
-            Necesitamos algunos datos para crear tu plan personalizado
+            {t('onboarding.subtitle')}
           </p>
         </div>
 
@@ -185,25 +284,29 @@ export default function OnboardingPage() {
             {STEPS[currentStep].title}
           </h2>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form 
+            onSubmit={handleSubmit(onSubmit)} 
+            onKeyDown={handleKeyDown}
+            className="space-y-6"
+          >
             {/* Step 1: Basics */}
             {currentStep === 0 && (
               <>
                 <div className="mb-4">
-                  <label className="label">Nombre completo</label>
+                  <label className="label">{t('onboarding.username_label')}</label>
                   <input
-                    {...register('fullName')}
+                    {...register('username')}
                     type="text"
                     className="input"
-                    placeholder="Tu nombre y apellidos"
+                    placeholder="nutri_user"
                   />
-                  {errors.fullName && (
-                    <p className="mt-1 text-sm text-red-600">{errors.fullName.message}</p>
+                  {errors.username && (
+                    <p className="mt-1 text-sm text-red-600">{t(`errors.${errors.username.message}`)}</p>
                   )}
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="label">Edad</label>
+                    <label className="label">{t('onboarding.age_label')}</label>
                     <input
                       {...register('age', { valueAsNumber: true })}
                       type="number"
@@ -211,20 +314,20 @@ export default function OnboardingPage() {
                       placeholder="30"
                     />
                     {errors.age && (
-                      <p className="mt-1 text-sm text-red-600">{errors.age.message}</p>
+                      <p className="mt-1 text-sm text-red-600">{t(`errors.${errors.age.message}`)}</p>
                     )}
                   </div>
                   <div>
-                    <label className="label">Sexo biológico</label>
+                    <label className="label">{t('onboarding.sex_label')}</label>
                     <select {...register('sex')} className="input">
-                      <option value={Sex.MALE}>Masculino</option>
-                      <option value={Sex.FEMALE}>Femenino</option>
+                      <option value={Sex.MALE}>{t('onboarding.sex_male')}</option>
+                      <option value={Sex.FEMALE}>{t('onboarding.sex_female')}</option>
                     </select>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="label">Peso actual (kg)</label>
+                    <label className="label">{t('onboarding.weight_label')}</label>
                     <input
                       {...register('weightKg', { valueAsNumber: true })}
                       type="number"
@@ -233,11 +336,11 @@ export default function OnboardingPage() {
                       placeholder="75"
                     />
                     {errors.weightKg && (
-                      <p className="mt-1 text-sm text-red-600">{errors.weightKg.message}</p>
+                      <p className="mt-1 text-sm text-red-600">{t(`errors.${errors.weightKg.message}`) || errors.weightKg.message}</p>
                     )}
                   </div>
                   <div>
-                    <label className="label">Altura (cm)</label>
+                    <label className="label">{t('onboarding.height_label')}</label>
                     <input
                       {...register('heightCm', { valueAsNumber: true })}
                       type="number"
@@ -245,7 +348,7 @@ export default function OnboardingPage() {
                       placeholder="175"
                     />
                     {errors.heightCm && (
-                      <p className="mt-1 text-sm text-red-600">{errors.heightCm.message}</p>
+                      <p className="mt-1 text-sm text-red-600">{t(`errors.${errors.heightCm.message}`) || errors.heightCm.message}</p>
                     )}
                   </div>
                 </div>
@@ -256,31 +359,31 @@ export default function OnboardingPage() {
             {currentStep === 1 && (
               <>
                 <div>
-                  <label className="label">Nivel de actividad física</label>
+                  <label className="label">{t('onboarding.activity_label')}</label>
                   <select {...register('activityLevel')} className="input">
                     <option value={ActivityLevel.SEDENTARY}>
-                      Sedentario (poco o nada de ejercicio)
+                      {t('onboarding.activity_sedentary')}
                     </option>
                     <option value={ActivityLevel.LIGHTLY_ACTIVE}>
-                      Ligeramente activo (1-3 días/semana)
+                      {t('onboarding.activity_light')}
                     </option>
                     <option value={ActivityLevel.MODERATELY_ACTIVE}>
-                      Moderadamente activo (3-5 días/semana)
+                      {t('onboarding.activity_moderate')}
                     </option>
                     <option value={ActivityLevel.VERY_ACTIVE}>
-                      Muy activo (6-7 días/semana)
+                      {t('onboarding.activity_very')}
                     </option>
                     <option value={ActivityLevel.EXTREMELY_ACTIVE}>
-                      Extremadamente activo (ejercicio intenso diario)
+                      {t('onboarding.activity_extreme')}
                     </option>
                   </select>
                 </div>
                 <div>
-                  <label className="label">Comidas por día</label>
+                  <label className="label">{t('onboarding.meals_label')}</label>
                   <select {...register('mealsPerDay', { valueAsNumber: true })} className="input">
-                    <option value={3}>3 comidas (desayuno, almuerzo, cena)</option>
-                    <option value={4}>4 comidas (+ 1 snack)</option>
-                    <option value={5}>5 comidas (+ 2 snacks)</option>
+                    <option value={3}>{t('onboarding.meals_3')}</option>
+                    <option value={4}>{t('onboarding.meals_4')}</option>
+                    <option value={5}>{t('onboarding.meals_5')}</option>
                   </select>
                 </div>
               </>
@@ -290,16 +393,16 @@ export default function OnboardingPage() {
             {currentStep === 2 && (
               <>
                 <div>
-                  <label className="label">Patrón de dieta</label>
+                  <label className="label">{t('onboarding.diet_label')}</label>
                   <select {...register('dietPattern')} className="input">
-                    <option value={DietPattern.OMNIVORE}>Omnívoro (como de todo)</option>
-                    <option value={DietPattern.VEGETARIAN}>Vegetariano</option>
-                    <option value={DietPattern.VEGAN}>Vegano</option>
-                    <option value={DietPattern.PESCATARIAN}>Pescatariano</option>
+                    <option value={DietPattern.OMNIVORE}>{t('onboarding.diet_omnivore')}</option>
+                    <option value={DietPattern.VEGETARIAN}>{t('onboarding.diet_vegetarian')}</option>
+                    <option value={DietPattern.VEGAN}>{t('onboarding.diet_vegan')}</option>
+                    <option value={DietPattern.PESCATARIAN}>{t('onboarding.diet_pescatarian')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="label">Peso objetivo (kg)</label>
+                  <label className="label">{t('onboarding.goal_weight_label')}</label>
                   <input
                     {...register('weightGoalKg', { valueAsNumber: true })}
                     type="number"
@@ -308,20 +411,99 @@ export default function OnboardingPage() {
                     placeholder={currentWeight ? String(currentWeight - 5) : '70'}
                   />
                   <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
-                    Peso actual: {currentWeight || '--'} kg
+                    {t('onboarding.current_weight_ref')}: {currentWeight || '--'} kg
                   </p>
                 </div>
 
                 {/* Disclaimer */}
-                <div className="flex gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                <div className="flex gap-3 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl">
                   <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-amber-800">
-                    Las recomendaciones de NutriFlow son orientativas y no sustituyen 
-                    el consejo de un profesional de la salud. Consulta con tu médico 
-                    antes de iniciar cualquier plan dietético.
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    {t('onboarding.disclaimer')}
                   </p>
                 </div>
               </>
+            )}
+
+             {/* Step 4: Allergens */}
+             {currentStep === 3 && (
+              <div className="space-y-4">
+                <p className="text-surface-600 dark:text-surface-300 mb-4">
+                  {t('onboarding.allergens_desc')}
+                </p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {allergens.length === 0 && (
+                    <div className="col-span-2 text-center py-6 text-surface-500">
+                      {t('onboarding.allergens_none_found')}
+                    </div>
+                  )}
+                  {allergens.map((allergen) => (
+                    <label 
+                      key={allergen.id}
+                      className={`relative flex items-center p-4 border rounded-xl cursor-pointer transition-all ${
+                        selectedAllergens?.includes(allergen.id)
+                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                          : 'border-surface-200 dark:border-surface-700 hover:border-surface-300'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        value={allergen.id}
+                        {...register('allergenIds')}
+                        className="sr-only"
+                      />
+                      <div className="flex-1">
+                         <span className={`font-medium ${
+                            selectedAllergens?.includes(allergen.id)
+                            ? 'text-primary-700 dark:text-primary-300' 
+                            : 'text-surface-700 dark:text-surface-200'
+                         }`}>
+                           {allergen.name}
+                         </span>
+                         {allergen.description && (
+                            <p className="text-xs text-surface-500 mt-0.5">{allergen.description}</p>
+                         )}
+                      </div>
+                      {selectedAllergens?.includes(allergen.id) && (
+                        <Check className="w-5 h-5 text-primary-600" />
+                      )}
+                    </label>
+                  ))}
+                </div>
+
+                 <div className="flex gap-3 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl mt-6">
+                  <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    {t('onboarding.disclaimer')}
+                  </p>
+                </div>
+
+                {/* Explicit Confirmation Block */}
+                <div className="mt-8 p-6 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-700">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      selectedAllergens?.length > 0 
+                        ? 'bg-amber-100 text-amber-600' 
+                        : 'bg-green-100 text-green-600'
+                    }`}>
+                      {selectedAllergens?.length > 0 ? <Shield className="w-6 h-6" /> : <Check className="w-6 h-6" />}
+                    </div>
+                    <div>
+                      <h3 className="font-heading font-bold text-surface-900 dark:text-white">
+                        {selectedAllergens?.length > 0 
+                          ? `${selectedAllergens.length} ${t('onboarding.allergens_selected')}` 
+                          : t('onboarding.allergens_none_selected')}
+                      </h3>
+                      <p className="text-sm text-surface-600 dark:text-surface-400">
+                        {selectedAllergens?.length > 0 
+                          ? t('onboarding.allergens_plan_avoid') 
+                          : t('onboarding.allergens_plan_confirm')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* Navigation */}
@@ -333,7 +515,7 @@ export default function OnboardingPage() {
                   className="btn-secondary flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  Anterior
+                  {t('onboarding.nav_prev')}
                 </button>
               ) : (
                 <div />
@@ -345,7 +527,7 @@ export default function OnboardingPage() {
                   onClick={nextStep}
                   className="btn-primary flex items-center gap-2"
                 >
-                  Siguiente
+                  {t('onboarding.nav_next')}
                   <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
@@ -355,11 +537,14 @@ export default function OnboardingPage() {
                   className="btn-primary flex items-center gap-2"
                 >
                   {isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span className="text-sm">{loadingStep}</span>
+                    </>
                   ) : (
                     <>
-                      Crear mi plan
-                      <ArrowRight className="w-4 h-4" />
+                      {t('onboarding.nav_submit')}
+                      <SparklesIcon className="w-4 h-4" />
                     </>
                   )}
                 </button>
@@ -370,4 +555,22 @@ export default function OnboardingPage() {
       </div>
     </div>
   );
+}
+
+// Helper component since we don't import Sparkles but used it in last button
+function SparklesIcon({ className }: { className?: string }) {
+    return (
+        <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            className={className}
+        >
+            <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+        </svg>
+    )
 }

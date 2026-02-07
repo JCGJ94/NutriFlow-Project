@@ -54,6 +54,11 @@ export class UpsertProfileDto {
     @Min(30)
     @Max(300)
     weightGoalKg?: number;
+
+    @ApiPropertyOptional({ description: 'Idioma preferido', example: 'es', default: 'es' })
+    @IsOptional()
+    @IsEnum(['es', 'en'])
+    language?: 'es' | 'en';
 }
 
 export class SetAllergensDto {
@@ -95,6 +100,9 @@ export class ProfileResponseDto {
 
     @ApiPropertyOptional()
     weightGoalKg?: number;
+
+    @ApiProperty()
+    language!: 'es' | 'en';
 
     @ApiProperty()
     createdAt!: Date;

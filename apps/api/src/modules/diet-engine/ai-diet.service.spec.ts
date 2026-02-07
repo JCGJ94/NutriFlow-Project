@@ -1,60 +1,42 @@
-import { Sex, ActivityLevel, DietPattern } from '@nutriflow/shared';
 import { AiDietService } from './ai-diet.service';
+import { DietNarrationService } from './diet-narration.service';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { UserProfile, GeneratedWeekPlan } from './types';
 
-describe('AiDietService Manual Test', () => {
+describe('AiDietService', () => {
     let service: AiDietService;
-    let geminiMock: any;
-    let mcpMock: any;
-    let configMock: any;
+    let narrationServiceMock: any;
 
-    const mockProfile: any = {
+    const mockProfile: UserProfile = {
         id: 'user-123',
         age: 30,
-        sex: Sex.MALE,
-        weightKg: 80,
-        heightCm: 180,
-        activityLevel: ActivityLevel.MODERATELY_ACTIVE,
-        mealsPerDay: 3,
-        dietPattern: DietPattern.MEDITERRANEAN,
-        allergenIds: [],
-    };
+    } as any;
 
     beforeEach(() => {
-        geminiMock = { generateText: vi.fn() };
-        mcpMock = { query: vi.fn() };
-        configMock = { get: vi.fn().mockReturnValue('mock-id') };
+        narrationServiceMock = {
+            narrateWeekPlan: vi.fn(),
+        };
 
-        // Manual instantiation
-        service = new AiDietService(geminiMock, mcpMock, configMock);
+        service = new AiDietService(narrationServiceMock as unknown as DietNarrationService);
     });
 
     it('should be defined', () => {
         expect(service).toBeDefined();
     });
 
-    it('should call generateText with context', async () => {
-        const mockResponse = JSON.stringify({
-            weekStart: '2026-02-10',
-            targetKcal: 2500,
-            targetProtein: 150,
-            targetCarbs: 250,
-            targetFat: 80,
-            days: []
-        });
-
-        geminiMock.generateText.mockResolvedValue(mockResponse);
-        mcpMock.query.mockResolvedValue('Scientific context');
-
-        const plan = await service.generateDietPlan(mockProfile);
-
-        expect(geminiMock.generateText).toHaveBeenCalled();
-        expect(plan.weekStart).toBe('2026-02-10');
+    it('generateDietPlan should throw deprecated error', async () => {
+        await expect(service.generateDietPlan(mockProfile)).rejects.toThrow(/deprecated/);
     });
 
-    it('should handle invalid JSON', async () => {
-        geminiMock.generateText.mockResolvedValue('Not a JSON');
+    it('narratePlan should delegate to DietNarrationService', async () => {
+        const mockPlan: GeneratedWeekPlan = { weekStart: '2026-02-10' } as any;
+        const mockResponse = { summary: 'Plan narration' };
 
-        await expect(service.generateDietPlan(mockProfile)).rejects.toThrow('AI failed to generate a valid diet plan format.');
+        narrationServiceMock.narrateWeekPlan.mockResolvedValue(mockResponse);
+
+        const result = await service.narratePlan(mockPlan, mockProfile);
+
+        expect(narrationServiceMock.narrateWeekPlan).toHaveBeenCalledWith(mockPlan, mockProfile);
+        expect(result).toEqual(mockResponse);
     });
 });

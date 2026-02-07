@@ -1,6 +1,7 @@
 # Dependencies
 node_modules
 .pnpm-store
+.local-pnpm-store/
 
 # Build outputs
 dist

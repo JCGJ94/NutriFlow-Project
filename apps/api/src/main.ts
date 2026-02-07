@@ -28,6 +28,10 @@ async function bootstrap() {
         }),
     );
 
+    // DEBUG: Register global exception filter
+    const { DebugExceptionFilter } = require('./common/filters/debug-exception.filter');
+    app.useGlobalFilters(new DebugExceptionFilter());
+
     // Swagger documentation
     const config = new DocumentBuilder()
         .setTitle('NutriFlow API')

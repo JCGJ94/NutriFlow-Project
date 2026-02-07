@@ -4,8 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Utensils, Twitter, Instagram, Linkedin, Github, Mail } from 'lucide-react';
 
+import { useLanguage } from '@/context/LanguageContext';
+
 export function Footer() {
   const pathname = usePathname();
+  const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
 
   const isAuthPage = pathname === '/login' || pathname === '/register';
@@ -27,7 +30,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-surface-600 dark:text-surface-400 text-sm leading-relaxed max-w-xs">
-              Tu compañero inteligente para una nutrición saludable. Planes personalizados basados en ciencia y adaptados a tu estilo de vida.
+              {t('footer.tagline')}
             </p>
             <div className="flex items-center gap-4">
               <a href="#" className="text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
@@ -52,27 +55,27 @@ export function Footer() {
           {/* Product Links */}
           <div>
             <h3 className="text-sm font-semibold text-surface-900 dark:text-white uppercase tracking-wider mb-4">
-              Producto
+              {t('footer.product')}
             </h3>
             <ul className="space-y-3">
               <li>
                 <Link href="/#features" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors">
-                  Características
+                  {t('footer.features')}
                 </Link>
               </li>
               <li>
                 <Link href="/#how-it-works" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors">
-                  Cómo funciona
+                  {t('footer.how_it_works')}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors">
-                  Planes y Precios
+                  {t('footer.pricing')}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors">
-                  Testimonios
+                  {t('footer.testimonials')}
                 </Link>
               </li>
             </ul>
@@ -81,27 +84,27 @@ export function Footer() {
           {/* Company/Support */}
           <div>
             <h3 className="text-sm font-semibold text-surface-900 dark:text-white uppercase tracking-wider mb-4">
-              Compañía
+              {t('footer.company')}
             </h3>
             <ul className="space-y-3">
               <li>
                 <Link href="#" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors">
-                  Sobre Nosotros
+                  {t('footer.about')}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors">
-                  Blog
+                  {t('footer.blog')}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors">
-                  Contacto
+                  {t('footer.contact')}
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors">
-                  Carreras
+                  {t('footer.careers')}
                 </Link>
               </li>
             </ul>
@@ -110,22 +113,22 @@ export function Footer() {
           {/* Legal / Contact Info */}
           <div>
             <h3 className="text-sm font-semibold text-surface-900 dark:text-white uppercase tracking-wider mb-4">
-              Legal y Contacto
+              {t('footer.legal')}
             </h3>
             <ul className="space-y-3 mb-6">
               <li>
                 <Link href="/privacy" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors">
-                  Política de Privacidad
+                  {t('footer.privacy')}
                 </Link>
               </li>
               <li>
                 <Link href="/terms" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors">
-                  Términos de Servicio
+                  {t('footer.terms')}
                 </Link>
               </li>
               <li>
                 <Link href="/cookies" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors">
-                  Política de Cookies
+                  {t('footer.cookies')}
                 </Link>
               </li>
             </ul>
@@ -141,7 +144,7 @@ export function Footer() {
         
         <div className="mt-12 pt-8 border-t border-surface-200 dark:border-surface-800">
           <p className="text-center text-surface-500 dark:text-surface-500 text-sm">
-            © {currentYear} NutriFlow. Todos los derechos reservados.
+            © {currentYear} NutriFlow. {t('footer.rights')}
           </p>
         </div>
       </div>

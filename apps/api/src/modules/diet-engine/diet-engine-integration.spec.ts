@@ -6,14 +6,13 @@ import { MacrosCalculator } from './calculators/macros.calculator';
 import { IngredientSelector } from './selectors/ingredient.selector';
 import { AllergenRule } from './rules/allergen.rule';
 import { DietPatternRule } from './rules/diet-pattern.rule';
+import { DietNarrationService } from './diet-narration.service';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
 describe('Diet Engine Integration Test', () => {
     let aiDietService: AiDietService;
     let dietEngineService: DietEngineService;
-    let geminiMock: any;
-    let mcpMock: any;
-    let configMock: any;
+    let narrationServiceMock: any;
 
     const mockProfile: any = {
         id: 'user-123',
@@ -37,11 +36,6 @@ describe('Diet Engine Integration Test', () => {
     ];
 
     beforeEach(() => {
-        // Manual DI to ensure Vitest compatibility
-        geminiMock = { generateText: vi.fn() };
-        mcpMock = { query: vi.fn() };
-        configMock = { get: vi.fn().mockReturnValue('mock-id') };
-
         const bmrCalculator = new BmrCalculator();
         const macrosCalculator = new MacrosCalculator();
         const ingredientSelector = new IngredientSelector();
@@ -56,7 +50,12 @@ describe('Diet Engine Integration Test', () => {
             dietPatternRule
         );
 
-        aiDietService = new AiDietService(geminiMock, mcpMock, configMock);
+        narrationServiceMock = {
+            narrateWeekPlan: vi.fn().mockResolvedValue({ summary: 'Narration mock' }),
+        };
+
+        // Manual DI for AiDietService
+        aiDietService = new AiDietService(narrationServiceMock as DietNarrationService);
     });
 
     describe('End-to-End Logic Verification', () => {
@@ -85,40 +84,16 @@ describe('Diet Engine Integration Test', () => {
             expect(day0.totalKcal).toBe(sumKcal);
         });
 
-        it('should use the new AI prompt correctly with context', async () => {
-            const mockAIResponse = JSON.stringify({
-                weekStart: '2026-02-10',
-                targetKcal: 2337,
-                targetProtein: 175,
-                targetCarbs: 234,
-                targetFat: 78,
-                days: [
-                    {
-                        dayOfWeek: 0,
-                        totalKcal: 2337,
-                        totalProtein: 175,
-                        totalCarbs: 234,
-                        totalFat: 78,
-                        meals: [
-                            {
-                                mealType: 'breakfast',
-                                totalKcal: 584,
-                                items: [{ ingredientName: 'Oats', grams: 100, kcal: 389, protein: 16.9, carbs: 66, fat: 6.9 }]
-                            }
-                        ]
-                    }
-                ]
-            });
+        it('AiDietService should delegate narration to DietNarrationService', async () => {
+            const plan = dietEngineService.generateWeeklyPlan(mockProfile, availableIngredients, '2026-02-10');
+            const narration = await aiDietService.narratePlan(plan, mockProfile);
 
-            geminiMock.generateText.mockResolvedValue(mockAIResponse);
-            mcpMock.query.mockResolvedValue('Scientific data about Mediterranean diet');
+            expect(narrationServiceMock.narrateWeekPlan).toHaveBeenCalled();
+            expect(narration).toEqual({ summary: 'Narration mock' });
+        });
 
-            const plan = await aiDietService.generateDietPlan(mockProfile);
-
-            expect(plan.weekStart).toBe('2026-02-10');
-            expect(plan.targetKcal).toBe(2337);
-            expect(geminiMock.generateText).toHaveBeenCalledWith(expect.stringContaining('SYSTEM ROLE:'));
-            expect(geminiMock.generateText).toHaveBeenCalledWith(expect.stringContaining('Scientific data about Mediterranean diet'));
+        it('AiDietService.generateDietPlan should throw error', async () => {
+            await expect(aiDietService.generateDietPlan(mockProfile)).rejects.toThrow();
         });
     });
 });

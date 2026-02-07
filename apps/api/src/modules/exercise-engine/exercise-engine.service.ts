@@ -112,14 +112,14 @@ export class ExerciseEngineService {
     generateExercisePlan(profile: ExerciseProfile, weekStart: string): GeneratedExercisePlan {
         const daysPerWeek = this.getDaysPerWeek(profile.activityLevel);
         const templateKey = this.getTemplateKey(profile.goal, daysPerWeek);
-        const template = WORKOUT_TEMPLATES[templateKey] || WORKOUT_TEMPLATES['maintain_3'];
+        const template = (WORKOUT_TEMPLATES as any)[templateKey] || WORKOUT_TEMPLATES['maintain_3'];
 
-        const workoutDays: GeneratedWorkoutDay[] = template.map((day, index) => {
+        const workoutDays: GeneratedWorkoutDay[] = template.map((day: any, index: number) => {
             if (day.type === 'rest') {
                 return this.createRestDay(index);
             }
 
-            const exercises = this.selectExercises(day.muscles, profile);
+            const exercises = this.selectExercises(day.muscles);
             const totalDurationMin = this.calculateDuration(exercises);
             const caloriesBurned = this.estimateCalories(day.type, totalDurationMin, profile);
 
@@ -176,16 +176,16 @@ export class ExerciseEngineService {
         };
     }
 
-    private selectExercises(muscleGroups: string[], profile: ExerciseProfile): GeneratedExerciseSet[] {
+    private selectExercises(muscleGroups: string[]): GeneratedExerciseSet[] {
         const exercises: GeneratedExerciseSet[] = [];
 
         muscleGroups.forEach(muscle => {
-            const available = EXERCISE_DATABASE[muscle] || [];
+            const available = (EXERCISE_DATABASE as any)[muscle] || [];
             // Select 2-3 exercises per muscle group
             const count = Math.min(available.length, muscle === 'core' ? 2 : 3);
             const selected = this.shuffleArray([...available]).slice(0, count);
 
-            selected.forEach(ex => {
+            selected.forEach((ex: any) => {
                 exercises.push({
                     exerciseName: ex.name,
                     sets: ex.sets,
@@ -210,9 +210,9 @@ export class ExerciseEngineService {
         return Math.round(totalSeconds / 60);
     }
 
-    private estimateCalories(type: string, durationMin: number, profile: ExerciseProfile): number {
+    private estimateCalories(type: string, durationMin: number, _profile: ExerciseProfile): number {
         // MET values for different exercise types
-        const metValues = {
+        const metValues: Record<string, number> = {
             strength: 5,
             cardio: 7,
             hiit: 10,

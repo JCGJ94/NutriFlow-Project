@@ -20,6 +20,7 @@ export interface UserProfile {
     dietPattern: DietPattern;
     weightGoalKg?: number;
     allergenIds: string[];
+    language?: string;
 }
 
 export interface IngredientData {

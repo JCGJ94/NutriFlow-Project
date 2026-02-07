@@ -17,7 +17,24 @@ export class ProfilesController {
     @ApiOperation({ summary: 'Obtener perfil del usuario actual' })
     @ApiResponse({ status: 200, type: ProfileResponseDto })
     async getProfile(@User() user: AuthUser): Promise<ProfileResponseDto | null> {
-        return this.profilesService.getProfile(user.id);
+        try {
+            console.log('Getting profile for user:', user.id);
+            const profile = await this.profilesService.getProfile(user.id);
+            console.log('Profile found:', profile ? 'yes' : 'no');
+            return profile;
+        } catch (error) {
+            console.error('Error in getProfile:', error);
+            // Emergency file logging
+            try {
+                const fs = require('fs');
+                const path = require('path');
+                const logPath = path.resolve('api-error.log');
+                const errorMessage = error instanceof Error ? error.stack : JSON.stringify(error);
+                fs.appendFileSync(logPath, `\n[${new Date().toISOString()}] Error in getProfile: ${errorMessage}\n`);
+            } catch (p) { console.error('Failed to write log file', p) }
+
+            throw error;
+        }
     }
 
     @Put('profile')

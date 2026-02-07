@@ -41,6 +41,7 @@ export class PlansController {
         @User() user: AuthUser,
         @Body() dto: GenerateWeeklyPlanDto,
     ): Promise<PlanResponseDto> {
+        console.log(`[PlansController] Generate request for user ${user.id}`, dto);
         return this.plansService.generateWeeklyPlan(user.id, dto.weekStart, dto.useAi);
     }
 

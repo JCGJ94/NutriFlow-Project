@@ -16,6 +16,8 @@ import { createClient } from '@/lib/supabase/client';
 import { formatDate } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
+import { useLanguage } from '@/context/LanguageContext';
+
 interface PlanSummary {
   id: string;
   weekStart: string;
@@ -27,6 +29,7 @@ interface PlanSummary {
 export default function PlansPage() {
   const router = useRouter();
   const { showToast } = useToast();
+  const { t } = useLanguage();
   const [plans, setPlans] = useState<PlanSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -69,7 +72,7 @@ export default function PlansPage() {
       }
     } catch (error) {
       console.error('Error loading data:', error);
-      showToast('Error al cargar los planes', 'error');
+      showToast(t('plans.load_error'), 'error');
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +86,7 @@ export default function PlansPage() {
       const token = session?.access_token;
 
       if (!token) {
-        showToast('No se encontró sesión activa', 'error');
+        showToast(t('dash.no_session'), 'error');
         return;
       }
 
@@ -100,22 +103,35 @@ export default function PlansPage() {
         const text = await response.text();
         if (text) {
           const plan = JSON.parse(text);
-          showToast('Plan generado correctamente', 'success');
+          showToast(t('plans.gen_success'), 'success');
           router.push(`/plan/${plan.id}`);
         }
       } else {
-        showToast('Error al generar el plan', 'error');
+        // Try to parse error message
+        const errorText = await response.text();
+        let errorMessage = t('plans.gen_error');
+        try {
+            const errorJson = JSON.parse(errorText);
+            errorMessage = errorJson.message || errorMessage;
+             // Handle "bad request" array of messages (class-validator)
+            if (Array.isArray(errorMessage)) {
+                errorMessage = errorMessage.join(', ');
+            }
+        } catch (e) {
+            console.warn('Could not parse error response JSON', e);
+        }
+        showToast(errorMessage, 'error');
       }
     } catch (error) {
       console.error('Error generating plan:', error);
-      showToast('Ocurrió un error inesperado', 'error');
+      showToast(t('common.error'), 'error');
     } finally {
       setIsGenerating(false);
     }
   };
 
   const deletePlan = async (planId: string) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este plan permanentemente?')) return;
+    if (!confirm(t('plans.delete_confirm'))) return;
     
     setIsDeleting(planId);
     try {
@@ -134,13 +150,13 @@ export default function PlansPage() {
 
         if (response.ok) {
             setPlans(plans.filter(p => p.id !== planId));
-            showToast('Plan eliminado correctamente', 'success');
+            showToast(t('plans.del_success'), 'success');
         } else {
-            showToast('Error al eliminar el plan', 'error');
+            showToast(t('dash.delete_error'), 'error');
         }
     } catch (error) {
         console.error('Error deleting plan:', error);
-        showToast('Ocurrió un error al eliminar', 'error');
+        showToast(t('common.error'), 'error');
     } finally {
         setIsDeleting(null);
     }
@@ -163,10 +179,10 @@ export default function PlansPage() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-heading font-bold text-surface-900 dark:text-white mb-2">
-              Mis Planes
+              {t('plans.title')}
             </h1>
             <p className="text-surface-600 dark:text-surface-300">
-              Gestiona tus planes de dieta semanales
+              {t('plans.subtitle')}
             </p>
           </div>
           
@@ -180,7 +196,7 @@ export default function PlansPage() {
             ) : (
               <Plus className="w-5 h-5" />
             )}
-            Generar nuevo plan
+            {t('plans.generate')}
           </button>
         </div>
 
@@ -188,20 +204,20 @@ export default function PlansPage() {
         <section className="mb-12">
           <h2 className="text-xl font-heading font-semibold text-surface-900 dark:text-white mb-4 flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary-500" />
-            Planes Activos
+            {t('plans.active_title')}
           </h2>
 
           {activePlans.length === 0 ? (
             <div className="card text-center py-12 border-dashed">
               <p className="text-surface-500 dark:text-surface-400 mb-4">
-                No tienes planes activos actualmente.
+                {t('plans.no_active')}
               </p>
               <button
                 onClick={generateNewPlan}
                 disabled={isGenerating}
                 className="text-primary-600 hover:text-primary-700 font-medium"
               >
-                Generar uno ahora &rarr;
+                {t('plans.generate_now')} &rarr;
               </button>
             </div>
           ) : (
@@ -219,7 +235,7 @@ export default function PlansPage() {
                     </div>
                     <div className="flex gap-2">
                          <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                           Activo
+                           {t('plans.status_active')}
                          </span>
                          <button
                             onClick={(e) => {
@@ -239,10 +255,10 @@ export default function PlansPage() {
                   </div>
                   
                   <h3 className="font-semibold text-lg text-surface-900 dark:text-white mb-1">
-                    Semana del {formatDate(plan.weekStart)}
+                    {t('plans.week_of')} {formatDate(plan.weekStart)}
                   </h3>
                   <p className="text-surface-500 dark:text-surface-400 text-sm mb-4">
-                    {plan.targetKcal} kcal / día
+                    {plan.targetKcal} {t('plans.kcal_day')}
                   </p>
 
                   <div className="flex items-center justify-between pt-4 border-t border-surface-100 dark:border-surface-800">
@@ -252,8 +268,8 @@ export default function PlansPage() {
                         className="text-sm font-medium text-surface-600 hover:text-primary-600 flex items-center gap-1 transition-colors"
                       >
                         <ShoppingCart className="w-4 h-4" />
-                        Lista de compra
-                      </Link>
+                        {t('dash.shopping_list')}
+                       </Link>
                     </div>
                     <ChevronRight className="w-5 h-5 text-surface-400 group-hover:text-primary-600 transition-colors" />
                   </div>
@@ -268,7 +284,7 @@ export default function PlansPage() {
           <section>
             <h2 className="text-xl font-heading font-semibold text-surface-900 dark:text-white mb-4 flex items-center gap-2">
               <Archive className="w-5 h-5 text-surface-500" />
-              Historial
+              {t('plans.history_title')}
             </h2>
             <div className="space-y-3">
               {archivedPlans.map((plan) => (
@@ -282,7 +298,7 @@ export default function PlansPage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-medium text-surface-700 dark:text-surface-200">
-                      Semana del {formatDate(plan.weekStart)}
+                      {t('plans.week_of')} {formatDate(plan.weekStart)}
                     </h3>
                   </div>
                   <div className="text-sm text-surface-500 dark:text-surface-400 mr-2">

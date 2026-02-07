@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { ThemeProvider } from '../components/ThemeProvider';
 import { ToastProvider } from '../context/ToastContext';
+import { LanguageProvider } from '../context/LanguageContext';
 import { ToastContainer } from '../components/ui/Toast';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -45,12 +46,14 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <UserProvider>
-            <ToastProvider>
+            <LanguageProvider>
+              <ToastProvider>
               <Navbar />
               {children}
               <Footer />
               <ToastContainer />
             </ToastProvider>
+            </LanguageProvider>
           </UserProvider>
         </ThemeProvider>
       </body>
