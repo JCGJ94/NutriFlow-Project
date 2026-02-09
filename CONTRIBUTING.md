@@ -1,5 +1,7 @@
 # Contributing to NutriFlow
 
+> 🇪🇸 **[Leer en Español](./CONTRIBUTING.es.md)**
+
 First off, thanks for taking the time to contribute! 🎉
 
 ## 🛠️ Development Workflow

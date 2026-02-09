@@ -6,6 +6,8 @@
 [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?style=for-the-badge&logo=supabase)](https://supabase.com/)
 [![Gemini AI](https://img.shields.io/badge/Gemini_2.0-Flash-4285F4?style=for-the-badge&logo=google-gemini)](https://deepmind.google/technologies/gemini/)
 
+> 🇪🇸 **[Leer en Español](./README.es.md)**
+
 > **NutriFlow** is a production-grade, full-stack application that redefines personal nutrition. By combining **deterministic algorithms** for caloric precision with **Generative AI** for culinary creativity, it delivers scientifically accurate yet flexible meal plans.
 
 ---

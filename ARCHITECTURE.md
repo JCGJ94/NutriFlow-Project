@@ -1,5 +1,7 @@
 # 🏗️ NutriFlow Architecture
 
+> 🇪🇸 **[Leer en Español](./ARCHITECTURE.es.md)**
+
 ## 1. System Overview
 
 NutriFlow is a **high-performance monorepo** designed for scalability and type safety. It utilizes **Turborepo** to manage the full-stack environment, ensuring efficiency in build and development processes.
