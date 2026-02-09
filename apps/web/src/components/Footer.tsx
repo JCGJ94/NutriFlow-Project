@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Utensils, Twitter, Instagram, Linkedin, Github, Mail } from 'lucide-react';
+import { Twitter, Instagram, Linkedin, Github, Mail } from 'lucide-react';
+import { Logo } from './Logo';
 
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -22,12 +23,7 @@ export function Footer() {
           {/* Brand Column */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="p-1.5 bg-primary-600 rounded-lg group-hover:scale-110 transition-transform">
-                <Utensils className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-heading font-bold text-surface-900 dark:text-white">
-                NutriFlow
-              </span>
+              <Logo size={40} className="transition-transform group-hover:scale-105" />
             </Link>
             <p className="text-surface-600 dark:text-surface-400 text-sm leading-relaxed max-w-xs">
               {t('footer.tagline')}

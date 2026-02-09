@@ -16,6 +16,10 @@ async function bootstrap() {
         credentials: true,
     });
 
+    // Security Headers (Helmet)
+    app.use(require('helmet')());
+
+
     // Global validation pipe
     app.useGlobalPipes(
         new ValidationPipe({

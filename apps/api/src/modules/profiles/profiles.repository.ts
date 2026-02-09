@@ -52,6 +52,7 @@ export class ProfilesRepository {
                 diet_pattern: dto.dietPattern ?? DietPattern.OMNIVORE,
                 weight_goal_kg: dto.weightGoalKg,
                 language: dto.language ?? 'es',
+                health_conditions: dto.healthConditions,
             })
             .select()
             .single();
@@ -78,6 +79,7 @@ export class ProfilesRepository {
                 diet_pattern: dto.dietPattern,
                 weight_goal_kg: dto.weightGoalKg,
                 language: dto.language,
+                health_conditions: dto.healthConditions,
                 updated_at: new Date().toISOString(),
             })
             .eq('id', userId)
@@ -173,6 +175,7 @@ export class ProfilesRepository {
             dietPattern: data.diet_pattern,
             weightGoalKg: data.weight_goal_kg,
             language: data.language || 'es',
+            healthConditions: data.health_conditions,
             createdAt: new Date(data.created_at),
             updatedAt: new Date(data.updated_at),
         };

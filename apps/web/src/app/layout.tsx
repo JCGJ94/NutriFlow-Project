@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: 'NutriFlow' }],
   openGraph: {
-    title: 'NutriFlow - Tu dieta semanal personalizada',
+    title: 'NutriFlow',
     description:
       'Genera planes de dieta semanales personalizados para perder peso de forma saludable.',
     type: 'website',
@@ -32,6 +32,7 @@ export const metadata: Metadata = {
 import { UserProvider } from '../context/UserContext';
 
 import { PlansProvider } from '../context/PlansContext';
+import { ConfirmationProvider } from '../context/ConfirmationContext';
 
 export default function RootLayout({
   children,
@@ -50,12 +51,14 @@ export default function RootLayout({
           <UserProvider>
             <PlansProvider>
             <LanguageProvider>
+              <ConfirmationProvider>
               <ToastProvider>
               <Navbar />
               {children}
               <Footer />
               <ToastContainer />
-            </ToastProvider>
+              </ToastProvider>
+              </ConfirmationProvider>
             </LanguageProvider>
             </PlansProvider>
           </UserProvider>

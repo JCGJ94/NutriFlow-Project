@@ -1,4 +1,6 @@
 # Dependencies
+# Presentación
+GUIA_PRESENTACION_TECNICA.md
 node_modules
 .pnpm-store
 .local-pnpm-store/

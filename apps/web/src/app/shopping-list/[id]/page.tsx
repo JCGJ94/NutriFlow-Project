@@ -252,7 +252,7 @@ export default function ShoppingListPage() {
   const progress = totalItems > 0 ? (checkedCount / totalItems) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-surface-50 dark:bg-surface-950 pb-20 print:bg-white pt-16">
+    <div className="min-h-screen bg-surface-50 dark:bg-surface-950 pb-20 print:bg-white pt-16" data-testid="shopping-list-container">
       {/* Header */}
       <header className="bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-surface-200 dark:border-surface-800 sticky top-16 z-20 print:hidden">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -328,7 +328,7 @@ export default function ShoppingListPage() {
                         <Icon className="w-5 h-5" />
                     </div>
                     <h3 className="font-heading font-bold text-lg">
-                        {t(`cat.${category}`)}
+                        {t(`cat.${(category as string).toUpperCase()}`)}
                     </h3>
                     <span className="ml-auto text-xs font-medium px-2 py-1 bg-white/50 dark:bg-black/20 rounded-full">
                         {items.filter(i => i.isChecked).length} / {items.length}
@@ -345,6 +345,7 @@ export default function ShoppingListPage() {
                             ? 'bg-surface-50 dark:bg-surface-900/50 opacity-60' 
                             : 'hover:bg-surface-50 dark:hover:bg-surface-700/50'
                         }`}
+                        data-testid={`shopping-item-${item.id}`}
                       >
                         <div className={`mt-0.5 w-6 h-6 rounded-lg border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
                              item.isChecked
@@ -402,11 +403,13 @@ export default function ShoppingListPage() {
               onChange={(e) => setNewItemName(e.target.value)}
               placeholder={t('shop.add_custom')}
               className="flex-1 input bg-surface-50 dark:bg-surface-900 border-surface-200 dark:border-surface-700 focus:ring-accent-500 focus:border-accent-500"
+              data-testid="add-custom-item-input"
             />
             <button 
                 type="submit" 
                 className="btn-primary bg-accent-500 hover:bg-accent-600 text-white disabled:opacity-50 px-4 rounded-xl"
                 disabled={!newItemName.trim()}
+                data-testid="add-custom-item-button"
             >
               <Plus className="w-5 h-5" />
             </button>

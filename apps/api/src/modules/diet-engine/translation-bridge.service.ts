@@ -44,7 +44,8 @@ export class TranslationBridgeService {
 
             return translatedPlan;
         } catch (error) {
-            this.logger.error(`Failed to translate plan: ${error.message}`);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            this.logger.error(`Failed to translate plan: ${errorMessage}`);
             // Fallback: return original plan if translation fails (better than crash)
             return plan;
         }

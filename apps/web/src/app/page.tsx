@@ -168,7 +168,7 @@ export default function LandingPage() {
                              <div className="text-xs text-emerald-600 font-medium">{t('landing.hero_perfect')}</div>
                         </div>
                         <div className="flex gap-2">
-                            {['Prot', 'Carbs', 'Grasas'].map((macro, i) => (
+                            {[t('landing.chart_protein'), t('landing.chart_carbs'), t('landing.chart_fats')].map((macro, i) => (
                                 <div key={macro} className="flex-1">
                                     <div className={`h-16 w-full rounded-lg bg-zinc-100 dark:bg-zinc-700 relative overflow-hidden`}>
                                         <motion.div 

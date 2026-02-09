@@ -59,6 +59,11 @@ export class UpsertProfileDto {
     @IsOptional()
     @IsEnum(['es', 'en'])
     language?: 'es' | 'en';
+
+    @ApiPropertyOptional({ description: 'Condiciones de salud o enfermedades', example: 'Lupus, Diabetes tipo 2' })
+    @IsOptional()
+    @IsString()
+    healthConditions?: string;
 }
 
 export class SetAllergensDto {
@@ -106,6 +111,9 @@ export class ProfileResponseDto {
 
     @ApiProperty()
     createdAt!: Date;
+
+    @ApiPropertyOptional()
+    healthConditions?: string;
 
     @ApiProperty()
     updatedAt!: Date;

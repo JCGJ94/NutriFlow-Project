@@ -13,6 +13,41 @@ interface Recommendation {
   reason: string;
 }
 
+// Helper to detect and translate static system protocols
+const getLocalizedContent = (rec: Recommendation, t: (key: string) => string) => {
+  const reason = rec.reason.toLowerCase();
+  
+  // 1. Security Protocol
+  if (reason.includes('seguridad') || reason.includes('security')) {
+    return {
+      title: t('prot.security_title'),
+      content: t('prot.security_desc')
+    };
+  }
+
+  // 2. BMI Protocol
+  if (reason.includes('imc') || reason.includes('bmi') || reason.includes('peso') || reason.includes('weight')) {
+    return {
+      title: t('prot.bmi_title'),
+      content: t('prot.bmi_desc')
+    };
+  }
+
+  // 3. General NutriFlow Protocol
+  if (reason.includes('bases') || reason.includes('foundations') || reason.includes('general')) {
+    return {
+      title: t('prot.general_title'),
+      content: t('prot.general_desc')
+    };
+  }
+
+  // Fallback: Return original content
+  return {
+    title: rec.reason,
+    content: rec.content
+  };
+};
+
 const getCardVisuals = (category: string, reason: string, t: (key: string) => string) => {
   const c = category.toLowerCase();
   const r = reason.toLowerCase();
@@ -33,9 +68,10 @@ const getCardVisuals = (category: string, reason: string, t: (key: string) => st
       label: t('rec.biometric_analysis')
     };
   }
-  if (c.includes('base') || r.includes('sistema') || c.includes('data') || r.includes('system')) {
+  if (c.includes('base') || r.includes('sistema') || c.includes('data') || r.includes('system') || c.includes('quality')) {
     return {
       image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop', // Data visualization
+      // ...
       icon: Database,
       color: 'purple',
       label: t('rec.knowledge_base')
@@ -118,6 +154,7 @@ export function SmartRecommendations() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {recommendations.map((rec) => {
           const visuals = getCardVisuals(rec.category, rec.reason, t);
+          const localizedContent = getLocalizedContent(rec, t);
           const Icon = visuals.icon;
           
           return (
@@ -155,13 +192,13 @@ export function SmartRecommendations() {
             <div className="p-6 flex-1 flex flex-col relative">
                 {/* Content */}
                 <h3 className="text-xl font-heading font-bold text-surface-900 dark:text-white mb-2 leading-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                  {rec.reason}
+                  {localizedContent.title}
                 </h3>
                 
                 <div className="w-12 h-1 bg-surface-100 dark:bg-surface-700 rounded-full mb-4 group-hover:bg-primary-500 transition-colors duration-500" />
                 
                 <p className="text-surface-600 dark:text-surface-300 text-sm leading-relaxed mb-6 line-clamp-3">
-                  {rec.content.replace(/[#*]/g, '').substring(0, 150)}...
+                  {localizedContent.content.replace(/[#*]/g, '').substring(0, 150)}...
                 </p>
 
                 <div className="mt-auto pt-4 border-t border-surface-100 dark:border-surface-700/50 flex items-center justify-between">

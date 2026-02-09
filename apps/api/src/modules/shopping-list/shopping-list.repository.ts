@@ -129,11 +129,14 @@ export class ShoppingListRepository {
             is_checked: false
         }));
 
-        const { error: insertItemsError } = await this.supabase
-            .from('shopping_list_items')
-            .insert(itemInserts);
+        // 5. Return the result
+        if (itemInserts.length > 0) {
+            const { error: insertItemsError } = await this.supabase
+                .from('shopping_list_items')
+                .insert(itemInserts);
 
-        if (insertItemsError) throw new Error(`Failed to insert items: ${insertItemsError.message}`);
+            if (insertItemsError) throw new Error(`Failed to insert items: ${insertItemsError.message}`);
+        }
 
         // 5. Return the result
         return this.getForPlan(planId);

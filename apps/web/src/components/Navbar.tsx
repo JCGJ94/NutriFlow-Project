@@ -4,7 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { 
-  Utensils, 
   Settings, 
   LogOut, 
   LayoutDashboard, 
@@ -12,6 +11,7 @@ import {
   X,
   Calendar,
 } from 'lucide-react';
+import { Logo } from './Logo';
 import { useUser } from '@/context/UserContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { ThemeToggle } from './ThemeToggle';
@@ -46,17 +46,12 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="p-1.5 bg-primary-600 rounded-lg group-hover:scale-110 transition-transform">
-              <Utensils className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-heading font-bold text-primary-600 dark:text-primary-400">
-              NutriFlow
-            </span>
+          <Link href="/" className="flex items-center gap-2 group" data-testid="navbar-logo">
+            <Logo size={40} className="transition-transform group-hover:scale-105" />
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-6" data-testid="navbar-desktop">
             {!isDashboard ? (
               <>
                 <a href="/#features" className="nav-link">{t('nav.features')}</a>
@@ -64,11 +59,11 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/dashboard" className={`nav-link ${pathname === '/dashboard' ? 'text-primary-600 dark:text-primary-400' : ''}`}>
+                <Link href="/dashboard" className={`nav-link ${pathname === '/dashboard' ? 'text-primary-600 dark:text-primary-400' : ''}`} data-testid="link-dashboard">
                   <LayoutDashboard className="w-4 h-4 inline mr-1" />
                   {t('nav.dashboard')}
                 </Link>
-                <Link href="/plans" className={`nav-link ${pathname.startsWith('/plans') ? 'text-primary-600 dark:text-primary-400' : ''}`}>
+                <Link href="/plans" className={`nav-link ${pathname.startsWith('/plans') ? 'text-primary-600 dark:text-primary-400' : ''}`} data-testid="link-plans">
                   <Calendar className="w-4 h-4 inline mr-1" />
                   {t('nav.plans')}
                 </Link>
@@ -109,6 +104,7 @@ export function Navbar() {
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="flex items-center gap-2 p-1 rounded-full border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                  data-testid="profile-menu-button"
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-bold shadow-sm">
                     {nameInitial.toUpperCase()}
@@ -135,6 +131,7 @@ export function Navbar() {
                         href="/dashboard"
                         className="flex items-center gap-3 px-4 py-2 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                         onClick={() => setIsProfileOpen(false)}
+                        data-testid="profile-dropdown-dashboard"
                       >
                         <LayoutDashboard className="w-4 h-4" />
                         {t('nav.dashboard')}
@@ -143,6 +140,7 @@ export function Navbar() {
                         href="/settings"
                         className="flex items-center gap-3 px-4 py-2 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                         onClick={() => setIsProfileOpen(false)}
+                        data-testid="profile-dropdown-settings"
                       >
                         <Settings className="w-4 h-4" />
                         {t('nav.settings')}
@@ -194,15 +192,15 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/dashboard" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/dashboard" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)} data-testid="mobile-link-dashboard">
                   <LayoutDashboard className="w-5 h-5" />
                   {t('nav.dashboard')}
                 </Link>
-                 <Link href="/plans" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>
+                 <Link href="/plans" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)} data-testid="mobile-link-plans">
                   <Calendar className="w-5 h-5" />
                   {t('nav.plans')}
                 </Link>
-                <Link href="/settings" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>
+                <Link href="/settings" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)} data-testid="mobile-link-settings">
                   <Settings className="w-5 h-5" />
                   {t('nav.settings')}
                 </Link>

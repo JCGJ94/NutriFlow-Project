@@ -1,9 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode, useRef } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { useUser } from './UserContext';
 import { DayOfWeek } from '@nutriflow/shared';
+import { apiClient } from '@/lib/apiClient';
 // Define PlanSummary locally to avoid circular deps or complex imports. 
 // Ideally should be in a shared types file.
 interface PlanSummary {
@@ -119,10 +119,10 @@ interface PlansContextType {
 
 const PlansContext = createContext<PlansContextType | undefined>(undefined);
 
-export function PlansProvider({ children }: { children: ReactNode }) {
+export function PlansProvider({ children, initialPlans }: { children: ReactNode, initialPlans?: PlanSummary[] }) {
   const { user } = useUser();
-  const [plans, setPlans] = useState<PlanSummary[]>([]);
-  const [isLoadingPlans, setIsLoadingPlans] = useState(true);
+  const [plans, setPlans] = useState<PlanSummary[]>(initialPlans || []);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(!initialPlans);
   
   // Caches
   const [cachedShoppingLists, setCachedShoppingLists] = useState<Record<string, ShoppingList>>({});
@@ -137,22 +137,27 @@ export function PlansProvider({ children }: { children: ReactNode }) {
   useEffect(() => { cachedPlanDetailsRef.current = cachedPlanDetails; }, [cachedPlanDetails]);
   useEffect(() => { cachedExercisePlansRef.current = cachedExercisePlans; }, [cachedExercisePlans]);
 
-  const supabase = createClient();
-
-  // Load from localStorage on mount
+  // Load from localStorage on mount ONLY if no initialPlans provided
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Plans Cache
-      const cachedPlans = localStorage.getItem('nutriflow_plans_cache');
-      if (cachedPlans) {
-        try {
-          const parsed = JSON.parse(cachedPlans);
-          setPlans(parsed);
-          setIsLoadingPlans(false);
-        } catch (e) {
-          console.error('Error parsing plans cache', e);
-        }
+      if (!initialPlans) {
+          // Plans Cache
+          const cachedPlans = localStorage.getItem('nutriflow_plans_cache');
+          if (cachedPlans) {
+            try {
+              const parsed = JSON.parse(cachedPlans);
+              setPlans(parsed);
+              setIsLoadingPlans(false);
+            } catch (e) {
+              console.error('Error parsing plans cache', e);
+            }
+          }
+      } else {
+         // Update cache with fresh server data
+         localStorage.setItem('nutriflow_plans_cache', JSON.stringify(initialPlans));
       }
+      
+      // Shopping Lists Cache (keep trying to load these)
       
       // Shopping Lists Cache
       const cachedLists = localStorage.getItem('nutriflow_shopping_lists_cache');
@@ -176,28 +181,19 @@ export function PlansProvider({ children }: { children: ReactNode }) {
 
   const fetchPlans = useCallback(async () => {
     if (!user) return;
+    // Don't set loading if we already have plans (optimistic/background update)
     if (plans.length === 0) setIsLoadingPlans(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) return;
-
-      const res = await fetch('/api/plans', {
-         headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setPlans(data);
-        localStorage.setItem('nutriflow_plans_cache', JSON.stringify(data));
-      }
+      const data = await apiClient.get<PlanSummary[]>('/plans');
+      setPlans(data);
+      localStorage.setItem('nutriflow_plans_cache', JSON.stringify(data));
     } catch (error) {
        console.error('Error fetching plans', error);
     } finally {
       setIsLoadingPlans(false);
     }
-  }, [user, supabase, plans.length]);
+  }, [user, plans.length]);
 
   const getShoppingList = useCallback(async (planId: string): Promise<ShoppingList | null> => {
       // Return cached version immediately if available
@@ -206,24 +202,14 @@ export function PlansProvider({ children }: { children: ReactNode }) {
           return cachedShoppingLists[planId];
       }
       return await fetchShoppingListBackground(planId);
-  }, [cachedShoppingLists, user, supabase]);
+  }, [cachedShoppingLists, user]); // Removed supabase
 
   const fetchShoppingListBackground = async (planId: string): Promise<ShoppingList | null> => {
       if (!user) return null;
       try {
-          const { data: { session } } = await supabase.auth.getSession();
-          const token = session?.access_token;
-          if (!token) return null;
-
-          const res = await fetch(`/api/shopping-list/${planId}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-          });
-          
-          if (res.ok) {
-              const data = await res.json();
-              updateShoppingListCache(planId, data);
-              return data;
-          }
+          const data = await apiClient.get<ShoppingList>(`/shopping-list/${planId}`);
+          updateShoppingListCache(planId, data);
+          return data;
       } catch (error) {
           console.error(`Error fetching shopping list ${planId}`, error);
       }
@@ -246,24 +232,14 @@ export function PlansProvider({ children }: { children: ReactNode }) {
           return cachedPlanDetailsRef.current[planId];
       }
       return await fetchPlanDetailsBackground(planId);
-  }, [user, supabase]); // Removed cachedPlanDetails dependency
+  }, [user]); // Removed supabase
 
   const fetchPlanDetailsBackground = async (planId: string): Promise<Plan | null> => {
       if (!user) return null;
       try {
-          const { data: { session } } = await supabase.auth.getSession();
-          const token = session?.access_token;
-          if (!token) return null;
-
-          const res = await fetch(`/api/plans/${planId}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-          });
-          
-          if (res.ok) {
-              const data = await res.json();
-              updatePlanCache(data);
-              return data;
-          }
+          const data = await apiClient.get<Plan>(`/plans/${planId}`);
+          updatePlanCache(data);
+          return data;
       } catch (error) {
            console.error(`Error fetching plan details ${planId}`, error);
       }
@@ -300,24 +276,14 @@ export function PlansProvider({ children }: { children: ReactNode }) {
           return cachedExercisePlansRef.current[planId];
       }
       return await fetchExercisePlanBackground(planId);
-  }, [user, supabase]); // Removed cachedExercisePlans dependency
+  }, [user]); // Removed supabase
 
   const fetchExercisePlanBackground = async (planId: string): Promise<ExercisePlan | null> => {
       if (!user) return null;
       try {
-          const { data: { session } } = await supabase.auth.getSession();
-          const token = session?.access_token;
-          if (!token) return null;
-
-          const res = await fetch(`/api/exercise-plans/${planId}`, {
-              headers: { 'Authorization': `Bearer ${token}` }
-          });
-          
-          if (res.ok) {
-              const data = await res.json();
-              updateExercisePlanCache(planId, data);
-              return data;
-          }
+          const data = await apiClient.get<ExercisePlan>(`/exercise-plans/${planId}`);
+          updateExercisePlanCache(planId, data);
+          return data;
       } catch (error) {
            console.error(`Error fetching exercise plan ${planId}`, error);
       }

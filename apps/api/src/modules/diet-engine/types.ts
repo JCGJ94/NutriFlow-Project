@@ -21,6 +21,7 @@ export interface UserProfile {
     weightGoalKg?: number;
     allergenIds: string[];
     language?: string;
+    healthConditions?: string;
 }
 
 export interface IngredientData {

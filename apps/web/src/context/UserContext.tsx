@@ -19,6 +19,7 @@ export interface UserProfile {
   weight_goal_kg?: number;
   created_at: string;
   updated_at: string;
+  healthConditions?: string;
 }
 
 interface UserContextType {

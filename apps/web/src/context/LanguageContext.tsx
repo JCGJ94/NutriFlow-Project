@@ -98,6 +98,16 @@ const translations = {
     'common.error': 'Error',
     'common.success': 'Éxito',
     'common.delete': 'Eliminar',
+    'common.confirm': 'Confirmar',
+    'common.cancel': 'Cancelar',
+
+    // Protocol Content (Static Mapping)
+    'prot.security_title': 'Protocolo de Seguridad Universal (Obligatorio)',
+    'prot.security_desc': 'Protocolos de Manejo Nutricional Avanzado. 1. Manejo Dietético de Diabetes Tipo 2 (DM2) y Remisión. La remisión se define como HbA1c < 6.5%',
+    'prot.bmi_title': 'Protocolo Activado por IMC > 25 (Sobrepeso/Obesidad)',
+    'prot.bmi_desc': 'Protocolos de Ejercicio Físico y Salud Integral. 1. Prescripción para Obesidad (Sexo y Edad). En niños (6-11 años), el objetivo es mantenimiento.',
+    'prot.general_title': 'Bases de NutriFlow (Recomendación General)',
+    'prot.general_desc': 'Fundamentos Nutricionales NutriFlow (Pilar de Calidad). 1. Dieta Equilibrada y Mediterránea Adaptada. Priorización de patrones de alimentos integrales.',
 
     // Plans
     'plans.title': 'Mis Planes',
@@ -116,6 +126,22 @@ const translations = {
     'plans.load_error': 'Error al cargar los planes',
     'plans.gen_error': 'Error al generar el plan',
 
+    // Allergens
+    'allergen.gluten': 'Gluten',
+    'allergen.dairy': 'Lácteos',
+    'allergen.nuts': 'Frutos secos',
+    'allergen.shellfish': 'Mariscos',
+    'allergen.eggs': 'Huevos',
+    'allergen.soy': 'Soja',
+    'allergen.peanuts': 'Cacahuetes',
+    'allergen.fish': 'Pescado',
+    'allergen.mustard': 'Mostaza',
+    'allergen.sesame': 'Sésamo',
+    'allergen.celery': 'Apio',
+    'allergen.lupin': 'Altramuces',
+    'allergen.molluscs': 'Moluscos',
+    'allergen.sulfites': 'Sulfitos',
+
     // Auth & Register
     'auth.login_title': 'Bienvenido de nuevo',
     'auth.login_subtitle': 'Inicia sesión para acceder a tu plan',
@@ -129,6 +155,23 @@ const translations = {
     'auth.error_invalid': 'Credenciales incorrectas. Revisa tu email/usuario y contraseña.',
     'auth.error_user_not_found': 'Usuario no encontrado. Verifica tu nombre de usuario.',
     
+    // Settings
+    'settings.title': 'Configuración',
+    'settings.personal_data': 'Datos personales',
+    'settings.activity_diet': 'Actividad y dieta',
+    'settings.allergens_title': 'Alergias e intolerancias',
+    'settings.save': 'Guardar cambios',
+    'settings.saving': 'Guardando...',
+    'settings.success': '¡Perfil actualizado correctamente!',
+    'settings.error': 'Error al guardar el perfil.',
+    'settings.username_hint': 'Este nombre aparecerá en la barra de navegación',
+    'settings.conditions_label': 'Otras condiciones médicas o enfermedades',
+    'settings.conditions_hint': 'Indica cualquier condición médica importante para adaptar tu dieta y ejercicio.',
+    'settings.username_taken': 'Este nombre de usuario ya está en uso. Elige otro.',
+    'settings.check_error': 'Error al verificar disponibilidad del nombre de usuario.',
+    'settings.session_error': 'Sesión no válida. Por favor, inicia sesión de nuevo.',
+    'settings.unexpected_error': 'Error inesperado al guardar el perfil.',
+
     'reg.title': 'Crea tu cuenta',
     'reg.subtitle': 'Empieza a generar tu plan nutricional personalizado',
     'reg.confirm_password': 'Confirmar contraseña',
@@ -156,6 +199,7 @@ const translations = {
     'onboarding.step_activity': 'Actividad',
     'onboarding.step_goals': 'Objetivos',
     'onboarding.step_allergens': 'Alergias',
+    'onboarding.step_safety': 'Seguridad',
     'onboarding.username_label': 'Nombre de usuario',
     'onboarding.age_label': 'Edad',
     'onboarding.sex_label': 'Sexo biológico',
@@ -187,7 +231,7 @@ const translations = {
     'onboarding.allergens_selected': 'alérgenos seleccionados',
     'onboarding.allergens_none_selected': 'Sin alergias seleccionadas',
     'onboarding.allergens_plan_avoid': 'Tu plan se generará evitando estos ingredientes.',
-    'onboarding.allergens_plan_confirm': 'Confirmas que no tienes restricciones alimentarias conocidas.',
+    'onboarding.allergens_plan_confirm': 'Confirmas que no tienes restricciones. ¡Listo para generar tu plan!',
     'onboarding.nav_prev': 'Anterior',
     'onboarding.nav_next': 'Siguiente',
     'onboarding.nav_submit': 'Generar Plan Personalizado',
@@ -197,10 +241,28 @@ const translations = {
     'onboarding.success': '¡Perfil y plan creados con éxito!',
     'onboarding.quota_error': 'Perfil guardado. La IA está saturada, tu plan se generará en unos minutos.',
     'onboarding.gen_error': 'Perfil guardado, pero hubo un problema al generar el plan inicial.',
+    'onboarding.health_conditions_label': 'Otras condiciones o enfermedades',
+    'onboarding.health_conditions_placeholder': 'Ej. Lupus, Hashimoto, Hipertensión...',
+    'onboarding.health_conditions_hint': 'Indica cualquier condición médica que debamos tener en cuenta para tu plan.',
+    'onboarding.safety_title': 'Confirmación de Seguridad',
+    'onboarding.safety_desc': 'Por favor, revisa que tus restricciones sean correctas antes de continuar.',
+    'onboarding.review_allergens': 'Alergias seleccionadas',
+    'onboarding.review_conditions': 'Condiciones médicas',
+    'onboarding.none': 'Ninguna',
+    'onboarding.safety_confirmation_text': 'Al hacer clic en "Generar Plan", confirmas que la información proporcionada es veraz y estás listo para comenzar tu nueva rutina personalizada.',
     
     'errors.username_short': 'Nombre de usuario muy corto',
     'errors.username_chars': 'Solo letras, números y guiones bajos',
     'errors.age_min': 'Debes tener al menos 18 años',
+    'errors.age_max': 'La edad máxima es 100 años',
+    'errors.weight_range': 'El peso debe estar entre 30 y 300 kg',
+    'errors.height_range': 'La altura debe estar entre 100 y 250 cm',
+    'errors.meals_range': 'Entre 2 y 6 comidas al día',
+    'errors.weight_goal_range': 'El peso objetivo debe estar entre 30 y 300 kg',
+    
+    // Settings Placeholders
+    'settings.username_placeholder': 'tu_usuario',
+    'settings.conditions_placeholder': 'Ej. Lupus, Hashimoto, Diabetes...',
 
     // Footer
     'footer.tagline': 'Tu compañero inteligente para una nutrición saludable. Planes personalizados basados en ciencia y adaptados a tu estilo de vida.',
@@ -256,6 +318,9 @@ const translations = {
     'landing.cta_desc': 'Únete hoy y obtén tu primer plan nutricional completo en menos de 2 minutos.',
     'landing.cta_button': 'Crear cuenta gratuita',
     'landing.cta_no_credit': 'No requiere tarjeta de crédito',
+    'landing.chart_protein': 'Prot',
+    'landing.chart_carbs': 'Carbs',
+    'landing.chart_fats': 'Grasas',
   },
   en: {
     // Navbar
@@ -342,6 +407,16 @@ const translations = {
     'common.error': 'Error',
     'common.success': 'Success',
     'common.delete': 'Delete',
+    'common.confirm': 'Confirm',
+    'common.cancel': 'Cancel',
+
+    // Protocol Content (Static Mapping)
+    'prot.security_title': 'Universal Security Protocol (Mandatory)',
+    'prot.security_desc': 'Advanced Nutritional Management Protocols. 1. Dietary Management of Type 2 Diabetes (T2D) and Remission. Remission is defined as HbA1c < 6.5%',
+    'prot.bmi_title': 'Protocol Activated by BMI > 25 (Overweight/Obesity)',
+    'prot.bmi_desc': 'Physical Exercise and Integral Health Protocols. 1. Prescription for Obesity (Sex and Age). In children (6-11 years), the goal is maintenance.',
+    'prot.general_title': 'NutriFlow Foundations (General Recommendation)',
+    'prot.general_desc': 'NutriFlow Nutritional Foundations (Quality Pillar). 1. Balanced and Adapted Mediterranean Diet. Prioritization of whole food patterns.',
 
     // Plans
     'plans.title': 'My Plans',
@@ -359,6 +434,22 @@ const translations = {
     'plans.del_success': 'Plan deleted successfully',
     'plans.load_error': 'Error loading plans',
     'plans.gen_error': 'Error generating plan',
+
+    // Allergens
+    'allergen.gluten': 'Gluten',
+    'allergen.dairy': 'Dairy',
+    'allergen.nuts': 'Nuts',
+    'allergen.shellfish': 'Shellfish',
+    'allergen.eggs': 'Eggs',
+    'allergen.soy': 'Soybeans',
+    'allergen.peanuts': 'Peanuts',
+    'allergen.fish': 'Fish',
+    'allergen.mustard': 'Mustard',
+    'allergen.sesame': 'Sesame',
+    'allergen.celery': 'Celery',
+    'allergen.lupin': 'Lupin',
+    'allergen.molluscs': 'Molluscs',
+    'allergen.sulfites': 'Sulfites',
 
     // Footer
     'footer.tagline': 'Your intelligent companion for healthy nutrition. Personalized plans based on science and adapted to your lifestyle.',
@@ -414,6 +505,9 @@ const translations = {
     'landing.cta_desc': 'Join today and get your first complete nutrition plan in less than 2 minutes.',
     'landing.cta_button': 'Create free account',
     'landing.cta_no_credit': 'No credit card required',
+    'landing.chart_protein': 'Prot',
+    'landing.chart_carbs': 'Carbs',
+    'landing.chart_fats': 'Fats',
 
     // Auth & Register
     'auth.login_title': 'Welcome Back',
@@ -428,6 +522,23 @@ const translations = {
     'auth.error_invalid': 'Invalid credentials. Check your email/username and password.',
     'auth.error_user_not_found': 'User not found. Check your username.',
     
+    // Settings
+    'settings.title': 'Settings',
+    'settings.personal_data': 'Personal Data',
+    'settings.activity_diet': 'Activity & Diet',
+    'settings.allergens_title': 'Allergies & Intolerances',
+    'settings.save': 'Save Changes',
+    'settings.saving': 'Saving...',
+    'settings.success': 'Profile updated successfully!',
+    'settings.error': 'Error saving profile.',
+    'settings.username_hint': 'This name will appear in the navigation bar',
+    'settings.conditions_label': 'Other medical conditions or diseases',
+    'settings.conditions_hint': 'Indicate any important medical condition to adapt your diet and exercise.',
+    'settings.username_taken': 'This username is already taken. Choose another.',
+    'settings.check_error': 'Error checking username availability.',
+    'settings.session_error': 'Invalid session. Please log in again.',
+    'settings.unexpected_error': 'Unexpected error saving profile.',
+
     'reg.title': 'Create your account',
     'reg.subtitle': 'Start generating your personalized nutritional plan',
     'reg.confirm_password': 'Confirm password',
@@ -455,6 +566,7 @@ const translations = {
     'onboarding.step_activity': 'Activity',
     'onboarding.step_goals': 'Goals',
     'onboarding.step_allergens': 'Allergies',
+    'onboarding.step_safety': 'Safety',
     'onboarding.username_label': 'Username',
     'onboarding.age_label': 'Age',
     'onboarding.sex_label': 'Biological sex',
@@ -486,7 +598,7 @@ const translations = {
     'onboarding.allergens_selected': 'allergies selected',
     'onboarding.allergens_none_selected': 'No allergies selected',
     'onboarding.allergens_plan_avoid': 'Your plan will be generated avoiding these ingredients.',
-    'onboarding.allergens_plan_confirm': 'You confirm that you have no known dietary restrictions.',
+    'onboarding.allergens_plan_confirm': 'You confirm no restrictions. Ready to generate your plan!',
     'onboarding.nav_prev': 'Previous',
     'onboarding.nav_next': 'Next',
     'onboarding.nav_submit': 'Generate Personalized Plan',
@@ -496,10 +608,28 @@ const translations = {
     'onboarding.success': 'Profile and plan created successfully!',
     'onboarding.quota_error': 'Profile saved. AI is busy, your plan will be generated in a few minutes.',
     'onboarding.gen_error': 'Profile saved, but there was a problem generating the initial plan.',
+    'onboarding.health_conditions_label': 'Other conditions or diseases',
+    'onboarding.health_conditions_placeholder': 'e.g. Lupus, Hashimoto, Hypertension...',
+    'onboarding.health_conditions_hint': 'Indicate any medical condition we should consider for your plan.',
+    'onboarding.safety_title': 'Safety Confirmation',
+    'onboarding.safety_desc': 'Please review that your restrictions are correct before continuing.',
+    'onboarding.review_allergens': 'Selected allergies',
+    'onboarding.review_conditions': 'Medical conditions',
+    'onboarding.none': 'None',
+    'onboarding.safety_confirmation_text': 'By clicking "Generate Plan", you confirm that the information provided is true and you are ready to start your new personal routine.',
     
     'errors.username_short': 'Username too short',
     'errors.username_chars': 'Letters, numbers and underscores only',
     'errors.age_min': 'You must be at least 18 years old',
+    'errors.age_max': 'Maximum age is 100',
+    'errors.weight_range': 'Weight must be between 30 and 300 kg',
+    'errors.height_range': 'Height must be between 100 and 250 cm',
+    'errors.meals_range': 'Between 2 and 6 meals per day',
+    'errors.weight_goal_range': 'Goal weight must be between 30 and 300 kg',
+
+    // Settings Placeholders
+    'settings.username_placeholder': 'your_username',
+    'settings.conditions_placeholder': 'e.g., Lupus, Hashimoto, Diabetes...',
   }
 };
 

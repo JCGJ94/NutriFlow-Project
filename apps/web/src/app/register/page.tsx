@@ -6,7 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Utensils, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import { Logo } from '@/components/Logo';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
 import { useLanguage } from '@/context/LanguageContext';
@@ -121,12 +122,9 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-page-gradient flex items-center justify-center px-4 py-12 transition-colors duration-300">
       <div className="w-full max-w-md">
         {/* Logo */}
-        <div className="text-center mb-6 sm:mb-8">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <Utensils className="w-8 h-8 sm:w-10 sm:h-10 text-primary-600 dark:text-primary-400" />
-            <span className="text-xl sm:text-2xl font-heading font-bold text-primary-600 dark:text-primary-400">
-              NutriFlow
-            </span>
+        <div className="text-center mb-6 sm:mb-8 flex justify-center">
+          <Link href="/">
+            <Logo size={48} variant="full" />
           </Link>
         </div>
 
@@ -154,6 +152,7 @@ export default function RegisterPage() {
                   placeholder="email@example.com"
                   className="input-icon"
                   autoComplete="email"
+                  data-testid="register-email"
                 />
               </div>
               {errors.email && (
@@ -175,6 +174,7 @@ export default function RegisterPage() {
                   placeholder={t('reg.password_placeholder')}
                   className="input-icon"
                   autoComplete="new-password"
+                  data-testid="register-password"
                 />
               </div>
               {errors.password && (
@@ -196,6 +196,7 @@ export default function RegisterPage() {
                   placeholder={t('reg.confirm_placeholder')}
                   className="input-icon"
                   autoComplete="new-password"
+                  data-testid="register-confirm-password"
                 />
               </div>
               {errors.confirmPassword && (
@@ -208,6 +209,7 @@ export default function RegisterPage() {
               type="submit"
               disabled={isLoading}
               className="btn-primary w-full flex items-center justify-center gap-2"
+              data-testid="register-submit"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

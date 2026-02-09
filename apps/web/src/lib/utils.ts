@@ -75,3 +75,6 @@ export function formatGrams(grams: number): string {
 export function formatMacros(value: number, unit: string = 'g'): string {
     return `${Math.round(value)}${unit}`;
 }
+export function isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}

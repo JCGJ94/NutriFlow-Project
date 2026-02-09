@@ -17,6 +17,7 @@ import { formatDate } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
 import { useLanguage } from '@/context/LanguageContext';
+import { useConfirmation } from '@/context/ConfirmationContext';
 
 interface PlanSummary {
   id: string;
@@ -30,6 +31,7 @@ export default function PlansPage() {
   const router = useRouter();
   const { showToast } = useToast();
   const { t } = useLanguage();
+  const { confirm } = useConfirmation();
   const [plans, setPlans] = useState<PlanSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -131,7 +133,15 @@ export default function PlansPage() {
   };
 
   const deletePlan = async (planId: string) => {
-    if (!confirm(t('plans.delete_confirm'))) return;
+    const confirmed = await confirm({
+        title: t('plans.delete_title') || t('plans.delete_confirm'), // Fallback if translation missing key title
+        description: t('plans.delete_description') || '¿Estás seguro de que deseas eliminar este plan? Esta acción no se puede deshacer.',
+        confirmText: t('common.delete') || 'Eliminar',
+        cancelText: t('common.cancel') || 'Cancelar',
+        variant: 'danger'
+    });
+    
+    if (!confirmed) return;
     
     setIsDeleting(planId);
     try {
@@ -174,7 +184,7 @@ export default function PlansPage() {
   }
 
   return (
-    <div className="min-h-screen bg-page-gradient pt-16">
+    <div className="min-h-screen bg-page-gradient pt-16" data-testid="plans-page-container">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
@@ -190,6 +200,7 @@ export default function PlansPage() {
             onClick={generateNewPlan}
             disabled={isGenerating}
             className="btn-primary inline-flex items-center gap-2"
+            data-testid="generate-plan-button"
           >
             {isGenerating ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -201,7 +212,7 @@ export default function PlansPage() {
         </div>
 
         {/* Active Plans */}
-        <section className="mb-12">
+        <section className="mb-12" data-testid="active-plans-section">
           <h2 className="text-xl font-heading font-semibold text-surface-900 dark:text-white mb-4 flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary-500" />
             {t('plans.active_title')}
@@ -221,12 +232,13 @@ export default function PlansPage() {
               </button>
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" data-testid="active-plans-grid">
               {activePlans.map((plan) => (
                 <div
                   key={plan.id}
                   onClick={() => router.push(`/plan/${plan.id}`)}
                   className="card hover:border-primary-300 transition-all duration-200 group cursor-pointer relative overflow-hidden"
+                  data-testid={`plan-item-${plan.id}`}
                 >
                   <div className="absolute top-0 left-0 w-1 h-full bg-primary-500"></div>
                   <div className="flex items-start justify-between mb-4">

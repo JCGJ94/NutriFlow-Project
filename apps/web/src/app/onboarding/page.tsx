@@ -42,6 +42,7 @@ const profileSchema = z.object({
   dietPattern: z.nativeEnum(DietPattern),
   weightGoalKg: z.number().min(30).max(300).optional(),
   allergenIds: z.array(z.string()).default([]),
+  healthConditions: z.string().optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -57,6 +58,7 @@ export default function OnboardingPage() {
     { id: 'activity', title: t('onboarding.step_activity'), icon: Activity },
     { id: 'goals', title: t('onboarding.step_goals'), icon: Target },
     { id: 'allergens', title: t('onboarding.step_allergens'), icon: Shield },
+    { id: 'safety', title: t('onboarding.step_safety'), icon: AlertTriangle },
   ];
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -127,7 +129,8 @@ export default function OnboardingPage() {
       ['username', 'age', 'sex', 'weightKg', 'heightCm'],
       ['activityLevel', 'mealsPerDay'],
       ['dietPattern', 'weightGoalKg'],
-      ['allergenIds'],
+      ['allergenIds', 'healthConditions'],
+      [], // Safety confirmation step doesn't have form fields in the same way (just a review)
     ];
 
     const isValid = await trigger(fieldsToValidate[currentStep]);
@@ -510,7 +513,10 @@ export default function OnboardingPage() {
                             ? 'text-primary-700 dark:text-primary-300' 
                             : 'text-surface-700 dark:text-surface-200'
                          }`}>
-                           {allergen.name}
+                           {/* Try to translate using name (e.g. 'allergen.gluten') or fallback to name/id */}
+                           {t('allergen.' + (allergen.name?.toLowerCase() || '')) !== 'allergen.' + (allergen.name?.toLowerCase() || '') 
+                              ? t('allergen.' + (allergen.name?.toLowerCase() || ''))
+                              : (allergen.name || t('allergen.' + allergen.id))}
                          </span>
                          {allergen.description && (
                             <p className="text-xs text-surface-500 mt-0.5">{allergen.description}</p>
@@ -554,6 +560,65 @@ export default function OnboardingPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* Health Conditions Free Text */}
+                <div className="mt-8">
+                  <label className="label mb-2 flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-primary-500" />
+                    {t('onboarding.health_conditions_label')}
+                  </label>
+                  <textarea
+                    {...register('healthConditions')}
+                    className="input min-h-[100px] text-sm"
+                    placeholder={t('onboarding.health_conditions_placeholder')}
+                  />
+                  <p className="mt-2 text-xs text-surface-500 italic">
+                    {t('onboarding.health_conditions_hint')}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Step 5: Safety Review (Intermediate Step) */}
+            {currentStep === 4 && (
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="p-6 rounded-3xl bg-amber-50 dark:bg-amber-900/10 border-2 border-amber-200 dark:border-amber-900/30">
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center">
+                      <AlertTriangle className="w-6 h-6 text-amber-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-heading font-bold text-amber-900 dark:text-amber-200">
+                        {t('onboarding.safety_title')}
+                      </h3>
+                      <p className="text-sm text-amber-800 dark:text-amber-300">
+                        {t('onboarding.safety_desc')}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 bg-white dark:bg-surface-800 p-4 rounded-xl border border-amber-100 dark:border-amber-900/20">
+                    <div className="flex justify-between items-start">
+                      <span className="text-xs font-bold uppercase tracking-wider text-surface-400">{t('onboarding.review_allergens')}</span>
+                      <span className="text-sm font-medium text-surface-900 dark:text-white">
+                        {selectedAllergens?.length > 0 ? selectedAllergens.length : t('onboarding.none')}
+                      </span>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs font-bold uppercase tracking-wider text-surface-400">{t('onboarding.review_conditions')}</span>
+                      <p className="text-sm font-medium text-surface-900 dark:text-white break-words">
+                        {watch('healthConditions') || t('onboarding.none')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-4 bg-primary-50 dark:bg-primary-900/10 rounded-2xl border border-primary-100 dark:border-primary-900/30">
+                  <ShieldCheck className="w-5 h-5 text-primary-600 mt-1 flex-shrink-0" />
+                  <p className="text-sm text-primary-900 dark:text-primary-300">
+                    {t('onboarding.safety_confirmation_text')}
+                  </p>
+                </div>
               </div>
             )}
 
@@ -576,26 +641,30 @@ export default function OnboardingPage() {
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="btn-primary flex items-center gap-2"
+                  className="btn-primary flex items-center gap-2 group"
                 >
                   {t('onboarding.nav_next')}
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               ) : (
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="btn-primary flex items-center gap-2"
+                  className={`btn-primary flex items-center justify-center gap-2 min-w-[200px] py-4 text-lg shadow-xl transition-all duration-500 ${
+                    selectedAllergens?.length === 0 
+                      ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20' 
+                      : 'bg-primary-600 hover:bg-primary-700 shadow-primary-500/20'
+                  }`}
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="text-sm">{loadingStep}</span>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span className="font-medium">{loadingStep}</span>
                     </>
                   ) : (
                     <>
-                      {t('onboarding.nav_submit')}
-                      <SparklesIcon className="w-4 h-4" />
+                      <span className="font-bold">{t('onboarding.nav_submit')}</span>
+                      <SparklesIcon className="w-5 h-5 animate-pulse" />
                     </>
                   )}
                 </button>

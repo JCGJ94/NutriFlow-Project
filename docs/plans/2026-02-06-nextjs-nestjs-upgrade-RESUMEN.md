@@ -26,9 +26,9 @@ He revisado completamente el código base de NutriFlow y el plan de migración e
 
 ### 1. **`apps/web/src/lib/supabase/server.ts`** 🔴 PRIORIDAD ALTA
 ```typescript
-// Este archivo usa cookies() y DEBE ser async
-export function createClient() {
-    const cookieStore = cookies(); // ❌ debe ser: await cookies()
+
+export async function createClient() {
+    const cookieStore = await cookies();
 }
 ```
 
@@ -37,8 +37,6 @@ export function createClient() {
 
 ### 2. **`apps/web/src/middleware.ts`** 🟡 MANTENER
 ```typescript
-// ✅ Compatible con Next.js 16
-// NO requiere migrar a proxy.ts (es opcional)
 ```
 
 **Impacto:** Ninguno - middleware.ts sigue soportado  

@@ -5,7 +5,6 @@ import { ProfilesService } from '../profiles/profiles.service';
 import { IngredientsService } from '../ingredients/ingredients.service';
 import { DietEngineService } from '../diet-engine/diet-engine.service';
 import { ExercisePlansService } from '../exercise-plans/exercise-plans.service';
-import { AiDietService } from '../diet-engine/ai-diet.service';
 import { PlanResponseDto, PlanSummaryDto } from './dto';
 import { UserProfile, IngredientData, GeneratedWeekPlan } from '../diet-engine/types';
 
@@ -16,7 +15,6 @@ export class PlansService {
         private readonly profilesService: ProfilesService,
         private readonly ingredientsService: IngredientsService,
         private readonly dietEngineService: DietEngineService,
-        private readonly aiDietService: AiDietService,
         private readonly exercisePlansService: ExercisePlansService,
     ) { }
 
@@ -54,6 +52,7 @@ export class PlansService {
             weightGoalKg: profile.weightGoalKg,
             allergenIds,
             language: profile.language,
+            healthConditions: profile.healthConditions,
         };
 
         // Calculate weekStart (must be Monday)
@@ -62,27 +61,27 @@ export class PlansService {
         let generatedPlan: GeneratedWeekPlan;
 
         try {
-            if (useAi) {
-                console.log('🤖 Generating diet plan using AI...');
-                console.log('📋 User profile:', JSON.stringify(userProfile, null, 2));
-                generatedPlan = await this.aiDietService.generateDietPlan(userProfile);
-                // Ensure the AI used the correct weekStart
-                generatedPlan.weekStart = calculatedWeekStart;
-                console.log('✅ AI plan generated successfully');
-            } else {
-                // Get all compatible ingredients
-                const ingredients = await this.ingredientsService.findAll({});
-                const ingredientData: IngredientData[] = ingredients.map((i) => ({
-                    ...i,
-                    allergenIds: i.allergenIds || [],
-                }));
+            // Get all compatible ingredients regardless of useAi flag
+            // (AiDietService.generateDietPlan is deprecated)
+            const ingredients = await this.ingredientsService.findAll({});
+            const ingredientData: IngredientData[] = ingredients.map((i) => ({
+                ...i,
+                allergenIds: i.allergenIds || [],
+            }));
 
-                // Generate plan using Rules Engine
-                generatedPlan = this.dietEngineService.generateWeeklyPlan(
-                    userProfile,
-                    ingredientData,
-                    calculatedWeekStart,
-                );
+            if (useAi) {
+                console.log('🤖 AI generation requested. Using Rules Engine for structure (Deterministic).');
+            }
+
+            // Generate plan using Rules Engine
+            generatedPlan = this.dietEngineService.generateWeeklyPlan(
+                userProfile,
+                ingredientData,
+                calculatedWeekStart,
+            );
+
+            if (useAi) {
+                console.log('✅ Plan structure generated successfully. AI narration can be applied to this structure.');
             }
         } catch (error: any) {
             console.error('❌ Error generating plan [PlansService]:', error);

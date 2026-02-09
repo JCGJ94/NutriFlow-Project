@@ -48,7 +48,9 @@ export class DebugExceptionFilter implements ExceptionFilter {
             timestamp: new Date().toISOString(),
             path: request.url,
             // Include message in response only for debugging
-            debugMessage: exception instanceof Error ? exception.message : 'Internal server error',
+            debugMessage: process.env.NODE_ENV !== 'production'
+                ? (exception instanceof Error ? exception.message : 'Internal server error')
+                : undefined,
         });
     }
 }
