@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ShoppingListRepository, ShoppingListDto } from './shopping-list.repository';
+import { ShoppingListRepository, ShoppingListDto, ShoppingListItemDto } from './shopping-list.repository';
 
 @Injectable()
 export class ShoppingListService {
@@ -17,7 +17,7 @@ export class ShoppingListService {
         return this.repository.removeItem(itemId);
     }
 
-    async addItem(planId: string, item: { ingredientId?: string; customName?: string; grams?: number }): Promise<void> {
+    async addItem(planId: string, item: { ingredientId?: string; customName?: string; grams?: number }): Promise<ShoppingListItemDto> {
         return this.repository.addItem(planId, item);
     }
 }

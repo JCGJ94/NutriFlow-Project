@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, ConflictException } from '@nestjs/common';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from '../../config/supabase.module';
 import { UpsertProfileDto, ProfileResponseDto, AllergenDto } from './dto';
@@ -58,6 +58,9 @@ export class ProfilesRepository {
             .single();
 
         if (error) {
+            if (error.code === '23505') {
+                throw new ConflictException('El nombre de usuario elegido ya está en uso. Por favor, elige otro.');
+            }
             throw new Error(`Failed to create profile: ${error.message}`);
         }
 
@@ -87,6 +90,9 @@ export class ProfilesRepository {
             .single();
 
         if (error) {
+            if (error.code === '23505') {
+                throw new ConflictException('El nombre de usuario elegido ya está en uso. Por favor, elige otro.');
+            }
             throw new Error(`Failed to update profile: ${error.message}`);
         }
 

@@ -35,6 +35,7 @@ export class ShoppingListRepository {
                 plans (week_start),
                 items:shopping_list_items (
                     id,
+                    custom_name,
                     ingredient_id,
                     total_grams,
                     is_checked,
@@ -160,7 +161,7 @@ export class ShoppingListRepository {
         if (error) throw new Error(`Failed to remove item: ${error.message}`);
     }
 
-    async addItem(planId: string, item: { ingredientId?: string; customName?: string; grams?: number }): Promise<void> {
+    async addItem(planId: string, item: { ingredientId?: string; customName?: string; grams?: number }): Promise<ShoppingListItemDto> {
         const { data: list } = await this.supabase
             .from('shopping_lists')
             .select('id')
@@ -169,16 +170,41 @@ export class ShoppingListRepository {
 
         if (!list) throw new Error('Shopping list not found');
 
-        const { error } = await this.supabase
+        const { data: newItem, error } = await this.supabase
             .from('shopping_list_items')
             .insert({
                 shopping_list_id: list.id,
                 ingredient_id: item.ingredientId || null,
                 custom_name: item.customName || null,
-                total_grams: item.grams || null,
+                total_grams: item.grams || 0,
                 is_checked: false
-            });
+            })
+            .select(`
+                id,
+                custom_name,
+                ingredient_id,
+                total_grams,
+                is_checked,
+                ingredients (
+                    id,
+                    name,
+                    category
+                )
+            `)
+            .single();
 
         if (error) throw new Error(`Failed to add item: ${error.message}`);
+
+        const ing = Array.isArray(newItem.ingredients) ? newItem.ingredients[0] : newItem.ingredients;
+
+        return {
+            id: newItem.id,
+            ingredientId: newItem.ingredient_id,
+            ingredientName: newItem.ingredient_id ? (ing?.name || 'Unknown') : newItem.custom_name,
+            category: newItem.ingredient_id ? (ing?.category || IngredientCategory.CONDIMENT) : IngredientCategory.CONDIMENT,
+            totalGrams: newItem.total_grams ? Number(newItem.total_grams) : undefined,
+            isChecked: newItem.is_checked,
+            isCustom: !newItem.ingredient_id
+        };
     }
 }

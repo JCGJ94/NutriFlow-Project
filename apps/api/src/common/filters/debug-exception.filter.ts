@@ -43,13 +43,30 @@ export class DebugExceptionFilter implements ExceptionFilter {
             console.error('Failed to write to api-error.log', e);
         }
 
+        let message = 'Internal server error';
+        if (exception instanceof HttpException) {
+            const res = exception.getResponse();
+            if (typeof res === 'object' && res !== null && 'message' in res) {
+                // If message is an array (class-validator), join it
+                const msg = (res as any).message;
+                message = Array.isArray(msg) ? msg.join(', ') : msg;
+            } else if (typeof res === 'string') {
+                message = res;
+            }
+        } else if (exception instanceof Error) {
+            // For non-http errors, we might want to hide details in production, 
+            // but strictly following the existing logic of debugMessage for now, 
+            // creating a 'message' field that client expects.
+            message = process.env.NODE_ENV !== 'production' ? exception.message : 'Internal server error';
+        }
+
         response.status(status).json({
             statusCode: status,
             timestamp: new Date().toISOString(),
             path: request.url,
-            // Include message in response only for debugging
+            message: message, // Client expects this
             debugMessage: process.env.NODE_ENV !== 'production'
-                ? (exception instanceof Error ? exception.message : 'Internal server error')
+                ? (exception instanceof Error ? exception.stack : JSON.stringify(exception))
                 : undefined,
         });
     }

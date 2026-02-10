@@ -132,10 +132,12 @@ export function PlansProvider({ children, initialPlans }: { children: ReactNode,
   // Refs for stable callback access to avoid infinite loops
   const cachedPlanDetailsRef = useRef(cachedPlanDetails);
   const cachedExercisePlansRef = useRef(cachedExercisePlans);
+  const cachedShoppingListsRef = useRef(cachedShoppingLists);
   
   // Sync refs with state
   useEffect(() => { cachedPlanDetailsRef.current = cachedPlanDetails; }, [cachedPlanDetails]);
   useEffect(() => { cachedExercisePlansRef.current = cachedExercisePlans; }, [cachedExercisePlans]);
+  useEffect(() => { cachedShoppingListsRef.current = cachedShoppingLists; }, [cachedShoppingLists]);
 
   // Load from localStorage on mount ONLY if no initialPlans provided
   useEffect(() => {
@@ -156,8 +158,6 @@ export function PlansProvider({ children, initialPlans }: { children: ReactNode,
          // Update cache with fresh server data
          localStorage.setItem('nutriflow_plans_cache', JSON.stringify(initialPlans));
       }
-      
-      // Shopping Lists Cache (keep trying to load these)
       
       // Shopping Lists Cache
       const cachedLists = localStorage.getItem('nutriflow_shopping_lists_cache');
@@ -196,13 +196,14 @@ export function PlansProvider({ children, initialPlans }: { children: ReactNode,
   }, [user, plans.length]);
 
   const getShoppingList = useCallback(async (planId: string): Promise<ShoppingList | null> => {
-      // Return cached version immediately if available
-      if (cachedShoppingLists[planId]) {
-          fetchShoppingListBackground(planId);
-          return cachedShoppingLists[planId];
+      // Use Ref to avoid dependency on state which causes recreation on every update -> infinite loop
+      if (cachedShoppingListsRef.current[planId]) {
+          // Do NOT fetch in background to avoid throttling/loops. 
+          // If we have it, we return it.
+          return cachedShoppingListsRef.current[planId];
       }
       return await fetchShoppingListBackground(planId);
-  }, [cachedShoppingLists, user]); // Removed supabase
+  }, [user]);
 
   const fetchShoppingListBackground = async (planId: string): Promise<ShoppingList | null> => {
       if (!user) return null;
@@ -228,11 +229,10 @@ export function PlansProvider({ children, initialPlans }: { children: ReactNode,
   const getPlanDetails = useCallback(async (planId: string): Promise<Plan | null> => {
       // Use Ref to avoid dependency on state which causes recreation on every update -> infinite loop
       if (cachedPlanDetailsRef.current[planId]) {
-          fetchPlanDetailsBackground(planId);
           return cachedPlanDetailsRef.current[planId];
       }
       return await fetchPlanDetailsBackground(planId);
-  }, [user]); // Removed supabase
+  }, [user]);
 
   const fetchPlanDetailsBackground = async (planId: string): Promise<Plan | null> => {
       if (!user) return null;
@@ -272,11 +272,10 @@ export function PlansProvider({ children, initialPlans }: { children: ReactNode,
   const getExercisePlan = useCallback(async (planId: string): Promise<ExercisePlan | null> => {
       // Use Ref for stability
       if (cachedExercisePlansRef.current[planId]) {
-          fetchExercisePlanBackground(planId);
           return cachedExercisePlansRef.current[planId];
       }
       return await fetchExercisePlanBackground(planId);
-  }, [user]); // Removed supabase
+  }, [user]);
 
   const fetchExercisePlanBackground = async (planId: string): Promise<ExercisePlan | null> => {
       if (!user) return null;
