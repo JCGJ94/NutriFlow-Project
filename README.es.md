@@ -120,7 +120,7 @@ El testing se centra en la corrección de las rutas críticas más que en una co
 - [x] Autenticación y políticas de RLS.
 - [x] Motor de cálculo nutricional determinista.
 - [x] Cobertura de pruebas E2E para flujos principales.
-- [ ] Optimizaciones de rendimiento (caché de respuestas de IA).
+- [x] Optimizaciones de rendimiento (caché de respuestas de IA).
 - [ ] Exploración de cliente móvil utilizando la API existente.
 
 ---
@@ -141,6 +141,15 @@ El testing se centra en la corrección de las rutas críticas más que en una co
 ¡Damos la bienvenida a las contribuciones! Por favor revisa nuestras **[Guías de Contribución](./CONTRIBUTING.es.md)** para estilo de código, proceso de PR y requisitos de testing.
 
 ---
+
+## Optimizaciones de Rendimiento
+
+### Frontend
+- **Turbopack**: Habilitado (`--turbo`) para HMR y arranque más rápidos.
+- **Transpilación**: Los paquetes compartidos se transpilan directamente para una integración fluida en el monorepo.
+
+### Backend
+- **Caché de Respuestas de IA**: Caché en memoria (TTL 24h) para planes de dieta generados, basado en el hash del perfil de usuario. Reduce costos de IA y latencia.
 
 ## 📄 Licencia
 

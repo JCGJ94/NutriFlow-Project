@@ -1,4 +1,6 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 import { AuthGuard } from '@nestjs/passport';
 import { UserProfile } from './types';
 import { DietEngineService } from './diet-engine.service';
@@ -14,10 +16,17 @@ export class AiDietController {
         private readonly ingredientsService: IngredientsService,
         private readonly dietNarrationService: DietNarrationService,
         private readonly translationBridgeService: TranslationBridgeService,
+        @Inject(CACHE_MANAGER) private cacheManager: Cache,
     ) { }
 
     @Post('generate-ai')
     async generateDiet(@Body() profile: UserProfile) {
+        const cacheKey = `diet_plan_${Buffer.from(JSON.stringify(profile)).toString('base64')}`;
+        const cachedPlan = await this.cacheManager.get(cacheKey);
+        if (cachedPlan) {
+            return cachedPlan;
+        }
+
         const ingredients = await this.ingredientsService.findAll({});
         const today = new Date();
         const day = today.getDay();
@@ -35,6 +44,7 @@ export class AiDietController {
             plan = await this.translationBridgeService.translatePlan(plan, 'en');
         }
 
+        await this.cacheManager.set(cacheKey, plan, 86400000); // 24 hours
         return plan;
     }
 

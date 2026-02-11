@@ -3,6 +3,7 @@ const nextConfig = {
     reactStrictMode: true,
 
     typedRoutes: true,
+    transpilePackages: ['@nutriflow/shared'],
 
     // API rewrites to backend
     async rewrites() {

@@ -1,3 +1,4 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { DietEngineService } from './diet-engine.service';
 import { BmrCalculator } from './calculators/bmr.calculator';
@@ -20,7 +21,7 @@ import { OllamaProvider } from './llm/providers/ollama.provider';
 import { NullProvider } from './llm/providers/null.provider';
 
 @Module({
-    imports: [IngredientsModule, ProfilesModule, AiModule],
+    imports: [IngredientsModule, ProfilesModule, AiModule, CacheModule.register({ ttl: 86400000 })],
     controllers: [AiDietController],
     providers: [
         DietEngineService,

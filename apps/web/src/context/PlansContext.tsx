@@ -188,8 +188,13 @@ export function PlansProvider({ children, initialPlans }: { children: ReactNode,
       const data = await apiClient.get<PlanSummary[]>('/plans');
       setPlans(data);
       localStorage.setItem('nutriflow_plans_cache', JSON.stringify(data));
-    } catch (error) {
-       console.error('Error fetching plans', error);
+    } catch (error: any) {
+       if (error.message && error.message.includes('Unauthorized')) {
+         console.warn('Unauthorized fetchPlans - session might be refreshing');
+         // Use existing cache if available
+       } else {
+         console.error('Error fetching plans', error);
+       }
     } finally {
       setIsLoadingPlans(false);
     }
