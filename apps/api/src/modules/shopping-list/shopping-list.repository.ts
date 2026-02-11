@@ -7,6 +7,7 @@ export interface ShoppingListItemDto {
     id: string;
     ingredientId: string | null;
     ingredientName: string;
+    ingredientNameEn?: string;
     category: IngredientCategory;
     totalGrams?: number;
     isChecked: boolean;
@@ -42,6 +43,7 @@ export class ShoppingListRepository {
                     ingredients (
                         id,
                         name,
+                        name_en,
                         category
                     )
                 )
@@ -57,6 +59,7 @@ export class ShoppingListRepository {
                     id: item.id,
                     ingredientId: item.ingredient_id,
                     ingredientName: item.ingredient_id ? (item.ingredients?.name || 'Unknown') : item.custom_name,
+                    ingredientNameEn: item.ingredient_id ? (item.ingredients?.name_en || item.ingredients?.name) : item.custom_name,
                     category: item.ingredient_id ? (item.ingredients?.category || IngredientCategory.CONDIMENT) : IngredientCategory.CONDIMENT,
                     totalGrams: item.total_grams ? Number(item.total_grams) : undefined,
                     isChecked: item.is_checked,
@@ -89,7 +92,7 @@ export class ShoppingListRepository {
                 ingredient_id,
                 grams,
                 plan_meals!inner (plan_id),
-                ingredients (id, name, category)
+                ingredients (id, name, name_en, category)
             `)
             .eq('plan_meals.plan_id', planId);
 
@@ -107,6 +110,7 @@ export class ShoppingListRepository {
                 aggregated.set(ingredientId, {
                     ingredientId,
                     ingredientName: (ingredient as any)?.name || 'Unknown',
+                    ingredientNameEn: (ingredient as any)?.name_en || (ingredient as any)?.name,
                     category: (ingredient as any)?.category || IngredientCategory.CONDIMENT,
                     totalGrams: Number(item.grams),
                 });
@@ -188,6 +192,7 @@ export class ShoppingListRepository {
                 ingredients (
                     id,
                     name,
+                    name_en,
                     category
                 )
             `)
@@ -201,6 +206,7 @@ export class ShoppingListRepository {
             id: newItem.id,
             ingredientId: newItem.ingredient_id,
             ingredientName: newItem.ingredient_id ? (ing?.name || 'Unknown') : newItem.custom_name,
+            ingredientNameEn: newItem.ingredient_id ? (ing?.name_en || ing?.name) : newItem.custom_name,
             category: newItem.ingredient_id ? (ing?.category || IngredientCategory.CONDIMENT) : IngredientCategory.CONDIMENT,
             totalGrams: newItem.total_grams ? Number(newItem.total_grams) : undefined,
             isChecked: newItem.is_checked,

@@ -1,88 +1,138 @@
-# 🍎 NutriFlow: Nutrición Personalizada e Inteligente
+# 🍎 NutriFlow — Plataforma de Nutrición Personalizada Inteligente
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-16.0-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
-[![NestJS](https://img.shields.io/badge/NestJS-11.0-e0234e?style=for-the-badge&logo=nestjs)](https://nestjs.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?style=for-the-badge&logo=supabase)](https://supabase.com/)
-[![Gemini AI](https://img.shields.io/badge/Gemini_2.0-Flash-4285F4?style=for-the-badge&logo=google-gemini)](https://deepmind.google/technologies/gemini/)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square&logo=typescript)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
+![NestJS](https://img.shields.io/badge/NestJS-11-e0234e?style=flat-square&logo=nestjs)
+![Supabase](https://img.shields.io/badge/PostgreSQL-Supabase-3ecf8e?style=flat-square&logo=supabase)
+![Gemini AI](https://img.shields.io/badge/Gemini_2.0-Flash-4285F4?style=flat-square&logo=google-gemini)
 
-> 🇬🇧 **[Read in English](./README.md)**
+> 🇺🇸 **[Read in English](./README.md)**
 
-> **NutriFlow** es una aplicación full-stack de nivel de producción que redefine la nutrición personal. Al combinar **algoritmos deterministas** para la precisión calórica con **IA Generativa** para la creatividad culinaria, ofrece planes alimenticios científicamente precisos pero flexibles.
+NutriFlow es una aplicación web full-stack de nivel producción centrada en la **planificación de nutrición personalizada**, diseñada para equilibrar la **precisión nutricional, la flexibilidad y la mantenibilidad** en una arquitectura de mundo real.
 
----
-
-## 🎯 ¿Por qué este proyecto?
-
-La mayoría de las apps de nutrición son simples contadores de calorías (aburridas) o totalmente generadas por IA (propensas a alucinaciones). **NutriFlow** cierra esta brecha con un **Motor de Dietas Híbrido**:
-
-1.  **Precisión**: Modelos matemáticos (Mifflin-St Jeor) aseguran objetivos de macros exactos.
-2.  **Creatividad**: Google Gemini 2.0 Flash genera recetas diversas y apetitosas que se adhieren estrictamente a esos números.
-3.  **Contexto**: El **Model Context Protocol (MCP)** integra ciencia nutricional fundamentada vía NotebookLM, evitando la "deriva de la IA".
+> **Estado:** 🚧 En Desarrollo — Entorno de demo/staging privado.
+> **Alcance:** Proyecto personal desarrollado y mantenido por un único desarrollador.
 
 ---
 
-## 📸 Experiencia
+## Perspectiva del Proyecto
 
-| Vista Dashboard | Vista Plan Móvil |
-| :---: | :---: |
-| ![Dashboard Placeholder](https://placehold.co/600x400/1e293b/FFF?text=Dashboard+UI) | ![Mobile Placeholder](https://placehold.co/300x600/1e293b/FFF?text=Mobile+UI) |
-> *UI premium y responsiva construida con Tailwind CSS y Shadcn.*
+NutriFlow explora cómo combinar la **lógica nutricional determinista** con la **generación de contenido asistida por IA** de una manera controlada y verificable.  
+El objetivo es evitar tanto los sistemas rígidos basados en plantillas como las salidas de IA descontroladas, manteniendo la arquitectura escalable y orientada a producción.
 
 ---
 
-## 🏗️ Arquitectura y Stack Tecnológico
+## El Problema
 
-Este proyecto es un **Monorepo** gestionado por [Turborepo](https://turbo.build/), diseñado para escalabilidad y experiencia de desarrollo.
+La mayoría de las aplicaciones de nutrición enfrentan limitaciones técnicas comunes:
 
-| Capa | Tecnología | Destacados |
-| :--- | :--- | :--- |
-| **Frontend** | [Next.js 16](https://nextjs.org/) | App Router, Server Components, TypeScript Strict Mode. |
-| **Backend** | [NestJS 11](https://nestjs.com/) | Arquitectura Limpia Modular, Validación DTO, Inyección de Dependencias. |
-| **Base de Datos** | [Supabase](https://supabase.com/) | PostgreSQL, Row Level Security (RLS), Suscripciones en tiempo real. |
-| **Núcleo IA** | [Gemini 2.0](https://deepmind.google/) | Motor Generativo Híbrido, Salida JSON Estructurada. |
-| **Testing** | [Vitest](https://vitest.dev/) + Playwright | Unit Tests para lógica, E2E para flujos de usuario críticos. |
-
-👉 **[Lee la Guía Completa de Arquitectura](./ARCHITECTURE.es.md)** para profundizar en el diseño del sistema, diagramas y flujo de datos.
+- **Sistemas rígidos basados en reglas:** Son precisos pero difíciles de extender o personalizar profundamente.
+- **Enfoques "AI-first":** Generan contenido atractivo pero suelen fallar al respetar restricciones nutricionales estrictas o reglas de seguridad de salud.
+- **Acoplamiento fuerte:** La lógica de cálculo, la generación de contenido y la persistencia suelen estar mezcladas, dificultando la evolución o el testing del sistema.
 
 ---
 
-## ✨ Características Clave
+## La Solución
 
--   **🥗 Motor de Dieta Inteligente**: Genera planes de 7 días respetando BMR, TDEE, alergias y preferencias dietéticas (Vegano, Keto, etc.).
--   **🛍️ Lista de Compra Inteligente**: Agrega ingredientes de los planes semanales en una lista consolidada.
--   **🔐 Seguridad Empresarial**: Implementación completa de políticas RLS localizadas—los usuarios *nunca* pueden acceder a datos que no poseen.
--   **⚡ Capacidad de Respuesta en Tiempo Real**: Actualizaciones de UI optimistas y streaming desde el servidor para feedback instantáneo.
+NutriFlow separa las responsabilidades de forma clara en todo el stack tecnológico:
+
+- **Capa de cálculo determinista:** Responsable de toda la matemática nutricional (TMB, GDT, distribución de macros) basada en modelos científicos (Mifflin-St Jeor).
+- **Capa asistida por IA controlada:** Utilizada exclusivamente para la generación de contenido (recetas, sugerencias) dentro de restricciones predefinidas por la capa de cálculo.
+- **Modelo de persistencia y seguridad:** Aplica el aislamiento de datos a nivel de base de datos, garantizando que la información sensible esté protegida por diseño.
+
+Este enfoque prioriza la **corrección, la claridad y la testabilidad** sobre el prototipado rápido.
 
 ---
 
-## 🚀 Empezando
+## Stack Tecnológico y Racional
 
-### Prerrequisitos
--   Node.js 20+
--   pnpm 9+
--   Un Proyecto en Supabase
--   Componentes: google-cloud-sdk (para funcionalidades de IA)
+| Capa | Tecnología | Racional |
+|------|-----------|-----------|
+| **Frontend** | [Next.js 16 (App Router)](https://nextjs.org/) | Permite Componentes de Servidor, reduce la complejidad en el cliente y mantiene la lógica sensible en el servidor. |
+| **Backend** | [NestJS 11](https://nestjs.com/) | Proporciona un backend estructurado y modular con inyección de dependencias y una clara separación de responsabilidades. |
+| **Base de Datos** | [PostgreSQL (Supabase)](https://supabase.com/) | Modelo relacional ideal para datos nutricionales estructurados y escalabilidad a largo plazo. |
+| **Autenticación** | [Supabase Auth (JWT)](https://supabase.com/auth) | Autenticación basada en estándares con un boilerplate mínimo. |
+| **IA Core** | [Gemini 2.0 Flash](https://deepmind.google/technologies/gemini/) | Motor híbrido de generación de contenido con salidas JSON estructuradas. |
+| **Monorepo** | [Turborepo](https://turbo.build/) | Permite compartir DTOs y tipos de TypeScript entre frontend y backend, garantizando la consistencia del contrato. |
+| **Testing** | [Vitest](https://vitest.dev/) & [Playwright](https://playwright.dev/) | Cubren tanto la lógica determinista como los flujos de usuario completos (E2E). |
 
-### Instalación
+---
 
-1.  **Clonar el Repo**:
-    ```bash
-    git clone https://github.com/JCGJ94/NutriFlow-Project.git
-    cd nutriflow
-    pnpm install
-    ```
+## Arquitectura
 
-2.  **Configurar Entorno**:
-    -   Duplica `.env.example` a `.env.local` (Frontend) y `.env` (Backend).
-    -   Añade tu URL de Supabase, Anon Key y API Key de Gemini.
+El proyecto está organizado como un **monorepo** para mantener las responsabilidades aisladas compartiendo contratos donde es necesario:
 
-3.  **Ejecutar Servidor de Desarrollo**:
-    ```bash
-    pnpm dev
-    ```
-    -   **Frontend**: [http://localhost:3000](http://localhost:3000)
-    -   **Backend**: [http://localhost:3001](http://localhost:3001)
+```text
+├── apps/
+│   ├── web/    # Frontend en Next.js (App Router)
+│   └── api/    # REST API en NestJS
+└── packages/
+    └── shared/ # DTOs compartidos, esquemas Zod y tipos de TypeScript
+```
+
+### Decisiones Clave de Diseño
+
+- **Contratos compartidos:** Los DTOs y esquemas se reutilizan en todo el stack para evitar discrepancias entre la API y el frontend.
+- **Backend basado en servicios:** La lógica de negocio está aislada de la persistencia y de las integraciones externas.
+- **Persistencia estructurada:** El contenido generado se almacena en tablas relacionales en lugar de texto libre para facilitar el análisis y la búsqueda.
+
+---
+
+## Seguridad y Autenticación
+
+La autenticación se gestiona mediante **JWT (Supabase Auth)**.  
+La autorización y el aislamiento de datos se aplican directamente en la capa de la base de datos.
+
+### Seguridad a Nivel de Fila (Row Level Security - RLS)
+
+Se utiliza RLS para garantizar el aislamiento total de los datos del usuario:
+
+- Los usuarios solo pueden acceder a las filas donde su `auth.uid()` coincide con el `user_id` propietario.
+- Los recursos anidados validan la propiedad mediante comprobaciones relacionales.
+- Los datos de referencia compartidos (bases de datos nutricionales generales) están separados de la información de salud privada.
+
+---
+
+## Estrategia de Testing
+
+- **Pruebas Unitarias (Vitest):**  
+  Validan los cálculos nutricionales y la distribución de macros para prevenir regresiones en la lógica core.
+- **Pruebas de Extremo a Extremo (Playwright):**  
+  Cubren el flujo completo del usuario, desde el registro hasta la generación de planes y su persistencia.
+
+El testing se centra en la corrección de las rutas críticas más que en una cobertura superficial de líneas de código.
+
+---
+
+## Flujo de Uso
+
+1. **Perfilado de Usuario:** Entrada de datos metabólicos, condiciones de salud (ej. Lupus) y preferencias.
+2. **Generación de Plan:** Cálculos deterministas combinados con contenido asistido por IA bajo control estricto.
+3. **Resultados:** Planes de comidas semanales y listas de compras generadas automáticamente.
+
+*(Próximamente: Screenshots / GIFs mostrando los flujos principales)*
+
+---
+
+## Estado Actual y Roadmap
+
+- [x] Arquitectura core y configuración de monorepo.
+- [x] Autenticación y políticas de RLS.
+- [x] Motor de cálculo nutricional determinista.
+- [x] Cobertura de pruebas E2E para flujos principales.
+- [ ] Optimizaciones de rendimiento (caché de respuestas de IA).
+- [ ] Exploración de cliente móvil utilizando la API existente.
+
+---
+
+## Rol y Responsabilidades
+
+**Desarrollador Único**
+
+- Diseño e implementación de la arquitectura full-stack.
+- Desarrollo de servicios backend, UI del frontend y esquema de base de datos.
+- Implementación de autenticación, políticas RLS y estrategia de testing.
+- Gestión de despliegue, entornos y configuración de CI/CD.
 
 ---
 
@@ -95,3 +145,4 @@ Este proyecto es un **Monorepo** gestionado por [Turborepo](https://turbo.build/
 ## 📄 Licencia
 
 Distribuido bajo la Licencia MIT. Ver `LICENSE` para más información.
+

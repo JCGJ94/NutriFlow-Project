@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProfilesService } from '../profiles/profiles.service';
 import { ExerciseEngineService } from '../exercise-engine/exercise-engine.service';
 import { GeneratedExercisePlan, ExerciseGoal, ActivityLevel } from '@nutriflow/shared';
+// import { TranslationBridgeService } from '../diet-engine/translation-bridge.service';
 
 // In-memory cache for exercise plans (linked to diet plans)
 // In production, this would be stored in Supabase
@@ -12,6 +13,7 @@ export class ExercisePlansService {
     constructor(
         private readonly profilesService: ProfilesService,
         private readonly exerciseEngineService: ExerciseEngineService,
+        // private readonly translationBridgeService: TranslationBridgeService,
     ) { }
 
     async generateExercisePlan(userId: string): Promise<GeneratedExercisePlan> {
@@ -29,9 +31,12 @@ export class ExercisePlansService {
             goal,
             age: profile.age,
             sex: profile.sex,
+            language: profile.language as 'es' | 'en', // Pass user language
         };
 
         const weekStart = this.getNextMonday();
+
+        // Generate plan in correct language directly
         const plan = this.exerciseEngineService.generateExercisePlan(exerciseProfile, weekStart);
 
         return plan;

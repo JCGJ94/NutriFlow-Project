@@ -8,6 +8,8 @@ import { ExercisePlansService } from '../exercise-plans/exercise-plans.service';
 import { PlanResponseDto, PlanSummaryDto } from './dto';
 import { UserProfile, IngredientData, GeneratedWeekPlan } from '../diet-engine/types';
 
+import { TranslationBridgeService } from '../diet-engine/translation-bridge.service';
+
 @Injectable()
 export class PlansService {
     constructor(
@@ -16,6 +18,7 @@ export class PlansService {
         private readonly ingredientsService: IngredientsService,
         private readonly dietEngineService: DietEngineService,
         private readonly exercisePlansService: ExercisePlansService,
+        private readonly translationBridgeService: TranslationBridgeService,
     ) { }
 
     async generateWeeklyPlan(userId: string, weekStart?: string, useAi = false): Promise<PlanResponseDto> {
@@ -79,6 +82,16 @@ export class PlansService {
                 ingredientData,
                 calculatedWeekStart,
             );
+
+            // AUTO-TRANSLATE IF NEEDED
+            if (userProfile.language === 'en') {
+                console.log('🌐 User language is English. Translating generated plan structure...');
+                try {
+                    generatedPlan = await this.translationBridgeService.translatePlan(generatedPlan, 'en');
+                } catch (translationError) {
+                    console.error('⚠️ Failed to translate plan. Falling back to Spanish content.', translationError);
+                }
+            }
 
             if (useAi) {
                 console.log('✅ Plan structure generated successfully. AI narration can be applied to this structure.');

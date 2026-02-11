@@ -8,8 +8,7 @@ import {
     Dumbbell,
     ArrowLeft,
     ShoppingCart,
-    Calendar,
-    Loader2
+    Calendar
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NutritionHeader } from '@/components/plan/NutritionHeader';
@@ -18,6 +17,7 @@ import { ExerciseDayCard, ExerciseDetail } from '@/components/exercise/ExerciseC
 import { getDayName, cn } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 import { usePlans } from '@/context/PlansContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { apiClient } from '@/lib/apiClient';
 
 // Types (should be shared)
@@ -97,6 +97,7 @@ interface PlanClientProps {
 export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanClientProps) {
     const router = useRouter();
     const { showToast } = useToast();
+    const { t, language } = useLanguage();
     
     // Local state for UI
     const [activeTab, setActiveTab] = useState<TabType>('diet');
@@ -104,9 +105,18 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
     const [selectedExerciseDay, setSelectedExerciseDay] = useState<number>(0);
     const [regeneratingMeal, setRegeneratingMeal] = useState<string | null>(null);
 
-    // Use initial props, assuming server fetches/caches correctly.
-    // We can update local copy if needed after actions.
-    const dietPlan = initialPlan;
+    // Optimistic Plan State
+    // We initialize with the server prop, but allow local updates to "win" momentarily
+    const [optimisticPlan, setOptimisticPlan] = useState<Plan | null>(initialPlan);
+
+    // Sync server updates if they happen (e.g. revalidation from other tabs/users)
+    // But be careful not to overwrite valid optimistic state if we are "ahead"
+    // For simplicity in this version, we trust props if they change significantly or we force it.
+    useEffect(() => {
+        if (initialPlan) {
+             setOptimisticPlan(initialPlan);
+        }
+    }, [initialPlan]);
     
     // State for exercise plan (sync with prop but allow updates/fetching)
     const [exercisePlan, setExercisePlan] = useState<ExercisePlan | null>(initialExercisePlan);
@@ -154,51 +164,82 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
         };
     }, [planId, exercisePlan, getExercisePlan]);
 
-    // Helper to refresh page data
-    const refreshData = () => {
-        router.refresh();
-    };
-
     const regenerateMeal = async (mealId: string) => {
+        if (regeneratingMeal) return; // Prevent double clicks
         setRegeneratingMeal(mealId);
+        
+        // Optimistic UI: We can't really "guess" the new meal, but we already verify status
+        // and spinner is shown. The key is NOT to wait for router.refresh().
+        
         try {
-            await apiClient.post(`/plans/${planId}/regenerate-meal`, { mealId });
-            refreshData();
-            showToast('Comida regenerada', 'success');
+            // API returns the NEW plan directly
+            const newPlan = await apiClient.post<Plan>(`/plans/${planId}/regenerate-meal`, { mealId });
+            
+            // 1. Update State Instantly
+            setOptimisticPlan(newPlan);
+            showToast(t('plans.gen_success'), 'success');
+            
+            // 2. Silent Sync (no await)
+            router.refresh(); 
+
         } catch (error) {
             console.error('Error regenerating meal:', error);
-            showToast('Error al regenerar comida', 'error');
+            showToast(t('plans.gen_error'), 'error');
         } finally {
             setRegeneratingMeal(null);
         }
     };
 
     const toggleMealLock = async (mealId: string, isLocked: boolean) => {
+        if (!optimisticPlan) return;
+
+        // 1. Optimistic Update
+        const previousPlan = { ...optimisticPlan };
+        const newLockedState = !isLocked;
+
+        // Deep clone or functional update to avoid mutating state directly
+        const updatedPlan = {
+            ...optimisticPlan,
+            days: optimisticPlan.days.map(day => ({
+                ...day,
+                meals: day.meals.map(meal => 
+                    meal.id === mealId ? { ...meal, isLocked: newLockedState } : meal
+                )
+            }))
+        };
+
+        setOptimisticPlan(updatedPlan);
+
         try {
-            await apiClient.post(`/plans/${planId}/lock-meal`, { mealId, isLocked: !isLocked });
-            refreshData();
+            // 2. API Call in Background
+            await apiClient.post(`/plans/${planId}/lock-meal`, { mealId, isLocked: newLockedState });
+            
+            // 3. Silent Sync
+            router.refresh(); 
         } catch (error) {
             console.error('Error toggling lock:', error);
-            showToast('Error al actualizar candado', 'error');
+            // Revert on failure
+            setOptimisticPlan(previousPlan);
+            showToast(t('common.error'), 'error');
         }
     };
 
-    if (!dietPlan) {
+    if (!optimisticPlan) {
         return (
             <div className="min-h-screen bg-surface-50 flex items-center justify-center">
                 <div className="text-center">
                     <h2 className="text-xl font-heading font-semibold text-surface-900 mb-2">
-                        Plan no encontrado
+                        {t('plans.no_plan')}
                     </h2>
                     <Link href="/dashboard" className="btn-primary">
-                        Volver al panel
+                        {t('plans.back_dashboard')}
                     </Link>
                 </div>
             </div>
         );
     }
 
-    const selectedDietDayData = dietPlan.days.find(d => d.dayOfWeek === selectedDietDay);
+    const selectedDietDayData = optimisticPlan.days.find(d => d.dayOfWeek === selectedDietDay);
     const selectedExerciseDayData = exercisePlan?.workoutDays.find(d => d.dayOfWeek === selectedExerciseDay);
 
     return (
@@ -221,12 +262,12 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                 </div>
                                 <div>
                                     <span className="text-xl font-heading font-black text-surface-900 dark:text-white tracking-tight">
-                                        Plan Semanal
+                                        {t('plans.weekly_plan')}
                                     </span>
                                     <div className="flex items-center gap-1.5">
                                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                                         <span className="text-[10px] font-black uppercase tracking-widest text-surface-400">
-                                            Dieta + Ejercicio
+                                            {t('plans.diet_exercise')}
                                         </span>
                                     </div>
                                 </div>
@@ -237,9 +278,10 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                             href={`/shopping-list/${planId}`}
                             className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-surface-900 text-white font-bold hover:bg-surface-800 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
                             data-testid="nav-shopping-list"
+                            onMouseEnter={() => router.prefetch(`/shopping-list/${planId}`)}
                         >
                             <ShoppingCart size={18} />
-                            <span className="hidden sm:inline">Lista de compra</span>
+                            <span className="hidden sm:inline">{t('plans.shopping_list_btn')}</span>
                         </Link>
                     </div>
                 </div>
@@ -260,7 +302,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                             data-testid="tab-diet"
                         >
                             <Utensils size={20} />
-                            <span>Plan Nutricional</span>
+                            <span>{t('plans.nutritional')}</span>
                         </button>
                         <button
                             onClick={() => setActiveTab('exercise')}
@@ -273,7 +315,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                             data-testid="tab-exercise"
                         >
                             <Dumbbell size={20} />
-                            <span>Plan de Ejercicios</span>
+                            <span>{t('plans.exercise')}</span>
                         </button>
                     </div>
                 </div>
@@ -287,14 +329,15 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
+                            transition={{ duration: 0.2 }}
                             className="space-y-10"
                         >
                             {/* Nutrition Summary */}
                             <NutritionHeader
-                                kcal={dietPlan.targetKcal}
-                                protein={dietPlan.targetProtein}
-                                carbs={dietPlan.targetCarbs}
-                                fat={dietPlan.targetFat}
+                                kcal={optimisticPlan.targetKcal}
+                                protein={optimisticPlan.targetProtein}
+                                carbs={optimisticPlan.targetCarbs}
+                                fat={optimisticPlan.targetFat}
                             />
 
                             <div className="flex flex-col lg:flex-row gap-10">
@@ -302,9 +345,9 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                 <aside className="lg:w-72 flex-shrink-0">
                                     <div className="sticky top-40 space-y-2">
                                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-surface-400 mb-6 pl-2">
-                                            Calendario Semanal
+                                            {t('plans.calendar')}
                                         </h3>
-                                        {dietPlan.days.map((day) => (
+                                        {optimisticPlan.days.map((day) => (
                                             <button
                                                 key={day.dayOfWeek}
                                                 onClick={() => setSelectedDietDay(day.dayOfWeek)}
@@ -321,11 +364,11 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                                         ? "bg-primary-600 text-white rotate-3"
                                                         : "bg-surface-100 dark:bg-surface-800 text-surface-400 dark:text-surface-500 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/30 group-hover:text-primary-500 dark:group-hover:text-primary-400"
                                                 )}>
-                                                    {getDayName(day.dayOfWeek).charAt(0)}
+                                                    {getDayName(day.dayOfWeek, language).charAt(0)}
                                                 </div>
                                                 <div className="text-left">
                                                     <div className="font-heading font-black text-sm uppercase tracking-wide">
-                                                        {getDayName(day.dayOfWeek)}
+                                                        {getDayName(day.dayOfWeek, language)}
                                                     </div>
                                                     <div className="text-[10px] font-bold opacity-70">
                                                         {day.totalKcal} kcal
@@ -343,10 +386,10 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                             <div className="flex items-end justify-between px-2">
                                                 <div>
                                                     <h3 className="text-4xl font-heading font-black text-surface-900 dark:text-white">
-                                                        {getDayName(selectedDietDayData.dayOfWeek)}
+                                                        {getDayName(selectedDietDayData.dayOfWeek, language)}
                                                     </h3>
                                                     <p className="text-primary-600 dark:text-primary-400 font-bold mt-1">
-                                                        {selectedDietDayData.totalKcal} kcal · {selectedDietDayData.meals.length} comidas
+                                                        {selectedDietDayData.totalKcal} kcal · {selectedDietDayData.meals.length} {t('plans.meals')}
                                                     </p>
                                                 </div>
                                             </div>
@@ -357,7 +400,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                                         key={meal.id}
                                                         initial={{ opacity: 0, y: 20 }}
                                                         animate={{ opacity: 1, y: 0 }}
-                                                        transition={{ delay: idx * 0.1 }}
+                                                        transition={{ delay: idx * 0.05, duration: 0.3 }}
                                                     >
                                                         <MealCard
                                                             meal={meal}
@@ -381,12 +424,25 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.2 }}
                             className="space-y-10"
                         >
                             {isLoadingExercise && !exercisePlan ? (
-                                <div className="flex flex-col items-center justify-center py-20 text-surface-400">
-                                    <Loader2 className="w-10 h-10 animate-spin mb-4 text-primary-500" />
-                                    <p className="font-medium animate-pulse">Cargando tu plan de entrenamiento...</p>
+                                <div className="animate-pulse space-y-10">
+                                    {/* Header Skeleton */}
+                                    <div className="h-48 rounded-3xl bg-surface-200 dark:bg-surface-800" />
+                                    
+                                    <div className="flex flex-col lg:flex-row gap-10">
+                                        {/* Sidebar Skeleton */}
+                                        <aside className="lg:w-80 flex-shrink-0 space-y-4">
+                                            {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+                                                <div key={i} className="h-20 rounded-2xl bg-surface-200 dark:bg-surface-800" />
+                                            ))}
+                                        </aside>
+                                        
+                                        {/* Detail Skeleton */}
+                                        <div className="flex-1 h-[600px] rounded-3xl bg-surface-200 dark:bg-surface-800" />
+                                    </div>
                                 </div>
                             ) : exercisePlan ? (
                                 <>
@@ -395,10 +451,10 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                                             <div>
                                                 <h2 className="text-3xl font-heading font-black mb-2">
-                                                    Plan de Ejercicios
+                                                    {t('exercise.title')}
                                                 </h2>
                                                 <p className="text-blue-100">
-                                                    {exercisePlan.daysPerWeek} días de entrenamiento por semana
+                                                    {t('exercise.days_per_week').replace('{{count}}', exercisePlan.daysPerWeek.toString())}
                                                 </p>
                                             </div>
                                             <div className="flex gap-8">
@@ -406,13 +462,13 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                                     <div className="text-4xl font-black">
                                                         {exercisePlan.workoutDays.filter(d => !d.isRestDay).length}
                                                     </div>
-                                                    <div className="text-sm text-blue-200">Días Activos</div>
+                                                    <div className="text-sm text-blue-200">{t('exercise.active_days')}</div>
                                                 </div>
                                                 <div className="text-center">
                                                     <div className="text-4xl font-black">
                                                         {exercisePlan.workoutDays.reduce((sum, d) => sum + d.caloriesBurned, 0)}
                                                     </div>
-                                                    <div className="text-sm text-blue-200">kcal/semana</div>
+                                                    <div className="text-sm text-blue-200">{t('exercise.kcal_week')}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -423,7 +479,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                         <aside className="lg:w-80 flex-shrink-0">
                                             <div className="sticky top-40 space-y-2">
                                                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-surface-400 mb-6 pl-2">
-                                                    Rutina Semanal
+                                                    {t('exercise.routine')}
                                                 </h3>
                                                 {exercisePlan.workoutDays.map((day) => (
                                                     <ExerciseDayCard
@@ -446,7 +502,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                 </>
                             ) : (
                                 <div className="text-center py-20 text-surface-500">
-                                    <p>No hay plan de ejercicios disponible para este plan.</p>
+                                    <p>{t('exercise.no_plan')}</p>
                                 </div>
                             )}
                         </motion.div>

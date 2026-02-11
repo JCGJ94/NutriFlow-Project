@@ -134,10 +134,10 @@ export default function PlansPage() {
 
   const deletePlan = async (planId: string) => {
     const confirmed = await confirm({
-        title: t('plans.delete_title') || t('plans.delete_confirm'), // Fallback if translation missing key title
-        description: t('plans.delete_description') || '¿Estás seguro de que deseas eliminar este plan? Esta acción no se puede deshacer.',
-        confirmText: t('common.delete') || 'Eliminar',
-        cancelText: t('common.cancel') || 'Cancelar',
+        title: t('plans.delete_title'),
+        description: t('plans.delete_description'),
+        confirmText: t('common.delete'),
+        cancelText: t('common.cancel'),
         variant: 'danger'
     });
     

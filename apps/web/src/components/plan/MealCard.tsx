@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Unlock, RefreshCw, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn, getMealTypeName, formatGrams } from '@/lib/utils';
 import { useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface MealItem {
   id: string;
@@ -36,6 +37,8 @@ export function MealCard({
 }: MealCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  const { t, language } = useLanguage();
+  
   return (
     <motion.div
       layout
@@ -51,11 +54,11 @@ export function MealCard({
               meal.mealType === 'dinner' ? "bg-indigo-100 text-indigo-600" :
               "bg-rose-100 text-rose-600"
             )}>
-              {getMealTypeName(meal.mealType).charAt(0)}
+              {getMealTypeName(meal.mealType, language).charAt(0)}
             </div>
             <div>
               <h4 className="font-heading font-bold text-surface-900 dark:text-white leading-tight">
-                {getMealTypeName(meal.mealType)}
+                {getMealTypeName(meal.mealType, language)}
               </h4>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-sm font-medium text-surface-500 dark:text-surface-400">
@@ -66,7 +69,7 @@ export function MealCard({
                   onClick={() => setIsExpanded(!isExpanded)}
                   className="text-xs font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 underline underline-offset-2 flex items-center gap-1"
                 >
-                  {meal.items.length} ingredientes
+                  {t('common.ingredientes_count').replace('{{count}}', meal.items.length.toString())}
                   {isExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                 </button>
               </div>
@@ -82,7 +85,7 @@ export function MealCard({
                   ? "bg-white dark:bg-surface-600 shadow-sm text-amber-600 dark:text-amber-400" 
                   : "text-surface-400 dark:text-surface-300 hover:text-surface-600 dark:hover:text-surface-100"
               )}
-              title={meal.isLocked ? 'Desbloquear' : 'Bloquear'}
+              title={meal.isLocked ? t('common.unlock') : t('common.lock')}
             >
               {meal.isLocked ? <Lock size={18} /> : <Unlock size={18} />}
             </button>
@@ -95,7 +98,7 @@ export function MealCard({
                   ? "bg-white dark:bg-surface-600 shadow-sm" 
                   : "text-surface-400 dark:text-surface-300 hover:text-primary-600 dark:hover:text-primary-400 disabled:opacity-30"
               )}
-              title="Regenerar comida"
+              title={t('plans.regenerate_meal')}
             >
               {isRegenerating ? (
                 <Loader2 size={18} className="animate-spin text-primary-600" />

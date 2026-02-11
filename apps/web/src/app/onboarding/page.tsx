@@ -73,6 +73,7 @@ export default function OnboardingPage() {
     watch,
     trigger,
     setValue,
+    setError,
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -134,8 +135,35 @@ export default function OnboardingPage() {
     ];
 
     const isValid = await trigger(fieldsToValidate[currentStep]);
-    if (isValid && currentStep < STEPS.length - 1) {
-      setCurrentStep(currentStep + 1);
+    
+    if (isValid) {
+      // Special check for Step 0: Username Availability
+      if (currentStep === 0) {
+        const username = watch('username');
+        setIsLoading(true);
+        try {
+          const res = await fetch(`/api/me/check-username/${username}`);
+          if (res.ok) {
+            const isAvailable = await res.json();
+            if (!isAvailable) {
+              setError('username', { 
+                type: 'manual', 
+                message: 'username_taken' 
+              });
+              showToast(t('errors.username_taken'), 'error');
+              return;
+            }
+          }
+        } catch (error) {
+          console.error('Error checking username:', error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+
+      if (currentStep < STEPS.length - 1) {
+        setCurrentStep(currentStep + 1);
+      }
     }
   };
 
@@ -233,7 +261,7 @@ export default function OnboardingPage() {
 
     } catch (error: any) {
       console.error('Error in onboarding:', error);
-      showToast(error.message || 'Error al completar el registro.', 'error');
+      showToast(error.message || t('onboarding.error_complete'), 'error');
     } finally {
       setIsLoading(false);
       setLoadingStep('');

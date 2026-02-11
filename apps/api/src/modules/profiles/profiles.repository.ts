@@ -36,6 +36,21 @@ export class ProfilesRepository {
         }
     }
 
+    async isUsernameAvailable(username: string): Promise<boolean> {
+        const { data, error } = await this.supabase
+            .from('profiles')
+            .select('username')
+            .eq('username', username)
+            .maybeSingle();
+
+        if (error) {
+            console.error('Error checking username availability:', error);
+            throw new Error(`Failed to check username availability: ${error.message}`);
+        }
+
+        return !data;
+    }
+
     async create(userId: string, dto: UpsertProfileDto): Promise<ProfileResponseDto> {
         const { data, error } = await this.supabase
             .from('profiles')

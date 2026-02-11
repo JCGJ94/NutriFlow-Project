@@ -10,6 +10,10 @@ export class ProfilesService {
         return this.repository.findByUserId(userId);
     }
 
+    async isUsernameAvailable(username: string): Promise<boolean> {
+        return this.repository.isUsernameAvailable(username);
+    }
+
     async upsertProfile(userId: string, dto: UpsertProfileDto): Promise<ProfileResponseDto> {
         const existing = await this.repository.findByUserId(userId);
 

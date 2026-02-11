@@ -1,13 +1,11 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import Link from 'next/link';
+
 import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft,
-  ShoppingCart,
   Check,
-  Loader2,
   Printer,
   Plus,
   Trash2,
@@ -22,7 +20,6 @@ import {
   Leaf,
   Info,
   Download,
-  Copy,
   ChevronDown,
   LayoutGrid
 } from 'lucide-react';
@@ -31,13 +28,15 @@ import { formatGrams } from '@/lib/utils';
 import { useLanguage } from '@/context/LanguageContext';
 import { usePlans } from '@/context/PlansContext';
 import { useToast } from '@/context/ToastContext';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { ShoppingListSkeleton } from '@/components/plan/ShoppingListSkeleton';
+import { drawPdfHeader } from '@/lib/pdf-branding';
+
 
 interface ShoppingListItem {
   id: string;
   ingredientId: string | null;
   ingredientName: string;
+  ingredientNameEn?: string;
   category: IngredientCategory | string;
   totalGrams?: number;
   isChecked: boolean;
@@ -81,16 +80,19 @@ const CATEGORY_ORDER = [
 ];
 
 // Helper to Clean Ingredient Names
-const cleanIngredientName = (name: string): string => {
-    return name
-        .replace(/\s+(cocido|a la plancha|frito|hervido|asado|al horno|vapor|crudo|tostado|en conserva|natural|fresco|semidesnatada|entera|desnatada)\b/gi, '')
-        .trim();
+const cleanIngredientName = (name: string, lang: string = 'es'): string => {
+    const terms = lang === 'es' 
+        ? 'cocido|a la plancha|frito|hervido|asado|al horno|vapor|crudo|tostado|en conserva|natural|fresco|semidesnatada|entera|desnatada'
+        : 'cooked|grilled|fried|boiled|roasted|baked|steamed|raw|toasted|canned|natural|fresh|semi-skimmed|whole|skimmed';
+    
+    const regex = new RegExp(`\\s+(${terms})\\b`, 'gi');
+    return name.replace(regex, '').trim();
 };
 
 export default function ShoppingListPage() {
   const params = useParams();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { getShoppingList, updateShoppingListCache } = usePlans();
   const { showToast } = useToast();
   const planId = params.id as string;
@@ -217,43 +219,36 @@ export default function ShoppingListPage() {
     }
   };
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
     if (!shoppingList) return null;
-    const doc = new jsPDF();
+    
+    // Dynamic Import
+    const jsPDFModule = (await import('jspdf')).default;
+    const autoTableModule = (await import('jspdf-autotable')).default;
+
+    const doc = new jsPDFModule();
     
     // Header with Logo Placeholder & Title
     doc.setFillColor(15, 23, 42); // slate-900 like
     doc.rect(0, 0, 210, 40, 'F');
-    // Draw Fork Icon (Minimalist) - White on Dark Header
-    // Handle: Rect
-    doc.setDrawColor(255, 255, 255); 
-    doc.setFillColor(255, 255, 255);
-    doc.roundedRect(25, 15, 4, 20, 1, 1, 'F');
-    // Tines base
-    doc.roundedRect(22, 10, 10, 6, 2, 2, 'F');
-    // Tines
-    doc.roundedRect(22, 6, 2, 6, 1, 1, 'F'); // Left
-    doc.roundedRect(26, 6, 2, 6, 1, 1, 'F'); // Middle
-    doc.roundedRect(30, 6, 2, 6, 1, 1, 'F'); // Right
+    // Filter Items: Only Checked OR Custom
+    const itemsToPrint = shoppingList.items.filter(i => i.isChecked || i.isCustom);
 
-    // Brand Name
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("NUTRIFLOW", 27, 42, { align: 'center' }); // Centered under logo
-
-    doc.setFontSize(22);
-    doc.setTextColor(255, 255, 255);
-    doc.text(t('shop.title'), 160, 22, { align: 'right' });
-    
-    doc.setFontSize(10);
-    doc.setTextColor(148, 163, 184); // slate-400
-    doc.text(`Week: ${new Date(shoppingList.weekStart).toLocaleDateString()}`, 160, 30, { align: 'right' });
+    // Call Branding Utility
+    const subtitle = `${t('shop.week')}: ${new Date(shoppingList.weekStart).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US')}`;
+    drawPdfHeader(doc, 'badge', t('shop.title'), subtitle);
     
     let yPos = 50;
 
+    if (itemsToPrint.length === 0) {
+        doc.setTextColor(100);
+        doc.setFontSize(12);
+        doc.text(t('shop.no_items_print'), 105, 60, { align: 'center' });
+        return doc;
+    }
+
     // Ordered Data for PDF
-    const grouped = (shoppingList.items || []).reduce((acc, item) => {
+    const grouped = itemsToPrint.reduce((acc, item) => {
         const cat = item.category || 'Other';
         if (!acc[cat]) acc[cat] = [];
         acc[cat].push(item);
@@ -269,20 +264,20 @@ export default function ShoppingListPage() {
     sortedForPDF.forEach(([cat, items]) => {
          // Category Header
          doc.setFontSize(12);
-         doc.setTextColor(15, 23, 42);
+         doc.setTextColor(16, 185, 129); // emerald-500
          doc.setFont('helvetica', 'bold');
          doc.text(t(`cat.${cat.toUpperCase()}`) || cat, 14, yPos);
          yPos += 2;
 
-         autoTable(doc, {
+         autoTableModule(doc, {
             startY: yPos,
-            // head: [[t(`cat.${cat.toUpperCase()}`) || cat, 'Qty']],
-            body: items.map(i => [cleanIngredientName(i.ingredientName), i.isChecked ? '(✔)' : '', i.totalGrams ? formatGrams(i.totalGrams) : '-']),
-            theme: 'plain',
-            styles: { fontSize: 10, cellPadding: 1, textColor: 50 },
+            body: items.map(i => [cleanIngredientName(language === 'en' && i.ingredientNameEn ? i.ingredientNameEn : i.ingredientName, language), i.isCustom ? '(Manual)' : '', i.totalGrams ? formatGrams(i.totalGrams) : '-']),
+            theme: 'grid', // Cleaner grid for print
+            headStyles: { fillColor: [240, 253, 244], textColor: 50 }, // emerald-50
+            styles: { fontSize: 10, cellPadding: 3, textColor: 50 },
             columnStyles: { 
                 0: { cellWidth: 100 },
-                1: { cellWidth: 10 },
+                1: { cellWidth: 30, fontStyle: 'italic' },
                 2: { halign: 'right', cellWidth: 20 } 
             },
             margin: { left: 14, right: 14 }
@@ -292,27 +287,28 @@ export default function ShoppingListPage() {
     });
 
     // Footer
+    // @ts-ignore
     const pageCount = doc.internal.getNumberOfPages();
     for(let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
         doc.setFontSize(8);
         doc.setTextColor(150);
-        doc.text('Generated by NutriFlow', 105, 290, { align: 'center' });
+        doc.text(`NutriFlow - ${t('shop.generated_by')}`, 105, 290, { align: 'center' });
     }
 
     return doc;
   };
 
-  const handleDownloadPDF = () => {
-    const doc = generatePDF();
+  const handleDownloadPDF = async () => {
+    const doc = await generatePDF();
     if (doc) {
         doc.save('NutriFlow-ShoppingList.pdf');
         showToast(t('shop.pdf_downloaded'), 'success');
     }
   };
 
-  const handlePreviewPDF = () => {
-    const doc = generatePDF();
+  const handlePreviewPDF = async () => {
+    const doc = await generatePDF();
     if (doc) {
         // @ts-ignore
         const blobUrl = doc.output('bloburl');
@@ -332,7 +328,7 @@ export default function ShoppingListPage() {
   const handleShare = async () => {
     if (navigator.share) {
         try {
-            const doc = generatePDF();
+            const doc = await generatePDF();
             if(doc) {
                  const blob = doc.output('blob');
                  const file = new File([blob], 'shopping-list.pdf', { type: 'application/pdf' });
@@ -361,7 +357,7 @@ export default function ShoppingListPage() {
 
   const copyToClipboard = () => {
       let text = `${t('shop.title')}\n`;
-      shoppingList?.items.forEach(i => text += `- ${cleanIngredientName(i.ingredientName)}\n`);
+      shoppingList?.items.forEach(i => text += `- ${cleanIngredientName(language === 'en' && i.ingredientNameEn ? i.ingredientNameEn : i.ingredientName, language)}\n`);
       navigator.clipboard.writeText(text);
       showToast(t('shop.copied_clipboard'), 'info');
   };
@@ -390,7 +386,7 @@ export default function ShoppingListPage() {
 
   const customItems = shoppingList?.items.filter(i => i.isCustom) || [];
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-950"><Loader2 className="w-8 h-8 animate-spin text-primary-500"/></div>;
+  if (isLoading) return <ShoppingListSkeleton />;
   if (!shoppingList) return null;
 
   const totalItems = shoppingList.items.length;
@@ -499,7 +495,7 @@ export default function ShoppingListPage() {
                                           {t(`cat.${cat.toUpperCase()}`) || cat}
                                       </h3>
                                       <p className="text-xs text-surface-400 font-medium">
-                                          {items.length} {t('common.items')}
+                                          {t('common.ingredientes_count').replace('{{count}}', items.length.toString())}
                                       </p>
                                   </div>
                               </div>
@@ -521,7 +517,7 @@ export default function ShoppingListPage() {
                                           
                                           <div className="flex-1 min-w-0">
                                               <p className={`font-medium truncate transition-all ${item.isChecked ? 'text-surface-400 line-through' : 'text-surface-700 dark:text-surface-200'}`}>
-                                                  {cleanIngredientName(item.ingredientName)}
+                                                  {cleanIngredientName(language === 'en' && item.ingredientNameEn ? item.ingredientNameEn : item.ingredientName, language)}
                                               </p>
                                               {item.totalGrams && !item.isChecked && (
                                                   <p className="text-xs text-surface-400 font-medium">
@@ -634,14 +630,14 @@ export default function ShoppingListPage() {
                           onClick={closePreview}
                           className="px-5 py-2.5 rounded-full text-surface-600 font-medium hover:bg-surface-50 dark:text-surface-300 dark:hover:bg-surface-800 transition-colors"
                       >
-                          {t('common.close') || 'Cerrar'}
+                          {t('common.close')}
                       </button>
                       <button 
                           onClick={() => { handleDownloadPDF(); closePreview(); }}
                           className="px-6 py-2.5 rounded-full bg-surface-900 text-white dark:bg-white dark:text-surface-900 font-bold hover:shadow-lg hover:scale-[1.02] transition-all flex items-center gap-2"
                       >
                           <Download className="w-4 h-4" />
-                          {t('common.download') || 'Descargar'}
+                          {t('common.download')}
                       </button>
                   </div>
               </div>

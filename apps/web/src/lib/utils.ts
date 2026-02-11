@@ -9,10 +9,10 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Format date to Spanish locale
+ * Format date to specified locale
  */
-export function formatDate(date: Date | string): string {
-    return new Date(date).toLocaleDateString('es-ES', {
+export function formatDate(date: Date | string, lang: 'es' | 'en' = 'es'): string {
+    return new Date(date).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
@@ -23,40 +23,43 @@ export function formatDate(date: Date | string): string {
 /**
  * Format short date
  */
-export function formatShortDate(date: Date | string): string {
-    return new Date(date).toLocaleDateString('es-ES', {
+export function formatShortDate(date: Date | string, lang: 'es' | 'en' = 'es'): string {
+    return new Date(date).toLocaleDateString(lang === 'es' ? 'es-ES' : 'en-US', {
         day: '2-digit',
         month: '2-digit',
     });
 }
 
 /**
- * Get day name in Spanish
+ * Get day name in specified language
  */
-export function getDayName(dayOfWeek: number): string {
-    const days = [
-        'Lunes',
-        'Martes',
-        'Miércoles',
-        'Jueves',
-        'Viernes',
-        'Sábado',
-        'Domingo',
-    ];
-    return days[dayOfWeek] || '';
+export function getDayName(dayOfWeek: number, lang: 'es' | 'en' = 'es'): string {
+    const days = {
+        es: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
+        en: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    };
+    return days[lang][dayOfWeek] || '';
 }
 
 /**
- * Get meal type name in Spanish
+ * Get meal type name in specified language
  */
-export function getMealTypeName(mealType: string): string {
-    const types: Record<string, string> = {
-        breakfast: 'Desayuno',
-        lunch: 'Almuerzo',
-        dinner: 'Cena',
-        snack: 'Snack',
+export function getMealTypeName(mealType: string, lang: 'es' | 'en' = 'es'): string {
+    const types: Record<string, Record<string, string>> = {
+        es: {
+            breakfast: 'Desayuno',
+            lunch: 'Almuerzo',
+            dinner: 'Cena',
+            snack: 'Snack',
+        },
+        en: {
+            breakfast: 'Breakfast',
+            lunch: 'Lunch',
+            dinner: 'Dinner',
+            snack: 'Snack',
+        }
     };
-    return types[mealType] || mealType;
+    return types[lang][mealType] || mealType;
 }
 
 /**

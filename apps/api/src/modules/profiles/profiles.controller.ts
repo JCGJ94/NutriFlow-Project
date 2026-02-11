@@ -1,4 +1,4 @@
-import { Controller, Get, Put, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Put, Body, UseGuards, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { ProfilesService } from './profiles.service';
 import { UpsertProfileDto, SetAllergensDto, ProfileResponseDto, AllergenDto } from './dto';
@@ -35,6 +35,13 @@ export class ProfilesController {
 
             throw error;
         }
+    }
+
+    @Get('check-username/:username')
+    @ApiOperation({ summary: 'Verificar si un nombre de usuario está disponible' })
+    @ApiResponse({ status: 200, type: Boolean })
+    async checkUsername(@Body() _dto: any, @User() _user: AuthUser, @Param('username') username: string): Promise<boolean> {
+        return this.profilesService.isUsernameAvailable(username);
     }
 
     @Put('profile')

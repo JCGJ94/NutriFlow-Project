@@ -144,6 +144,9 @@ export class IngredientResponseDto {
     @ApiProperty()
     isVegetarian!: boolean;
 
+    @ApiProperty()
+    nameEn?: string;
+
     @ApiPropertyOptional({ type: [String] })
     allergenIds?: string[];
 

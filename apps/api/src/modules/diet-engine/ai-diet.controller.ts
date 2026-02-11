@@ -24,11 +24,16 @@ export class AiDietController {
         const diff = today.getDate() - day + (day === 0 ? -6 : 1) + 7;
         const nextMonday = new Date(today.setDate(diff)).toISOString().split('T')[0];
 
-        const plan = this.dietEngineService.generateWeeklyPlan(
+        let plan = this.dietEngineService.generateWeeklyPlan(
             profile,
             ingredients as any[],
             nextMonday
         );
+
+        // SYNC: Translate if language is English
+        if (profile.language === 'en') {
+            plan = await this.translationBridgeService.translatePlan(plan, 'en');
+        }
 
         return plan;
     }

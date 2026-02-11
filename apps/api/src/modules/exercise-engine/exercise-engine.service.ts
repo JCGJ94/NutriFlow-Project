@@ -12,10 +12,11 @@ interface ExerciseProfile {
     goal: ExerciseGoal;
     age: number;
     sex: string;
+    language?: 'es' | 'en';
 }
 
-// Exercise database (simplified for rules engine)
-const EXERCISE_DATABASE = {
+// Exercise database (ES)
+const EXERCISE_DATABASE_ES = {
     chest: [
         { name: 'Press de banca', sets: 4, reps: 10, restSec: 90 },
         { name: 'Flexiones', sets: 3, reps: 15, restSec: 60 },
@@ -67,8 +68,61 @@ const EXERCISE_DATABASE = {
     ],
 };
 
-// Workout templates based on goal and days per week
-const WORKOUT_TEMPLATES = {
+// Exercise database (EN)
+const EXERCISE_DATABASE_EN = {
+    chest: [
+        { name: 'Bench Press', sets: 4, reps: 10, restSec: 90 },
+        { name: 'Push-ups', sets: 3, reps: 15, restSec: 60 },
+        { name: 'Dumbbell Flyes', sets: 3, reps: 12, restSec: 60 },
+        { name: 'Incline Press', sets: 3, reps: 10, restSec: 90 },
+    ],
+    back: [
+        { name: 'Pull-ups', sets: 4, reps: 8, restSec: 90 },
+        { name: 'Barbell Row', sets: 4, reps: 10, restSec: 90 },
+        { name: 'Lat Pulldown', sets: 3, reps: 12, restSec: 60 },
+        { name: 'Dumbbell Row', sets: 3, reps: 10, restSec: 60 },
+    ],
+    legs: [
+        { name: 'Squats', sets: 4, reps: 10, restSec: 120 },
+        { name: 'Romanian Deadlift', sets: 4, reps: 10, restSec: 90 },
+        { name: 'Leg Press', sets: 3, reps: 12, restSec: 90 },
+        { name: 'Lunges', sets: 3, reps: 12, restSec: 60 },
+        { name: 'Leg Extensions', sets: 3, reps: 15, restSec: 45 },
+    ],
+    shoulders: [
+        { name: 'Overhead Press', sets: 4, reps: 10, restSec: 90 },
+        { name: 'Lateral Raises', sets: 3, reps: 15, restSec: 45 },
+        { name: 'Face Pulls', sets: 3, reps: 15, restSec: 45 },
+        { name: 'Front Raises', sets: 3, reps: 12, restSec: 45 },
+    ],
+    arms: [
+        { name: 'Bicep Curls', sets: 3, reps: 12, restSec: 60 },
+        { name: 'Tricep Extensions', sets: 3, reps: 12, restSec: 60 },
+        { name: 'Hammer Curls', sets: 3, reps: 10, restSec: 45 },
+        { name: 'Dips', sets: 3, reps: 10, restSec: 60 },
+    ],
+    core: [
+        { name: 'Plank', sets: 3, durationSec: 45, restSec: 30 },
+        { name: 'Crunches', sets: 3, reps: 20, restSec: 30 },
+        { name: 'Leg Raises', sets: 3, reps: 15, restSec: 30 },
+        { name: 'Russian Twists', sets: 3, reps: 20, restSec: 30 },
+    ],
+    cardio: [
+        { name: 'Running', sets: 1, durationSec: 1800, restSec: 0 },
+        { name: 'Stationary Bike', sets: 1, durationSec: 1200, restSec: 0 },
+        { name: 'Elliptical', sets: 1, durationSec: 1500, restSec: 0 },
+        { name: 'Jump Rope', sets: 5, durationSec: 120, restSec: 60 },
+    ],
+    hiit: [
+        { name: 'Burpees', sets: 4, reps: 10, restSec: 30 },
+        { name: 'Mountain Climbers', sets: 4, durationSec: 30, restSec: 15 },
+        { name: 'Jumping Jacks', sets: 4, durationSec: 45, restSec: 15 },
+        { name: 'Jump Squats', sets: 4, reps: 12, restSec: 30 },
+    ],
+};
+
+// Workout templates (ES)
+const WORKOUT_TEMPLATES_ES = {
     build_muscle_3: [
         { name: 'Full Body A', type: 'strength', muscles: ['chest', 'back', 'legs', 'core'] },
         { name: 'Descanso', type: 'rest', muscles: [] },
@@ -107,19 +161,62 @@ const WORKOUT_TEMPLATES = {
     ],
 };
 
+// Workout templates (EN)
+const WORKOUT_TEMPLATES_EN = {
+    build_muscle_3: [
+        { name: 'Full Body A', type: 'strength', muscles: ['chest', 'back', 'legs', 'core'] },
+        { name: 'Rest Day', type: 'rest', muscles: [] },
+        { name: 'Full Body B', type: 'strength', muscles: ['shoulders', 'arms', 'legs', 'core'] },
+        { name: 'Rest Day', type: 'rest', muscles: [] },
+        { name: 'Full Body C', type: 'strength', muscles: ['chest', 'back', 'shoulders', 'arms'] },
+        { name: 'Rest Day', type: 'rest', muscles: [] },
+        { name: 'Active Recovery', type: 'flexibility', muscles: ['core'] },
+    ],
+    build_muscle_4: [
+        { name: 'Chest + Triceps', type: 'strength', muscles: ['chest', 'arms'] },
+        { name: 'Back + Biceps', type: 'strength', muscles: ['back', 'arms'] },
+        { name: 'Rest Day', type: 'rest', muscles: [] },
+        { name: 'Legs + Glutes', type: 'strength', muscles: ['legs'] },
+        { name: 'Shoulders + Core', type: 'strength', muscles: ['shoulders', 'core'] },
+        { name: 'Rest Day', type: 'rest', muscles: [] },
+        { name: 'Rest Day', type: 'rest', muscles: [] },
+    ],
+    lose_weight_4: [
+        { name: 'HIIT + Core', type: 'hiit', muscles: ['hiit', 'core'] },
+        { name: 'Upper Body Strength', type: 'strength', muscles: ['chest', 'back', 'shoulders'] },
+        { name: 'Moderate Cardio', type: 'cardio', muscles: ['cardio'] },
+        { name: 'Rest Day', type: 'rest', muscles: [] },
+        { name: 'Lower Body Strength', type: 'strength', muscles: ['legs', 'core'] },
+        { name: 'HIIT', type: 'hiit', muscles: ['hiit'] },
+        { name: 'Active Recovery', type: 'cardio', muscles: ['cardio'] },
+    ],
+    maintain_3: [
+        { name: 'Full Body', type: 'strength', muscles: ['chest', 'back', 'legs'] },
+        { name: 'Cardio', type: 'cardio', muscles: ['cardio'] },
+        { name: 'Rest Day', type: 'rest', muscles: [] },
+        { name: 'Full Body', type: 'strength', muscles: ['shoulders', 'arms', 'core'] },
+        { name: 'Rest Day', type: 'rest', muscles: [] },
+        { name: 'Cardio + HIIT', type: 'hiit', muscles: ['hiit', 'core'] },
+        { name: 'Rest Day', type: 'rest', muscles: [] },
+    ],
+};
+
 @Injectable()
 export class ExerciseEngineService {
     generateExercisePlan(profile: ExerciseProfile, weekStart: string): GeneratedExercisePlan {
+        const lang = profile.language === 'en' ? 'en' : 'es';
         const daysPerWeek = this.getDaysPerWeek(profile.activityLevel);
         const templateKey = this.getTemplateKey(profile.goal, daysPerWeek);
-        const template = (WORKOUT_TEMPLATES as any)[templateKey] || WORKOUT_TEMPLATES['maintain_3'];
+
+        const templates = lang === 'en' ? WORKOUT_TEMPLATES_EN : WORKOUT_TEMPLATES_ES;
+        const template = (templates as any)[templateKey] || (templates as any)['maintain_3'];
 
         const workoutDays: GeneratedWorkoutDay[] = template.map((day: any, index: number) => {
             if (day.type === 'rest') {
-                return this.createRestDay(index);
+                return this.createRestDay(index, lang);
             }
 
-            const exercises = this.selectExercises(day.muscles);
+            const exercises = this.selectExercises(day.muscles, lang);
             const totalDurationMin = this.calculateDuration(exercises);
             const caloriesBurned = this.estimateCalories(day.type, totalDurationMin, profile);
 
@@ -164,10 +261,10 @@ export class ExerciseEngineService {
         return `${goal}_${mappedDays}`;
     }
 
-    private createRestDay(dayIndex: number): GeneratedWorkoutDay {
+    private createRestDay(dayIndex: number, lang: 'es' | 'en'): GeneratedWorkoutDay {
         return {
             dayOfWeek: dayIndex,
-            name: 'Descanso',
+            name: lang === 'en' ? 'Rest Day' : 'Descanso',
             type: 'rest',
             isRestDay: true,
             exercises: [],
@@ -176,11 +273,12 @@ export class ExerciseEngineService {
         };
     }
 
-    private selectExercises(muscleGroups: string[]): GeneratedExerciseSet[] {
+    private selectExercises(muscleGroups: string[], lang: 'es' | 'en'): GeneratedExerciseSet[] {
         const exercises: GeneratedExerciseSet[] = [];
+        const database = lang === 'en' ? EXERCISE_DATABASE_EN : EXERCISE_DATABASE_ES;
 
         muscleGroups.forEach(muscle => {
-            const available = (EXERCISE_DATABASE as any)[muscle] || [];
+            const available = (database as any)[muscle] || [];
             // Select 2-3 exercises per muscle group
             const count = Math.min(available.length, muscle === 'core' ? 2 : 3);
             const selected = this.shuffleArray([...available]).slice(0, count);

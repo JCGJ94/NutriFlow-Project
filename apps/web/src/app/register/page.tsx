@@ -72,7 +72,7 @@ export default function RegisterPage() {
         }
         
         // Generic error
-        showToast(`Error al registrarse: ${authError.message}`, 'error');
+        showToast(t('reg.error_signup') + ': ' + authError.message, 'error');
         return;
       }
 

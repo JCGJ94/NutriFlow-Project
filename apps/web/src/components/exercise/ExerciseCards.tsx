@@ -3,6 +3,8 @@
 import { motion } from 'framer-motion';
 import { Dumbbell, Clock, Flame, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useLanguage } from '@/context/LanguageContext';
+import { getDayName } from '@/lib/utils';
 
 interface ExerciseSet {
     exerciseName: string;
@@ -28,8 +30,6 @@ interface ExerciseCardProps {
     onClick: () => void;
 }
 
-const DAY_NAMES = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-
 const TYPE_COLORS = {
     strength: 'bg-blue-500',
     cardio: 'bg-green-500',
@@ -38,15 +38,9 @@ const TYPE_COLORS = {
     rest: 'bg-gray-400',
 };
 
-const TYPE_LABELS = {
-    strength: 'Fuerza',
-    cardio: 'Cardio',
-    hiit: 'HIIT',
-    flexibility: 'Flexibilidad',
-    rest: 'Descanso',
-};
-
 export function ExerciseDayCard({ day, isSelected, onClick }: ExerciseCardProps) {
+    const { language } = useLanguage();
+    
     return (
         <motion.button
             onClick={onClick}
@@ -69,7 +63,7 @@ export function ExerciseDayCard({ day, isSelected, onClick }: ExerciseCardProps)
             </div>
             <div className="flex-1">
                 <div className="font-heading font-black text-sm uppercase tracking-wide text-surface-900 dark:text-white">
-                    {DAY_NAMES[day.dayOfWeek]}
+                    {getDayName(day.dayOfWeek, language)}
                 </div>
                 <div className="text-xs font-medium text-surface-500 dark:text-surface-400">
                     {day.name}
@@ -100,19 +94,40 @@ interface ExerciseDetailProps {
 }
 
 export function ExerciseDetail({ day }: ExerciseDetailProps) {
+    const { t } = useLanguage();
+    
     if (day.isRestDay) {
         return (
             <div className="bg-white dark:bg-surface-800 rounded-3xl p-8 shadow-xl shadow-surface-200/50 dark:shadow-none text-center transition-colors duration-300">
                 <div className="text-6xl mb-4">🧘‍♂️</div>
                 <h3 className="text-2xl font-heading font-black text-surface-900 dark:text-white mb-2">
-                    Día de Descanso
+                    {t('exercise.rest_day')}
                 </h3>
                 <p className="text-surface-500 dark:text-surface-400">
-                    Tu cuerpo necesita recuperarse. Aprovecha para hidratarte, estirar suavemente y dormir bien.
+                    {t('exercise.rest_desc')}
                 </p>
             </div>
         );
     }
+
+    const typeLabels: Record<string, string> = {
+        strength: t('exercise.type_strength'),
+        cardio: t('exercise.type_cardio'),
+        hiit: t('exercise.type_hiit'),
+        flexibility: t('exercise.type_flexibility'),
+        rest: t('exercise.descanso'),
+        'rest day': t('exercise.rest_day'),
+        'full body': t('exercise.type_fullbody'),
+        'full body a': t('exercise.type_fullbody'),
+        'full body b': t('exercise.type_fullbody'),
+        'full body c': t('exercise.type_fullbody'),
+        'upper body': t('exercise.type_upper'),
+        'lower body': t('exercise.type_lower'),
+        'upper body strength': t('exercise.type_upper'),
+        'lower body strength': t('exercise.type_lower'),
+        'active recovery': t('exercise.active_recovery') || 'Recuperación Activa',
+        'core': t('exercise.type_core'),
+    };
 
     return (
         <div className="bg-white dark:bg-surface-800 rounded-3xl shadow-xl shadow-surface-200/50 dark:shadow-none overflow-hidden transition-colors duration-300">
@@ -124,10 +139,10 @@ export function ExerciseDetail({ day }: ExerciseDetailProps) {
                 <div className="flex items-center justify-between">
                     <div>
                         <span className="text-xs font-bold uppercase tracking-widest opacity-80">
-                            {TYPE_LABELS[day.type as keyof typeof TYPE_LABELS] || day.type}
+                            {typeLabels[day.type.toLowerCase()] || typeLabels[day.name.toLowerCase()] || day.type}
                         </span>
                         <h3 className="text-2xl font-heading font-black mt-1">
-                            {day.name}
+                            {typeLabels[day.name.toLowerCase()] || day.name}
                         </h3>
                     </div>
                     <div className="flex gap-4">
@@ -163,7 +178,9 @@ export function ExerciseDetail({ day }: ExerciseDetailProps) {
                             <div className="text-sm text-surface-500 dark:text-surface-400">
                                 {exercise.sets} series × {exercise.reps ? `${exercise.reps} reps` : `${exercise.durationSec}s`}
                                 <span className="mx-2">·</span>
-                                <span className="text-orange-500">Descanso: {exercise.restSec}s</span>
+                                <span className="text-orange-500">
+                                    {t('exercise.descanso')}: {exercise.restSec}s
+                                </span>
                             </div>
                         </div>
                     </motion.div>

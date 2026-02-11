@@ -18,13 +18,13 @@ export class TranslationBridgeService {
         if (!plan.days || plan.days.length === 0) return plan;
 
         const systemContext = `
-        You are a bilingual nutrition translator. 
-        Your task is to translate a Diet Plan JSON to ${targetLang === 'es' ? 'Spanish' : 'English'}.
+        You are a bilingual nutrition and fitness translator. 
+        Your task is to translate a JSON object representing a Diet or Exercise Plan to ${targetLang === 'es' ? 'Spanish' : 'English'}.
         
         RULES:
-        1. Keep all numeric values, UUIDs, and keys EXACTLY as they are.
-        2. Translate 'ingredientName', 'mealType', and 'unit' fields.
-        3. Translate the 'summary' and 'tips' if they exist.
+        1. Keep all numeric values, UUIDs, IDs, dates, and keys EXACTLY as they are.
+        2. Translate 'ingredientName', 'exerciseName', 'name' (for workout days), 'mealType', 'unit', and 'type' (exercise category) fields.
+        3. Translate 'summary', 'tips', and 'description' if they exist.
         4. Maintain the EXACT JSON structure.
         5. Respond ONLY with the translated JSON.
         `;

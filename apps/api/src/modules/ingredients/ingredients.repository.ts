@@ -210,6 +210,7 @@ export class IngredientsRepository {
         return {
             id: data.id,
             name: data.name,
+            nameEn: data.name_en,
             category: data.category,
             kcalPer100g: data.kcal_per_100g,
             proteinPer100g: data.protein_per_100g,
