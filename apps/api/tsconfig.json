@@ -17,6 +17,9 @@
         "paths": {
             "@/*": [
                 "src/*"
+            ],
+            "@nutriflow/shared": [
+                "../../packages/shared/src"
             ]
         }
     },
