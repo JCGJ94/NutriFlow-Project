@@ -23,16 +23,27 @@ export class NotebooklmMcpService implements OnModuleInit, OnModuleDestroy {
     }
 
     async onModuleInit() {
+        // We no longer connect on init to avoid blocking the application startup
+        // Connection will happen lazily on the first query
+        this.logger.log('Knowledge Service initialized (Lazy mode)');
+    }
+
+    private async ensureConnection() {
+        if (this.isConnected && this.transport) {
+            return;
+        }
+
         try {
             const mcpPath = this.configService.get<string>('NOTEBOOKLM_MCP_PATH');
 
             if (!mcpPath) {
-                this.logger.warn('⚠️ NOTEBOOKLM_MCP_PATH not found in env, using pre-installed notebooklm-mcp');
+                this.logger.log('Connecting to Knowledge Service via local bridge...');
                 this.transport = new StdioClientTransport({
                     command: 'npx',
                     args: ['--no-install', 'notebooklm-mcp'],
                 });
             } else {
+                this.logger.log('Connecting to Knowledge Service via custom path...');
                 this.transport = new StdioClientTransport({
                     command: mcpPath,
                 });
@@ -40,10 +51,11 @@ export class NotebooklmMcpService implements OnModuleInit, OnModuleDestroy {
 
             await this.client.connect(this.transport);
             this.isConnected = true;
-            this.logger.log(`✅ Connected to NotebookLM MCP Server (${mcpPath ? 'Local' : 'npx'})`);
+            this.logger.log('✅ Knowledge Service connected successfully');
         } catch (error: any) {
             this.isConnected = false;
-            this.logger.error('❌ Failed to connect to NotebookLM MCP Server', error.stack);
+            this.logger.error('❌ Failed to connect to Knowledge Service', error.stack);
+            throw new Error('Knowledge Service is currently unavailable');
         }
     }
 
@@ -58,9 +70,7 @@ export class NotebooklmMcpService implements OnModuleInit, OnModuleDestroy {
     }
 
     async query(notebookId: string, query: string): Promise<string> {
-        if (!this.isConnected) {
-            throw new Error('NotebookLM MCP is not connected');
-        }
+        await this.ensureConnection();
 
         try {
             const response = await this.client.callTool({

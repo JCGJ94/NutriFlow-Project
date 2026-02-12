@@ -145,17 +145,17 @@ NEXT_PUBLIC_API_BASE_URL=https://api.tudominio.com
 ```
 
 ### PASO 3 — Deploy del Backend
-**Proveedor recomendado:** Render, Railway, Fly.io
+**Proveedor recomendado:** Railway
 **Requisitos:**
-- Build correcto del monorepo.
-- Ejecutar sólo `apps/api`.
-- Puerto expuesto correctamente.
+- Build correcto del monorepo usando Turbo.
+- Comando de Build: `pnpm install && pnpm turbo run build --filter=@nutriflow/api...`
+- Comando de Start: `pnpm --filter @nutriflow/api start:prod`
 
 **Checklist:**
-- [ ] Servicio accesible.
-- [ ] `/health` funciona.
-- [ ] CORS correcto.
-- [ ] Logs visibles.
+- [ ] Servicio accesible en dominio `.railway.app`.
+- [ ] `/v1/health` devuelve 200.
+- [ ] Variables de entorno inyectadas.
+- [ ] Watch paths configurados (`apps/api/**`, `packages/shared/**`).
 
 ### PASO 4 — Deploy del Frontend
 **Proveedor recomendado:** Vercel
@@ -189,6 +189,12 @@ Para procesos largos:
 **Estados:** `PENDING`, `RUNNING`, `READY`, `FAILED`.
 
 Esto permite escalar fácilmente con workers en el futuro.
+
+## 🔟 Resiliencia de IA (Knowledge Service)
+El sistema utiliza una conexión perezosa (Lazy Load) para el servidor MCP:
+- La API no depende del estado del servidor MCP para arrancar.
+- El servidor MCP se conecta solo ante la primera solicitud.
+- Si el motor de conocimiento falla, el sistema degrada la funcionalidad grácilmente sin afectar el flujo principal del usuario.
 
 ---
 
