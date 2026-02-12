@@ -14,6 +14,7 @@ import { RagModule } from './modules/rag/rag.module';
 import { AiModule } from './modules/ai/ai.module';
 import { ExerciseEngineModule } from './modules/exercise-engine/exercise-engine.module';
 import { ExercisePlansModule } from './modules/exercise-plans/exercise-plans.module';
+import { AppController } from './app.controller';
 
 @Module({
     imports: [
@@ -50,6 +51,7 @@ import { ExercisePlansModule } from './modules/exercise-plans/exercise-plans.mod
         ExerciseEngineModule,
         ExercisePlansModule,
     ],
+    controllers: [AppController],
     providers: [
         {
             provide: APP_GUARD,

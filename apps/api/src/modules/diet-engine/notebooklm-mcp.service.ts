@@ -27,10 +27,10 @@ export class NotebooklmMcpService implements OnModuleInit, OnModuleDestroy {
             const mcpPath = this.configService.get<string>('NOTEBOOKLM_MCP_PATH');
 
             if (!mcpPath) {
-                this.logger.warn('⚠️ NOTEBOOKLM_MCP_PATH not found in env, falling back to npx');
+                this.logger.warn('⚠️ NOTEBOOKLM_MCP_PATH not found in env, using pre-installed notebooklm-mcp');
                 this.transport = new StdioClientTransport({
                     command: 'npx',
-                    args: ['-y', 'notebooklm-mcp'],
+                    args: ['--no-install', 'notebooklm-mcp'],
                 });
             } else {
                 this.transport = new StdioClientTransport({
