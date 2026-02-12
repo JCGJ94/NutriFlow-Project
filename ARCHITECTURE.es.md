@@ -91,3 +91,9 @@ Usamos **Supabase** como un Backend-as-a-Service (BaaS) integral.
 -   **Seguridad**: **Row Level Security (RLS)** se aplica en TODAS las tablas.
     -   *Regla*: Los usuarios solo pueden acceder a sus propios datos (`auth.uid() = user_id`).
     -   *Excepción*: Roles de administrador para gestión de ingredientes.
+
+---
+
+## 6. Despliegue y Operaciones
+
+Para detalles sobre la estrategia de despliegue, variables de entorno y configuración de producción, consulte la [Guía de Arquitectura de Despliegue](docs/DEPLOYMENT_ARCHITECTURE.md).

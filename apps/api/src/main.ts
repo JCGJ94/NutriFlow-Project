@@ -7,12 +7,16 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     // Global prefix
-    const apiPrefix = process.env.API_PREFIX || 'api';
+    const apiPrefix = process.env.API_PREFIX || 'v1';
     app.setGlobalPrefix(apiPrefix);
 
     // CORS
     app.enableCors({
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        origin: [
+            process.env.CORS_ORIGIN,
+            process.env.FRONTEND_URL,
+            'http://localhost:3000'
+        ].filter(Boolean),
         credentials: true,
     });
 
@@ -63,7 +67,7 @@ async function bootstrap() {
     SwaggerModule.setup(`${apiPrefix}/docs`, app, document);
 
     // Start server
-    const port = process.env.API_PORT || 3001;
+    const port = process.env.PORT || process.env.API_PORT || 3000;
     await app.listen(port);
 
     console.log(`🚀 NutriFlow API running on: http://localhost:${port}/${apiPrefix}`);

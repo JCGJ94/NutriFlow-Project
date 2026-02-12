@@ -27,7 +27,7 @@ export const SUPABASE_ADMIN = 'SUPABASE_ADMIN';
             inject: [ConfigService],
             useFactory: (configService: ConfigService): SupabaseClient => {
                 const supabaseUrl = configService.get<string>('SUPABASE_URL');
-                const supabaseServiceKey = configService.get<string>('SUPABASE_SERVICE_KEY');
+                const supabaseServiceKey = configService.get<string>('SUPABASE_SERVICE_ROLE_KEY') || configService.get<string>('SUPABASE_SERVICE_KEY');
 
                 if (!supabaseUrl || !supabaseServiceKey) {
                     throw new Error('Missing Supabase admin environment variables');
