@@ -1,0 +1,9 @@
+[build]
+builder = "NIXPACKS"
+
+[services."@nutriflow/api"]
+path = "apps/api"
+buildCommand = "pnpm install && pnpm run build"
+startCommand = "node dist/main"
+restartPolicyType = "ON_FAILURE"
+watchPatterns = ["apps/api/**", "packages/**", "pnpm-lock.yaml"]
