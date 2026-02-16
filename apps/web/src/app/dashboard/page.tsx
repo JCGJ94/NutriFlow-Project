@@ -1,6 +1,8 @@
 import { apiClient } from '@/lib/apiClient';
 import { DashboardClient } from './dashboard-client';
 
+export const dynamic = 'force-dynamic';
+
 // Define PlanSummary locally or import. 
 // Ideally shared, but re-defining to avoid internal package dependency issues for now depending on monorepo setup.
 interface PlanSummary {
