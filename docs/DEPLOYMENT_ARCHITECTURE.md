@@ -51,7 +51,7 @@ graph TD
     User[👤 Usuario]
 
     subgraph Frontend
-        WEB[Next.js 15]
+        WEB[Next.js 16]
     end
 
     subgraph Backend

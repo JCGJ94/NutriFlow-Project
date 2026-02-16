@@ -90,4 +90,11 @@ We use **Supabase** as a comprehensive Backend-as-a-Service (BaaS).
 -   **Authentication**: Supabase Auth (JWT).
 -   **Security**: **Row Level Security (RLS)** is enforced on ALL tables.
     -   *Rule*: Users can only access their own data (`auth.uid() = user_id`).
-    -   *Exception*: Admin roles for ingredient management.
+## 6. Deployment Strategy
+
+NutriFlow leverages a decoupled infrastructure:
+- **Backend (API):** Railway.
+- **Frontend (Web):** Vercel.
+- **Database:** Supabase.
+
+Detailed guide: [Deployment Runbook](./docs/runbooks/deploy.md).

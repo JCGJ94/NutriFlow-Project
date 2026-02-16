@@ -121,9 +121,22 @@ Testing focuses on verifying correctness in critical paths rather than achieving
 - [x] Core architecture and monorepo foundation.
 - [x] Global Authentication & RLS policies implementation.
 - [x] Deterministic nutritional calculation engine.
+- [x] Global Authentication & RLS policies implementation.
+- [x] Deterministic nutritional calculation engine.
 - [x] E2E test coverage for the primary user flow.
-- [ ] Performance optimizations (AI response caching).
+- [x] Performance optimizations (AI response caching).
 - [ ] Mobile client exploration using the existing API.
+
+---
+
+## Performance Optimizations
+
+### Frontend
+- **Turbopack**: Enabled (`--turbo`) for faster HMR and startup.
+- **Transpilation**: Shared packages are directly transpiled for seamless monorepo integration.
+
+### Backend
+- **AI Response Caching**: In-memory cache (24h TTL) for generated diet plans based on user profile hash. Reduces AI costs and latency.
 
 ---
 

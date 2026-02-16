@@ -1,8 +1,6 @@
 {
-    "buildCommand": "cd ../.. && pnpm turbo run build --filter=@nutriflow/web",
+    "buildCommand": "pnpm turbo run build --filter=@nutriflow/web",
     "outputDirectory": "apps/web/.next",
     "framework": "nextjs",
-    "installCommand": "pnpm install --frozen-lockfile",
-    "devCommand": "cd apps/web && pnpm dev",
-    "ignoreCommand": "git diff --quiet HEAD^ HEAD ./apps/web"
+    "installCommand": "pnpm install --frozen-lockfile"
 }

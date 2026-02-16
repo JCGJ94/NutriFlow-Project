@@ -1,22 +1,24 @@
 # NutriFlow Testing Guide
 
-Este proyecto utiliza una estrategia de testing combinada:
+# NutriFlow Testing Guide
+
+This project follows a balanced testing strategy:
 - **Unit Testing**: Vitest (Backend)
 - **E2E Testing**: Playwright (Frontend + Backend Integration)
 
 ## 1. Backend Unit Tests (Vitest)
 
-Pruebas unitarias para la lógica de negocio, especialmente el `DietEngine`.
+Unit tests for business logic, especially the `DietEngine`.
 
-### Ejecutar tests
+### Run tests
 ```bash
 pnpm --filter @nutriflow/api test
 ```
 
-### Ubicación
+### Location
 - `apps/api/src/**/*.spec.ts`
 
-### Ejemplo (BmrCalculator)
+### Example (BmrCalculator)
 ```typescript
 it('should calculate BMR correctly', () => {
   const result = calculator.calculateBmr(profile);
@@ -26,40 +28,40 @@ it('should calculate BMR correctly', () => {
 
 ## 2. E2E Tests (Playwright)
 
-Pruebas de extremo a extremo que simulan la interacción del usuario real en el navegador.
+End-to-end tests simulating real user interactions in the browser.
 
-### Instalar navegadores (primera vez)
+### Install browsers (first time)
 ```bash
 pnpm exec playwright install
 ```
 
-### Ejecutar tests (Headless)
-IMPORTANT: Asegúrate de que tu app NO esté corriendo en el puerto 3000, Playwright la levantará (o usa `webServer` config).
-O si ya la tienes corriendo:
+### Run tests (Headless)
+IMPORTANT: Ensure your app is NOT running on port 3000, Playwright will start it (or use `webServer` config).
+Or if it's already running:
 ```bash
 pnpm exec playwright test
 ```
 
-### Ejecutar con UI (Recomendado para desarrollo)
+### Run with UI (Recommended for development)
 ```bash
 pnpm exec playwright test --ui
 ```
 
-### Flujos cubiertos
-1. **Auth Flow**: Registro e inicio de sesión (`e2e/auth.spec.ts`)
-2. **Plan Flow**: Generación de plan semanal (`e2e/plan-generation.spec.ts`)
+### Flow Coverage
+1. **Auth Flow**: Registration and login (`e2e/auth.spec.ts`)
+2. **Plan Flow**: Weekly plan generation (`e2e/plan-generation.spec.ts`)
 
-## 3. Subagente de Testing (Instrucciones)
+## 3. Testing Subagent Instructions
 
-Para continuar ampliando el testing, sigue este patrón:
+To continue expanding the test suite, follow this pattern:
 
-1. **Identificar lógica crítica**: Priorizar lógica de negocio compleja (ej. algoritmos) para Unit Tests.
-2. **Identificar flujos críticos**: Priorizar flujos de usuario (ej. checkout, settings) para E2E.
-3. **Crear archivo**:
-   - Unit: `servicename.spec.ts` junto al archivo fuente.
+1. **Identify critical logic**: Prioritize complex business logic (e.g., algorithms) for Unit Tests.
+2. **Identify critical flows**: Prioritize user flows (e.g., checkout, settings) for E2E.
+3. **Create file**:
+   - Unit: `servicename.spec.ts` alongside the source file.
    - E2E: `e2e/feature-name.spec.ts`.
 
-### Próximos Tests Recomendados
-- [ ] Unit: `MacrosCalculator` (verificar distribución 30/40/30)
-- [ ] Unit: `AllergenRule` (verificar filtrado correcto)
-- [ ] E2E: `ShoppingList` (verificar items y checked state)
+### Recommended Upcoming Tests
+- [ ] Unit: `MacrosCalculator` (verify 30/40/30 distribution)
+- [ ] Unit: `AllergenRule` (verify correct filtering)
+- [ ] E2E: `ShoppingList` (verify items and checked state)

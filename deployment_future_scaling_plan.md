@@ -220,13 +220,13 @@ hash(profile + goal + constraints + week)
 
 ## 12. Checklist final
 
-- [ ] API versionada (`/v1`)
-- [ ] Backend separado de Vercel
+- [x] API versionada (`/v1`)
+- [x] Backend separado de Vercel (Configuración lista)
 - [ ] Jobs persistidos
 - [ ] Lógica asíncrona
 - [ ] Cache de narraciones
-- [ ] Observabilidad mínima
-- [ ] Dominio independiente del framework
+- [x] Observabilidad mínima (Logs estructurados configurados)
+- [x] Dominio independiente del framework (Documentado)
 
 ---
 

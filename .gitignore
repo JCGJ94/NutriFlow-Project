@@ -42,3 +42,5 @@ coverage
 
 # Misc
 *.tsbuildinfo
+GUIA_PRESENTACION_TECNICA.md
+.agent/
