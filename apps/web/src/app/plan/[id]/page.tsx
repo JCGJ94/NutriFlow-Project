@@ -1,6 +1,8 @@
 import { apiClient } from '@/lib/apiClient';
 import { PlanClient } from './PlanClient';
 
+export const dynamic = 'force-dynamic';
+
 // Types (shared)
 interface ExerciseSet {
     exerciseName: string;

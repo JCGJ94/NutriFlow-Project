@@ -17,7 +17,7 @@ class ApiClient {
             // NEXT_PUBLIC_API_URL is likely http://localhost:3001
             // We assume backend has /api prefix based on next.config.js rewrites
             const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-            return `${apiUrl}/api/${cleanEndpoint}`;
+            return `${apiUrl}/${cleanEndpoint}`;
         }
 
         // Client-side: Use (relative) Next.js rewrites
