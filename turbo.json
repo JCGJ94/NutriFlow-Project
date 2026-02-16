@@ -3,6 +3,20 @@
     "globalDependencies": [
         "**/.env.*local"
     ],
+    "globalEnv": [
+        "NODE_ENV",
+        "NEXT_PUBLIC_APP_URL",
+        "NEXT_PUBLIC_API_URL",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "GEMINI_API_KEY",
+        "GOOGLE_DRIVE_FOLDER_ID",
+        "NOTEBOOKLM_ID",
+        "CORS_ORIGIN",
+        "FRONTEND_URL",
+        "PORT"
+    ],
     "tasks": {
         "build": {
             "dependsOn": [
