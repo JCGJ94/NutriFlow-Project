@@ -8,7 +8,7 @@ import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 
 export const metadata: Metadata = {
-  title: 'NutriFlow - Tu dieta semanal personalizada',
+  title: 'NutriFlow',
   description:
     'Genera planes de dieta semanales personalizados para perder peso de forma saludable. Combinaciones de alimentos adaptadas a tus objetivos y restricciones.',
   keywords: [

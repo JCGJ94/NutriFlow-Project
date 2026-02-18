@@ -15,8 +15,20 @@ class ApiClient {
         if (isServer) {
             // Server-side: Hit the backend directly
             // NEXT_PUBLIC_API_URL is likely http://localhost:3001
-            // We assume backend has /api prefix based on next.config.js rewrites
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+            // We assume backend has /v1 prefix based on main.ts global prefix
+            let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+            // Ensure apiUrl doesn't end with slash
+            if (apiUrl.endsWith('/')) {
+                apiUrl = apiUrl.slice(0, -1);
+            }
+
+            // Backend always uses /v1 prefix globally
+            // Check if apiUrl already includes /v1 (e.g. production URL)
+            if (!apiUrl.includes('/v1')) {
+                apiUrl = `${apiUrl}/v1`;
+            }
+
             return `${apiUrl}/${cleanEndpoint}`;
         }
 
