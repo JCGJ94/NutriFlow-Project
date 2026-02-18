@@ -111,8 +111,8 @@ interface PlansContextType {
   // Full Plan Details Caching
   cachedPlanDetails: Record<string, Plan>;
   cachedExercisePlans: Record<string, ExercisePlan>;
-  getPlanDetails: (planId: string) => Promise<Plan | null>;
-  getExercisePlan: (planId: string) => Promise<ExercisePlan | null>;
+  getPlanDetails: (planId: string, forceFetch?: boolean) => Promise<Plan | null>;
+  getExercisePlan: (planId: string, forceFetch?: boolean) => Promise<ExercisePlan | null>;
   updatePlanCache: (plan: Plan) => void;
   updateExercisePlanCache: (planId: string, plan: ExercisePlan) => void;
 }
@@ -231,9 +231,9 @@ export function PlansProvider({ children, initialPlans }: { children: ReactNode,
   }, []);
 
   // --- Plan Details Caching ---
-  const getPlanDetails = useCallback(async (planId: string): Promise<Plan | null> => {
+  const getPlanDetails = useCallback(async (planId: string, forceFetch = false): Promise<Plan | null> => {
       // Use Ref to avoid dependency on state which causes recreation on every update -> infinite loop
-      if (cachedPlanDetailsRef.current[planId]) {
+      if (!forceFetch && cachedPlanDetailsRef.current[planId]) {
           return cachedPlanDetailsRef.current[planId];
       }
       return await fetchPlanDetailsBackground(planId);
@@ -274,9 +274,9 @@ export function PlansProvider({ children, initialPlans }: { children: ReactNode,
       });
   }, []);
 
-  const getExercisePlan = useCallback(async (planId: string): Promise<ExercisePlan | null> => {
+  const getExercisePlan = useCallback(async (planId: string, forceFetch = false): Promise<ExercisePlan | null> => {
       // Use Ref for stability
-      if (cachedExercisePlansRef.current[planId]) {
+      if (!forceFetch && cachedExercisePlansRef.current[planId]) {
           return cachedExercisePlansRef.current[planId];
       }
       return await fetchExercisePlanBackground(planId);

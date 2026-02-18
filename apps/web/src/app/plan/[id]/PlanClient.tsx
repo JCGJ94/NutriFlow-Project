@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -19,6 +19,15 @@ import { useToast } from '@/context/ToastContext';
 import { usePlans } from '@/context/PlansContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { apiClient } from '@/lib/apiClient';
+import { useDayScrollSync } from '@/lib/useDayScrollSync';
+
+// Fixed Order for Meals (independent of language)
+const MEAL_ORDER: Record<string, number> = {
+    breakfast: 0,
+    lunch: 1,
+    dinner: 2,
+    snack: 3,
+};
 
 // Types (should be shared)
 interface ExerciseSet {
@@ -99,28 +108,59 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
     const { showToast } = useToast();
     const { t, language } = useLanguage();
     
+    // Mobile detection
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 1023px)');
+        setIsMobile(mq.matches);
+        const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+        mq.addEventListener('change', handler);
+        return () => mq.removeEventListener('change', handler);
+    }, []);
+
     // Local state for UI
     const [activeTab, setActiveTab] = useState<TabType>('diet');
-    const [selectedDietDay, setSelectedDietDay] = useState<number>(0);
-    const [selectedExerciseDay, setSelectedExerciseDay] = useState<number>(0);
+    const [selectedDietDay, setSelectedDietDay] = useState<number>(new Date().getDay() || 6); 
+    const [selectedExerciseDay, setSelectedExerciseDay] = useState<number>(new Date().getDay() || 6);
     const [regeneratingMeal, setRegeneratingMeal] = useState<string | null>(null);
 
     // Optimistic Plan State
-    // We initialize with the server prop, but allow local updates to "win" momentarily
     const [optimisticPlan, setOptimisticPlan] = useState<Plan | null>(initialPlan);
+    
+    // State for exercise plan
+    const [exercisePlan, setExercisePlan] = useState<ExercisePlan | null>(initialExercisePlan);
+    const [isLoadingExercise, setIsLoadingExercise] = useState(false);
 
-    // Sync server updates if they happen (e.g. revalidation from other tabs/users)
-    // But be careful not to overwrite valid optimistic state if we are "ahead"
-    // For simplicity in this version, we trust props if they change significantly or we force it.
+    // Active day tab ref for horizontal scroll into view
+    const dietTabsRef = useRef<HTMLDivElement>(null);
+    const exerciseTabsRef = useRef<HTMLDivElement>(null);
+
+    // Scroll sync hooks with active day detection
+    const dietDays = optimisticPlan?.days.map(d => d.dayOfWeek) || [];
+    const exerciseDays = exercisePlan?.workoutDays.map(d => d.dayOfWeek) || [];
+    
+    const { registerDayRef: registerDietDayRef, scrollToDay: scrollToDietDay } = useDayScrollSync(
+        180, // Offset
+        dietDays,
+        (day) => {
+            if (activeTab === 'diet') setSelectedDietDay(day);
+        }
+    );
+
+    const { registerDayRef: registerExerciseDayRef, scrollToDay: scrollToExerciseDay } = useDayScrollSync(
+        180, 
+        exerciseDays,
+        (day) => {
+            if (activeTab === 'exercise') setSelectedExerciseDay(day);
+        }
+    );
+
+    // Sync server updates
     useEffect(() => {
         if (initialPlan) {
              setOptimisticPlan(initialPlan);
         }
     }, [initialPlan]);
-    
-    // State for exercise plan (sync with prop but allow updates/fetching)
-    const [exercisePlan, setExercisePlan] = useState<ExercisePlan | null>(initialExercisePlan);
-    const [isLoadingExercise, setIsLoadingExercise] = useState(false);
 
     // Get context for fetching if needed
     const { getExercisePlan } = usePlans();
@@ -136,7 +176,8 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
             const pollExercise = async () => {
                 setIsLoadingExercise(true);
                 try {
-                    const data = await getExercisePlan(planId);
+                    // Force refresh to bypass cache (SSR might have cached null)
+                    const data = await getExercisePlan(planId, true);
                     if (data) {
                         setExercisePlan(data);
                         setIsLoadingExercise(false);
@@ -242,6 +283,39 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
     const selectedDietDayData = optimisticPlan.days.find(d => d.dayOfWeek === selectedDietDay);
     const selectedExerciseDayData = exercisePlan?.workoutDays.find(d => d.dayOfWeek === selectedExerciseDay);
 
+    // Sync horizontal tabs scroll when selectedDay changes
+    useEffect(() => {
+        if (!isMobile) return;
+        
+        if (activeTab === 'diet' && dietTabsRef.current) {
+            const tabBtn = dietTabsRef.current.querySelector(`[data-day="${selectedDietDay}"]`);
+            if (tabBtn) {
+                tabBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        } else if (activeTab === 'exercise' && exerciseTabsRef.current) {
+            const tabBtn = exerciseTabsRef.current.querySelector(`[data-day="${selectedExerciseDay}"]`);
+            if (tabBtn) {
+                tabBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        }
+    }, [selectedDietDay, selectedExerciseDay, activeTab, isMobile]);
+
+    /** Handle diet day selection: update state + scroll on mobile */
+    const handleDietDayClick = useCallback((dayOfWeek: number) => {
+        setSelectedDietDay(dayOfWeek);
+        if (isMobile) {
+            scrollToDietDay(dayOfWeek);
+        }
+    }, [isMobile, scrollToDietDay]);
+
+    /** Handle exercise day selection: update state + scroll on mobile */
+    const handleExerciseDayClick = useCallback((dayOfWeek: number) => {
+        setSelectedExerciseDay(dayOfWeek);
+        if (isMobile) {
+           scrollToExerciseDay(dayOfWeek);
+        }
+    }, [isMobile, scrollToExerciseDay]);
+
     return (
         <div className="min-h-screen bg-page-gradient pt-16">
 
@@ -340,16 +414,53 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                 fat={optimisticPlan.targetFat}
                             />
 
-                            <div className="flex flex-col lg:flex-row gap-10">
-                                {/* Day Selection Sidebar */}
+                            <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
+                                {/* Day Selection — Horizontal (mobile) / Sidebar (desktop) */}
                                 <aside className="lg:w-72 flex-shrink-0">
-                                    <div className="sticky top-40 space-y-2">
+                                    {/* Mobile: Horizontal scrollable tabs */}
+                                    <div
+                                        ref={dietTabsRef}
+                                        role="tablist"
+                                        aria-label={t('plans.calendar')}
+                                        className="flex lg:hidden gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory -mx-4 px-4"
+                                    >
+                                        {optimisticPlan.days.map((day) => (
+                                            <button
+                                                key={day.dayOfWeek}
+                                                role="tab"
+                                                aria-selected={selectedDietDay === day.dayOfWeek}
+                                                aria-controls={`diet-day-${day.dayOfWeek}`}
+                                                id={`diet-tab-${day.dayOfWeek}`}
+                                                onClick={() => handleDietDayClick(day.dayOfWeek)}
+                                                data-testid={`diet-day-tab-${day.dayOfWeek}`}
+                                                className={cn(
+                                                    "flex-shrink-0 snap-center flex flex-col items-center gap-1 px-4 py-3 rounded-2xl transition-all duration-300 min-w-[72px]",
+                                                    selectedDietDay === day.dayOfWeek
+                                                        ? "bg-primary-600 text-white shadow-lg shadow-primary-200/50 dark:shadow-none"
+                                                        : "bg-white dark:bg-surface-800 text-surface-500 dark:text-surface-400 border border-surface-200 dark:border-surface-700"
+                                                )}
+                                            >
+                                                <span className="text-xs font-black uppercase tracking-wide">
+                                                    {getDayName(day.dayOfWeek, language).slice(0, 3)}
+                                                </span>
+                                                <span className="text-[10px] font-bold opacity-80">
+                                                    {day.totalKcal}
+                                                </span>
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Desktop: Vertical sidebar (original) */}
+                                    <div className="hidden lg:block sticky top-40 space-y-2">
                                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-surface-400 mb-6 pl-2">
                                             {t('plans.calendar')}
                                         </h3>
                                         {optimisticPlan.days.map((day) => (
                                             <button
                                                 key={day.dayOfWeek}
+                                                role="tab"
+                                                aria-selected={selectedDietDay === day.dayOfWeek}
+                                                aria-controls={`diet-day-${day.dayOfWeek}`}
                                                 onClick={() => setSelectedDietDay(day.dayOfWeek)}
                                                 className={cn(
                                                     "w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 group",
@@ -381,37 +492,90 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
 
                                 {/* Meals Display */}
                                 <div className="flex-1 space-y-8">
-                                    {selectedDietDayData && (
-                                        <div className="space-y-8">
-                                            <div className="flex items-end justify-between px-2">
-                                                <div>
-                                                    <h3 className="text-4xl font-heading font-black text-surface-900 dark:text-white">
-                                                        {getDayName(selectedDietDayData.dayOfWeek, language)}
-                                                    </h3>
-                                                    <p className="text-primary-600 dark:text-primary-400 font-bold mt-1">
-                                                        {selectedDietDayData.totalKcal} kcal · {selectedDietDayData.meals.length} {t('plans.meals')}
-                                                    </p>
+                                    {/* Mobile: All days visible, scroll target */}
+                                    {isMobile ? (
+                                        optimisticPlan.days.map((dayData) => (
+                                            <div
+                                                key={dayData.dayOfWeek}
+                                                ref={registerDietDayRef(dayData.dayOfWeek)}
+                                                id={`diet-day-${dayData.dayOfWeek}`}
+                                                role="tabpanel"
+                                                aria-labelledby={`diet-tab-${dayData.dayOfWeek}`}
+                                                data-testid={`diet-day-content-${dayData.dayOfWeek}`}
+                                                className="space-y-6"
+                                            >
+                                                <div className="flex items-end justify-between px-2 pt-4 border-t border-surface-200 dark:border-surface-800 first:border-t-0 first:pt-0">
+                                                    <div>
+                                                        <h3 className="text-2xl sm:text-3xl font-heading font-black text-surface-900 dark:text-white">
+                                                            {getDayName(dayData.dayOfWeek, language)}
+                                                        </h3>
+                                                        <p className="text-primary-600 dark:text-primary-400 font-bold mt-1 text-sm">
+                                                            {dayData.totalKcal} kcal · {dayData.meals.length} {t('plans.meals')}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="grid sm:grid-cols-2 gap-4">
+                                                    {[...dayData.meals]
+                                                        .sort((a, b) => (MEAL_ORDER[a.mealType] ?? 99) - (MEAL_ORDER[b.mealType] ?? 99))
+                                                        .map((meal, idx) => (
+                                                        <motion.div
+                                                            key={meal.id}
+                                                            initial={{ opacity: 0, y: 20 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            transition={{ delay: idx * 0.03, duration: 0.25 }}
+                                                        >
+                                                            <MealCard
+                                                                meal={meal}
+                                                                onToggleLock={toggleMealLock}
+                                                                onRegenerate={regenerateMeal}
+                                                                isRegenerating={regeneratingMeal === meal.id}
+                                                            />
+                                                        </motion.div>
+                                                    ))}
                                                 </div>
                                             </div>
+                                        ))
+                                    ) : (
+                                        /* Desktop: Single selected day */
+                                        selectedDietDayData && (
+                                            <div
+                                                id={`diet-day-${selectedDietDayData.dayOfWeek}`}
+                                                role="tabpanel"
+                                                aria-labelledby={`diet-tab-${selectedDietDayData.dayOfWeek}`}
+                                                className="space-y-8"
+                                            >
+                                                <div className="flex items-end justify-between px-2">
+                                                    <div>
+                                                        <h3 className="text-4xl font-heading font-black text-surface-900 dark:text-white">
+                                                            {getDayName(selectedDietDayData.dayOfWeek, language)}
+                                                        </h3>
+                                                        <p className="text-primary-600 dark:text-primary-400 font-bold mt-1">
+                                                            {selectedDietDayData.totalKcal} kcal · {selectedDietDayData.meals.length} {t('plans.meals')}
+                                                        </p>
+                                                    </div>
+                                                </div>
 
-                                            <div className="grid md:grid-cols-2 gap-6">
-                                                {selectedDietDayData.meals.map((meal, idx) => (
-                                                    <motion.div
-                                                        key={meal.id}
-                                                        initial={{ opacity: 0, y: 20 }}
-                                                        animate={{ opacity: 1, y: 0 }}
-                                                        transition={{ delay: idx * 0.05, duration: 0.3 }}
-                                                    >
-                                                        <MealCard
-                                                            meal={meal}
-                                                            onToggleLock={toggleMealLock}
-                                                            onRegenerate={regenerateMeal}
-                                                            isRegenerating={regeneratingMeal === meal.id}
-                                                        />
-                                                    </motion.div>
-                                                ))}
+                                                <div className="grid md:grid-cols-2 gap-6">
+                                                    {[...selectedDietDayData.meals]
+                                                        .sort((a, b) => (MEAL_ORDER[a.mealType] ?? 99) - (MEAL_ORDER[b.mealType] ?? 99))
+                                                        .map((meal, idx) => (
+                                                        <motion.div
+                                                            key={meal.id}
+                                                            initial={{ opacity: 0, y: 20 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            transition={{ delay: idx * 0.05, duration: 0.3 }}
+                                                        >
+                                                            <MealCard
+                                                                meal={meal}
+                                                                onToggleLock={toggleMealLock}
+                                                                onRegenerate={regenerateMeal}
+                                                                isRegenerating={regeneratingMeal === meal.id}
+                                                            />
+                                                        </motion.div>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
+                                        )
                                     )}
                                 </div>
                             </div>
@@ -474,10 +638,44 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col lg:flex-row gap-10">
-                                        {/* Day Selection Sidebar */}
+                                    <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
+                                        {/* Day Selection — Horizontal (mobile) / Sidebar (desktop) */}
                                         <aside className="lg:w-80 flex-shrink-0">
-                                            <div className="sticky top-40 space-y-2">
+                                            {/* Mobile: Horizontal scrollable */}
+                                            <div
+                                                ref={exerciseTabsRef}
+                                                role="tablist"
+                                                aria-label={t('exercise.routine')}
+                                                className="flex lg:hidden gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory -mx-4 px-4"
+                                            >
+                                                {exercisePlan.workoutDays.map((day) => (
+                                                    <button
+                                                        key={day.dayOfWeek}
+                                                        role="tab"
+                                                        aria-selected={selectedExerciseDay === day.dayOfWeek}
+                                                        aria-controls={`exercise-day-${day.dayOfWeek}`}
+                                                        id={`exercise-tab-${day.dayOfWeek}`}
+                                                        onClick={() => handleExerciseDayClick(day.dayOfWeek)}
+                                                        data-testid={`exercise-day-tab-${day.dayOfWeek}`}
+                                                        className={cn(
+                                                            "flex-shrink-0 snap-center flex flex-col items-center gap-1 px-4 py-3 rounded-2xl transition-all duration-300 min-w-[72px]",
+                                                            selectedExerciseDay === day.dayOfWeek
+                                                                ? "bg-blue-600 text-white shadow-lg shadow-blue-200/50 dark:shadow-none"
+                                                                : "bg-white dark:bg-surface-800 text-surface-500 dark:text-surface-400 border border-surface-200 dark:border-surface-700"
+                                                        )}
+                                                    >
+                                                        <span className="text-xs font-black uppercase tracking-wide">
+                                                            {getDayName(day.dayOfWeek, language).slice(0, 3)}
+                                                        </span>
+                                                        <span className="text-[10px] font-bold opacity-80">
+                                                            {day.isRestDay ? '😴' : `${day.totalDurationMin}m`}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            {/* Desktop: Vertical sidebar (original) */}
+                                            <div className="hidden lg:block sticky top-40 space-y-2">
                                                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-surface-400 mb-6 pl-2">
                                                     {t('exercise.routine')}
                                                 </h3>
@@ -493,9 +691,30 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                         </aside>
 
                                         {/* Exercise Detail */}
-                                        <div className="flex-1">
-                                            {selectedExerciseDayData && (
-                                                <ExerciseDetail day={selectedExerciseDayData} />
+                                        <div className="flex-1 space-y-8">
+                                            {isMobile ? (
+                                                exercisePlan.workoutDays.map((day) => (
+                                                    <div
+                                                        key={day.dayOfWeek}
+                                                        ref={registerExerciseDayRef(day.dayOfWeek)}
+                                                        id={`exercise-day-${day.dayOfWeek}`}
+                                                        role="tabpanel"
+                                                        aria-labelledby={`exercise-tab-${day.dayOfWeek}`}
+                                                        data-testid={`exercise-day-content-${day.dayOfWeek}`}
+                                                    >
+                                                        <ExerciseDetail day={day} />
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                selectedExerciseDayData && (
+                                                    <div
+                                                        id={`exercise-day-${selectedExerciseDayData.dayOfWeek}`}
+                                                        role="tabpanel"
+                                                        aria-labelledby={`exercise-tab-${selectedExerciseDayData.dayOfWeek}`}
+                                                    >
+                                                        <ExerciseDetail day={selectedExerciseDayData} />
+                                                    </div>
+                                                )
                                             )}
                                         </div>
                                     </div>

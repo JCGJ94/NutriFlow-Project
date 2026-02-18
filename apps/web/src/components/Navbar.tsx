@@ -24,10 +24,21 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const handleLogout = async () => {
-    await signOut();
-    router.push('/');
+  const handleLogout = async (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    // Close menus first for immediate feedback
     setIsProfileOpen(false);
+    setIsMenuOpen(false);
+    
+    try {
+      await signOut();
+      router.push('/');
+      router.refresh(); // Ensure clean state
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Fallback redirect even if error
+      window.location.href = '/';
+    }
   };
 
   const displayName = profile?.username || 'userNutriflow';

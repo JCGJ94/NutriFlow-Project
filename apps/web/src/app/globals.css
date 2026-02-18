@@ -172,6 +172,15 @@ a {
   .bg-page-gradient {
     @apply bg-gradient-to-b from-primary-100 via-primary-50 to-white dark:from-vscode dark:to-[#121212] transition-colors duration-300;
   }
+
+  /* Hide scrollbar but keep scroll functionality (mobile day tabs) */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* ============================================= */

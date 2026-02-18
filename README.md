@@ -10,7 +10,7 @@
 
 NutriFlow is a production-grade, full-stack web application focused on **personalized nutrition planning**, designed to balance **nutritional precision, flexibility, and maintainability** within a real-world architecture.
 
-> **Status:** 🚧 WIP — Private demo / staging environment  
+> **Status:** 🚀 [Live Demo Available](https://nutri-flow-mu.vercel.app/)  
 > **Scope:** Personal project developed and maintained by a single developer
 
 ---
@@ -71,6 +71,8 @@ Responsibilities are strictly isolated while sharing contracts where necessary:
 └── packages/
     └── shared/ # Shared DTOs, Zod schemas, and TypeScript types
 ```
+For more details, see [Architecture Overview](./docs/architecture/overview.md) and the [Scaling Plan](./docs/architecture/scaling-plan.md).
+
 
 ### Key Design Decisions
 
@@ -102,17 +104,40 @@ RLS is leveraged to guarantee total user data isolation:
 - **E2E Testing (Playwright):**  
   Covers the entire user journey—from registration to plan generation and persistent storage.
 
-Testing focuses on verifying correctness in critical paths rather than achieving superficial code coverage.
+Testing focuses on verifying correctness in critical paths rather than achieving superficial code coverage. See the [Testing Guide](./docs/guides/testing.md) for details.
 
 ---
 
 ## Usage Flow
 
-1. **User Profiling:** Input of metabolic data, health conditions (e.g., Lupus), and dietary preferences.
-2. **Plan Generation:** Scientific calculations matched with AI-driven recipe generation under strict supervision.
-3. **Outputs:** Automated 7-day meal plans and consolidated shopping lists.
+### 1. User Profiling & Onboarding
+Input of metabolic data, health conditions, and dietary preferences.
 
-*(Coming Soon: Screenshots / GIFs showing the primary workflows)*
+<div align="center">
+  <img src="apps/web/public/demo/landing.png" alt="NutriFlow Landing Page" width="800"/>
+  <br/>
+  <br/>
+  <img src="apps/web/public/demo/login.png" alt="Login Screen" width="400"/>
+  <img src="apps/web/public/demo/register.png" alt="Register Screen" width="400"/>
+</div>
+
+### 2. Dashboard & Plan Generation
+Scientific calculations matched with AI-driven content generation.
+
+<div align="center">
+  <img src="apps/web/public/demo/dashboard.png" alt="User Dashboard" width="800"/>
+</div>
+
+### 3. Weekly Plans (Diet & Exercise)
+Automated 7-day meal plans and consolidated shopping lists.
+
+<div align="center">
+  <img src="apps/web/public/demo/weekly-plan-nutritional.png" alt="Nutritional Plan" width="800"/>
+  <br/>
+  <br/>
+  <img src="apps/web/public/demo/weekly-plan-exercise.png" alt="Exercise Plan" width="800"/>
+</div>
+
 
 ---
 

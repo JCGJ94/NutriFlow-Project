@@ -23,10 +23,11 @@ export class TranslationBridgeService {
         
         RULES:
         1. Keep all numeric values, UUIDs, IDs, dates, and keys EXACTLY as they are.
-        2. Translate 'ingredientName', 'exerciseName', 'name' (for workout days), 'mealType', 'unit', and 'type' (exercise category) fields.
+        2. Translate 'ingredientName', 'exerciseName', 'name' (for workout days), 'unit', and 'type' (exercise category) fields.
         3. Translate 'summary', 'tips', and 'description' if they exist.
-        4. Maintain the EXACT JSON structure.
-        5. Respond ONLY with the translated JSON.
+        4. DO NOT translate 'mealType' (keep as 'breakfast', 'lunch', 'dinner', 'snack').
+        5. Maintain the EXACT JSON structure.
+        6. Respond ONLY with the translated JSON.
         `;
 
         const prompt = `Translate this JSON object: ${JSON.stringify(plan)}`;

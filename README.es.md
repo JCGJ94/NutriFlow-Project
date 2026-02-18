@@ -10,7 +10,7 @@
 
 NutriFlow es una aplicación web full-stack de nivel producción centrada en la **planificación de nutrición personalizada**, diseñada para equilibrar la **precisión nutricional, la flexibilidad y la mantenibilidad** en una arquitectura de mundo real.
 
-> **Estado:** 🚧 En Desarrollo — Entorno de demo/staging privado.
+> **Estado:** 🚀 [Demo en Vivo Disponible](https://nutri-flow-mu.vercel.app/)  
 > **Alcance:** Proyecto personal desarrollado y mantenido por un único desarrollador.
 
 ---
@@ -69,6 +69,8 @@ El proyecto está organizado como un **monorepo** para mantener las responsabili
 └── packages/
     └── shared/ # DTOs compartidos, esquemas Zod y tipos de TypeScript
 ```
+Para más detalles, consulta la [Visión General de la Arquitectura](./docs/architecture/overview.es.md).
+
 
 ### Decisiones Clave de Diseño
 
@@ -106,11 +108,34 @@ El testing se centra en la corrección de las rutas críticas más que en una co
 
 ## Flujo de Uso
 
-1. **Perfilado de Usuario:** Entrada de datos metabólicos, condiciones de salud (ej. Lupus) y preferencias.
-2. **Generación de Plan:** Cálculos deterministas combinados con contenido asistido por IA bajo control estricto.
-3. **Resultados:** Planes de comidas semanales y listas de compras generadas automáticamente.
+### 1. Perfilado y Onboarding
+Entrada de datos metabólicos, condiciones de salud y preferencias dietéticas.
 
-*(Próximamente: Screenshots / GIFs mostrando los flujos principales)*
+<div align="center">
+  <img src="apps/web/public/demo/landing.png" alt="NutriFlow Landing Page" width="800"/>
+  <br/>
+  <br/>
+  <img src="apps/web/public/demo/login.png" alt="Pantalla de Login" width="400"/>
+  <img src="apps/web/public/demo/register.png" alt="Pantalla de Registro" width="400"/>
+</div>
+
+### 2. Panel Principal y Generación
+Cálculos científicos combinados con generación de contenido por IA.
+
+<div align="center">
+  <img src="apps/web/public/demo/dashboard.png" alt="Dashboard de Usuario" width="800"/>
+</div>
+
+### 3. Planes Semanales (Dieta y Ejercicio)
+Planes de comidas automatizados de 7 días y listas de compras consolidadas.
+
+<div align="center">
+  <img src="apps/web/public/demo/weekly-plan-nutritional.png" alt="Plan Nutricional" width="800"/>
+  <br/>
+  <br/>
+  <img src="apps/web/public/demo/weekly-plan-exercise.png" alt="Plan de Ejercicios" width="800"/>
+</div>
+
 
 ---
 
