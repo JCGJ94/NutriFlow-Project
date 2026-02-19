@@ -70,6 +70,10 @@ Responsibilities are strictly isolated while sharing contracts where necessary:
 │   └── api/    # NestJS REST API (Modular Architecture)
 └── packages/
     └── shared/ # Shared DTOs, Zod schemas, and TypeScript types
+
+### Frontend Architecture (2026 Refactor)
+- **Providers Pattern:** Context providers are consolidated in `src/components/Providers.tsx` to minimize tree depth in `layout.tsx`.
+- **Decoupled i18n:** Translations are extracted to `src/lib/i18n.ts`, reducing bundle size for non-text components and improving maintainability.
 ```
 For more details, see [Architecture Overview](./docs/architecture/overview.md) and the [Scaling Plan](./docs/architecture/scaling-plan.md).
 

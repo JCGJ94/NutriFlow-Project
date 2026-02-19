@@ -33,7 +33,6 @@ export function Footer() {
           <div className="col-span-2 lg:col-span-1 space-y-4">
             <Link href="/" className="flex items-center gap-2 group w-fit">
               <Logo size={32} className="transition-transform group-hover:scale-105" />
-              <span className="font-heading font-bold text-xl text-surface-900 dark:text-white">NutriFlow</span>
             </Link>
             <p className="text-surface-600 dark:text-surface-400 text-sm leading-relaxed max-w-xs">
               {t('footer.tagline')}
@@ -61,7 +60,7 @@ export function Footer() {
               </a>
               {/* GitHub Link - functional if public, otherwise placeholder */}
               <a 
-                href="https://github.com/jcgonzalez94/NutriFlow-Project" 
+                href="https://github.com/JCGJ94/NutriFlow-Project" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors p-1"
@@ -160,7 +159,7 @@ export function Footer() {
             © {currentYear} NutriFlow. {t('footer.rights')}
           </p>
           <div className="flex gap-4 text-xs text-surface-500">
-             <span>v0.1.0 Beta</span>
+             <span>v0.3.0 Beta</span>
           </div>
         </div>
       </div>

@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { ThemeProvider } from '../components/ThemeProvider';
-import { ToastProvider } from '../context/ToastContext';
-import { LanguageProvider } from '../context/LanguageContext';
+import { Providers } from '../components/Providers';
 import { ToastContainer } from '../components/ui/Toast';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
@@ -75,10 +73,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
 };
 
-import { UserProvider } from '../context/UserContext';
 
-import { PlansProvider } from '../context/PlansContext';
-import { ConfirmationProvider } from '../context/ConfirmationContext';
 
 import { JsonLd } from '../components/seo/JsonLd';
 
@@ -108,27 +103,12 @@ export default function RootLayout({
             },
           }}
         />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <UserProvider>
-            <PlansProvider>
-            <LanguageProvider>
-              <ConfirmationProvider>
-              <ToastProvider>
-              <Navbar />
-              {children}
-              <Footer />
-              <ToastContainer />
-              </ToastProvider>
-              </ConfirmationProvider>
-            </LanguageProvider>
-            </PlansProvider>
-          </UserProvider>
-        </ThemeProvider>
+        <Providers>
+          <Navbar />
+          {children}
+          <Footer />
+          <ToastContainer />
+        </Providers>
       </body>
     </html>
   );

@@ -5,6 +5,7 @@ import { UpsertProfileDto, SetAllergensDto, ProfileResponseDto, AllergenDto } fr
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User } from '../auth/decorators/user.decorator';
 import { AuthUser } from '../auth/strategies/supabase-jwt.strategy';
+import { Public } from '../auth/decorators/public.decorator';
 
 @ApiTags('profiles')
 @ApiBearerAuth('supabase-auth')
@@ -37,6 +38,7 @@ export class ProfilesController {
         }
     }
 
+    @Public()
     @Get('check-username/:username')
     @ApiOperation({ summary: 'Verificar si un nombre de usuario está disponible' })
     @ApiResponse({ status: 200, type: Boolean })
