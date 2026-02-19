@@ -32,32 +32,27 @@ export class DebugExceptionFilter implements ExceptionFilter {
             error: exception instanceof Error ? exception.stack : JSON.stringify(exception),
         };
 
-        // Console log
-        console.error('🔥 CRITICAL ERROR CAUGHT BY FILTER 🔥', errorLog);
+        if (status >= 500) {
+            // Console log
+            console.error('🔥 CRITICAL ERROR CAUGHT BY FILTER 🔥', errorLog);
 
-        // File log
-        try {
-            const logPath = path.resolve(process.cwd(), 'api-error.log');
-            fs.appendFileSync(logPath, JSON.stringify(errorLog, null, 2) + '\n---\n');
-        } catch (e) {
-            console.error('Failed to write to api-error.log', e);
+            // File log
+            try {
+                const logPath = path.resolve(process.cwd(), 'api-error.log');
+                fs.appendFileSync(logPath, JSON.stringify(errorLog, null, 2) + '\n---\n');
+            } catch (e) {
+                console.error('Failed to write to api-error.log', e);
+            }
+        } else {
+            // Warn for auth/validation errors but don't spam critical logs
+            console.warn(`[${request.method} ${request.url}] ${status} - ${message}`);
         }
 
-        let message = 'Internal server error';
+        let finalMessage = message;
         if (exception instanceof HttpException) {
-            const res = exception.getResponse();
-            if (typeof res === 'object' && res !== null && 'message' in res) {
-                // If message is an array (class-validator), join it
-                const msg = (res as any).message;
-                message = Array.isArray(msg) ? msg.join(', ') : msg;
-            } else if (typeof res === 'string') {
-                message = res;
-            }
+            // Already handled message extraction above, but ensure it's clean
         } else if (exception instanceof Error) {
-            // For non-http errors, we might want to hide details in production, 
-            // but strictly following the existing logic of debugMessage for now, 
-            // creating a 'message' field that client expects.
-            message = process.env.NODE_ENV !== 'production' ? exception.message : 'Internal server error';
+            finalMessage = process.env.NODE_ENV !== 'production' ? exception.message : 'Internal server error';
         }
 
         response.status(status).json({
