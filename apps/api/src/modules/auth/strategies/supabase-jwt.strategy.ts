@@ -63,10 +63,12 @@ export class SupabaseJwtStrategy extends PassportStrategy(Strategy, 'jwt') {
             const { data: { user }, error } = await this.supabaseAdmin.auth.getUser(token);
 
             if (error || !user) {
-                console.error('❌ Supabase Token Validation Failed:', error?.message);
+                // Solo loguear errores reales, no 'session missing' o 'expired' que son normales
+                if (error && !error.message.includes('missing') && !error.message.includes('expired')) {
+                    console.warn('⚠️ Supabase Token Validation Failed:', error.message);
+                }
                 return this.fail('Invalid token', 401);
             }
-
 
             const authUser: AuthUser = {
                 id: user.id,
@@ -76,7 +78,7 @@ export class SupabaseJwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
             return this.success(authUser);
         } catch (err) {
-            console.error('💥 Auth Strategy Error:', err);
+            console.error('💥 Auth Strategy Unexpected Error:', err);
             return this.fail(err, 401);
         }
     }

@@ -19,8 +19,7 @@ export class DebugExceptionFilter implements ExceptionFilter {
         const status =
             exception instanceof HttpException
                 ? exception.getStatus()
-                : HttpStatus.INTERNAL_SERVER_ERROR;
-
+                : (exception as any)?.status || (exception as any)?.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
 
         let message = 'Internal server error';
 
@@ -38,26 +37,26 @@ export class DebugExceptionFilter implements ExceptionFilter {
             method: request.method,
             user: (request as any).user?.id || 'anonymous',
             error: exception instanceof Error ? exception.stack : JSON.stringify(exception),
-            message: message, // Log the extracted message
+            message: message,
         };
 
         if (status >= 500) {
-            // Console log
+            // Solo loguear como CRITICAL errores reales del servidor (500+)
             console.error('🔥 CRITICAL ERROR CAUGHT BY FILTER 🔥', errorLog);
 
-            // File log
             try {
                 const logPath = path.resolve(process.cwd(), 'api-error.log');
                 fs.appendFileSync(logPath, JSON.stringify(errorLog, null, 2) + '\n---\n');
             } catch (e) {
                 console.error('Failed to write to api-error.log', e);
             }
+        } else if (status === 401 || status === 403) {
+            // Errores de auth son normales, loguear como debug/info para no alarmar
+            // console.debug(`[Auth] ${request.method} ${request.url} - ${status}: ${message}`);
         } else {
-            // Warn for auth/validation errors but don't spam critical logs
-            console.warn(`[${request.method} ${request.url}] ${status} - ${message}`);
+            // Otros 4xx (400, 404, etc)
+            console.warn(`[ClientError] ${request.method} ${request.url} - ${status}: ${message}`);
         }
-
-        // No need to redeclare finalMessage or re-check exception type extensively since we normalized `message` above
         const debugMessage = process.env.NODE_ENV !== 'production'
             ? (exception instanceof Error ? exception.stack : JSON.stringify(exception))
             : undefined;

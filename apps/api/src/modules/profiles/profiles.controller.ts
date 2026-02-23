@@ -42,7 +42,7 @@ export class ProfilesController {
     @Get('check-username/:username')
     @ApiOperation({ summary: 'Verificar si un nombre de usuario está disponible' })
     @ApiResponse({ status: 200, type: Boolean })
-    async checkUsername(@Body() _dto: any, @User() _user: AuthUser, @Param('username') username: string): Promise<boolean> {
+    async checkUsername(@Param('username') username: string): Promise<boolean> {
         return this.profilesService.isUsernameAvailable(username);
     }
 
