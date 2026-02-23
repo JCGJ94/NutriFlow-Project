@@ -50,7 +50,7 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
 
   useEffect(() => {
     if (!isUserLoading && (!profile || !profile.id)) {
-        console.log('Profile missing, redirecting to onboarding...');
+
         // showToast(t('dash.welcome_new'), 'info'); // Avoid toast on server redirect if possible, but this is client
         router.push('/onboarding');
     }

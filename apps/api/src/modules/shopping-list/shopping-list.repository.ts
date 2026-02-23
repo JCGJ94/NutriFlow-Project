@@ -75,13 +75,13 @@ export class ShoppingListRepository {
 
     private async generateAndSave(planId: string): Promise<ShoppingListDto> {
         // Get plan info
-        const { data: plan, error: planError } = await this.supabase
+        const { error: planError } = await this.supabase
             .from('plans')
             .select('week_start')
             .eq('id', planId)
             .single();
 
-        console.log('Generating list for plan starting:', plan?.week_start);
+
 
         if (planError) throw new Error(`Plan not found: ${planError.message}`);
 

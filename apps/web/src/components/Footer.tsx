@@ -8,11 +8,13 @@ import { Logo } from './Logo';
 import { useLanguage } from '@/context/LanguageContext';
 
 import { useToast } from '@/context/ToastContext';
+import { useUser } from '@/context/UserContext';
 
 export function Footer() {
   const pathname = usePathname();
   const { t } = useLanguage();
   const { showToast } = useToast();
+  const { user } = useUser();
   const currentYear = new Date().getFullYear();
 
   const isAuthPage = pathname === '/login' || pathname === '/register';
@@ -31,7 +33,7 @@ export function Footer() {
           
           {/* Brand Column - Spans 2 columns on mobile */}
           <div className="col-span-2 lg:col-span-1 space-y-4">
-            <Link href="/" className="flex items-center gap-2 group w-fit">
+            <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 group w-fit">
               <Logo size={32} className="transition-transform group-hover:scale-105" />
             </Link>
             <p className="text-surface-600 dark:text-surface-400 text-sm leading-relaxed max-w-xs">
@@ -78,12 +80,12 @@ export function Footer() {
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link href="/#features" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <Link href={user ? "/dashboard" : "/#features"} className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
                   {t('footer.features')}
                 </Link>
               </li>
               <li>
-                <Link href="/#how-it-works" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <Link href={user ? "/dashboard" : "/#how-it-works"} className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
                   {t('footer.how_it_works')}
                 </Link>
               </li>

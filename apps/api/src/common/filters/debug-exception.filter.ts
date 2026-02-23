@@ -22,6 +22,14 @@ export class DebugExceptionFilter implements ExceptionFilter {
                 : HttpStatus.INTERNAL_SERVER_ERROR;
 
 
+        let message = 'Internal server error';
+
+        if (exception instanceof HttpException) {
+            const response = exception.getResponse();
+            message = typeof response === 'string' ? response : (response as any).message || exception.message;
+        } else if (exception instanceof Error) {
+            message = exception.message;
+        }
 
         const errorLog = {
             statusCode: status,
@@ -30,6 +38,7 @@ export class DebugExceptionFilter implements ExceptionFilter {
             method: request.method,
             user: (request as any).user?.id || 'anonymous',
             error: exception instanceof Error ? exception.stack : JSON.stringify(exception),
+            message: message, // Log the extracted message
         };
 
         if (status >= 500) {
@@ -48,21 +57,17 @@ export class DebugExceptionFilter implements ExceptionFilter {
             console.warn(`[${request.method} ${request.url}] ${status} - ${message}`);
         }
 
-        let finalMessage = message;
-        if (exception instanceof HttpException) {
-            // Already handled message extraction above, but ensure it's clean
-        } else if (exception instanceof Error) {
-            finalMessage = process.env.NODE_ENV !== 'production' ? exception.message : 'Internal server error';
-        }
+        // No need to redeclare finalMessage or re-check exception type extensively since we normalized `message` above
+        const debugMessage = process.env.NODE_ENV !== 'production'
+            ? (exception instanceof Error ? exception.stack : JSON.stringify(exception))
+            : undefined;
 
         response.status(status).json({
             statusCode: status,
             timestamp: new Date().toISOString(),
             path: request.url,
-            message: message, // Client expects this
-            debugMessage: process.env.NODE_ENV !== 'production'
-                ? (exception instanceof Error ? exception.stack : JSON.stringify(exception))
-                : undefined,
+            message: message,
+            debugMessage: debugMessage,
         });
     }
 }

@@ -67,7 +67,9 @@ async function bootstrap() {
     SwaggerModule.setup(`${apiPrefix}/docs`, app, document);
 
     // Start server
-    const port = process.env.PORT || process.env.API_PORT || 3000;
+    const port = process.env.PORT || process.env.API_PORT || 3001;
+
+    // Ensure we listen on all interfaces or specific host if needed, but for local 3001 is key
     await app.listen(port);
 
     console.log(`🚀 NutriFlow API running on: http://localhost:${port}/${apiPrefix}`);

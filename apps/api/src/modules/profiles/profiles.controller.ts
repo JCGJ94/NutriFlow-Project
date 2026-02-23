@@ -19,9 +19,9 @@ export class ProfilesController {
     @ApiResponse({ status: 200, type: ProfileResponseDto })
     async getProfile(@User() user: AuthUser): Promise<ProfileResponseDto | null> {
         try {
-            console.log('Getting profile for user:', user.id);
+
             const profile = await this.profilesService.getProfile(user.id);
-            console.log('Profile found:', profile ? 'yes' : 'no');
+
             return profile;
         } catch (error) {
             console.error('Error in getProfile:', error);

@@ -28,7 +28,7 @@ export class ProfilesRepository {
                 return null;
             }
 
-            console.log('Raw profile data found:', data);
+
             return this.mapToDto(data);
         } catch (err) {
             console.error('Unexpected error in findByUserId:', err);

@@ -44,7 +44,7 @@ export class SupabaseJwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         // GIVEN THE 401 ERRORS: We will use the secret-less approach inside a custom guard if needed,
         // but for now, let's just log and try to use what we have.
 
-        console.log('🔍 Validating user ID:', payload.sub);
+
         return {
             id: payload.sub,
             email: payload.email,
@@ -67,7 +67,7 @@ export class SupabaseJwtStrategy extends PassportStrategy(Strategy, 'jwt') {
                 return this.fail('Invalid token', 401);
             }
 
-            console.log('✅ Supabase Token Validated for:', user.email);
+
             const authUser: AuthUser = {
                 id: user.id,
                 email: user.email,

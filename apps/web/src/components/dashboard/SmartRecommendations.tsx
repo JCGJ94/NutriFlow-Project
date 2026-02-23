@@ -108,7 +108,7 @@ export function SmartRecommendations() {
         });
 
         if (error) {
-          console.log('No recommendations available:', error.message);
+          console.error('No recommendations available:', error.message);
           setRecommendations([]);
         } else {
           setRecommendations(data || []);

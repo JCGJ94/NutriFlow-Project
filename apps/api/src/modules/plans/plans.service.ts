@@ -73,7 +73,7 @@ export class PlansService {
             }));
 
             if (useAi) {
-                console.log('🤖 AI generation requested. Using Rules Engine for structure (Deterministic).');
+
             }
 
             // Generate plan using Rules Engine
@@ -85,7 +85,7 @@ export class PlansService {
 
             // AUTO-TRANSLATE IF NEEDED
             if (userProfile.language === 'en') {
-                console.log('🌐 User language is English. Translating generated plan structure...');
+
                 try {
                     generatedPlan = await this.translationBridgeService.translatePlan(generatedPlan, 'en');
                 } catch (translationError) {
@@ -94,7 +94,7 @@ export class PlansService {
             }
 
             if (useAi) {
-                console.log('✅ Plan structure generated successfully. AI narration can be applied to this structure.');
+
             }
         } catch (error: any) {
             console.error('❌ Error generating plan [PlansService]:', error);

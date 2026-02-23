@@ -107,15 +107,7 @@ export default function OnboardingPage() {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user?.email) {
-          const emailPrefix = user.email.split('@')[0];
-          const cleanUsername = emailPrefix
-            .replace(/[^a-zA-Z0-9]/g, '_')
-            .toLowerCase()
-            .substring(0, 15);
-          
-          const randomSuffix = Math.floor(Math.random() * 1000);
-          const usernameSuggestion = `${cleanUsername}${randomSuffix}`;
-          console.log('Username suggestion:', usernameSuggestion);
+          // Username suggestion logic removed to reduce noise/unused code
         }
       } catch (error) {
         console.error('Error getting user', error);
@@ -199,7 +191,7 @@ export default function OnboardingPage() {
       // 1. Save Profile (Sanitize data to exclude fields not in DTO)
       const { allergenIds, ...profileData } = data;
       
-      console.log('Saving profile data:', profileData);
+
       
       const profileRes = await fetch('/api/me/profile', {
         method: 'PUT',
@@ -219,7 +211,7 @@ export default function OnboardingPage() {
       // 2. Save Allergens (if any)
       if (allergenIds && allergenIds.length > 0) {
         setLoadingStep(t('onboarding.loading_allergens'));
-        console.log('Saving allergens:', allergenIds);
+
         const allergensRes = await fetch('/api/me/allergens', {
           method: 'PUT',
           headers,
