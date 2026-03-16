@@ -12,6 +12,8 @@
         "SUPABASE_URL",
         "SUPABASE_ANON_KEY",
         "SUPABASE_SERVICE_ROLE_KEY",
+        "SUPABASE_SERVICE_KEY",
+        "SUPABASE_KEY",
         "GEMINI_API_KEY",
         "GOOGLE_DRIVE_FOLDER_ID",
         "NOTEBOOKLM_ID",
