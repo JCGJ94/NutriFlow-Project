@@ -102,7 +102,7 @@ class ApiClient {
                         const errorBody = JSON.parse(text);
                         errorMessage = errorBody.message || errorMessage;
                     }
-                } catch { }
+                } catch { /* Ignore parse error */ }
                 throw new Error(errorMessage);
             }
 

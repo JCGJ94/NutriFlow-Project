@@ -18,7 +18,7 @@ export class AiDietService {
    * @deprecated The AI no longer generates the plan structure. 
    * Use DietEngineService.generateWeeklyPlan() instead.
    */
-  async generateDietPlan(_profile: UserProfile): Promise<GeneratedWeekPlan> {
+  async generateDietPlan(): Promise<GeneratedWeekPlan> {
     throw new Error('AiDietService.generateDietPlan is deprecated. Use DietEngineService.generateWeeklyPlan for deterministic generation.');
   }
 

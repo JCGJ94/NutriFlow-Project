@@ -1,0 +1,159 @@
+• turbo 2.8.1
+• Packages in scope: @nutriflow/api, @nutriflow/shared, @nutriflow/web, mcp-railway
+• Running lint in 4 packages
+• Remote caching disabled
+@nutriflow/shared:lint: cache hit, replaying logs aa3ad38e001af9b8
+@nutriflow/shared:lint: 
+@nutriflow/shared:lint: > @nutriflow/shared@0.1.0 lint E:\Full Stack Jose Carlos\App NutriFlow\packages\shared
+@nutriflow/shared:lint: > eslint src --ext .ts
+@nutriflow/shared:lint: 
+@nutriflow/api:lint: cache miss, executing cdfc12f982188f47
+@nutriflow/web:lint: cache miss, executing 5b22b6e64552ef98
+@nutriflow/web:lint: 
+@nutriflow/web:lint: > @nutriflow/web@0.1.0 lint E:\Full Stack Jose Carlos\App NutriFlow\apps\web
+@nutriflow/web:lint: > eslint .
+@nutriflow/web:lint: 
+@nutriflow/api:lint: 
+@nutriflow/api:lint: > @nutriflow/api@0.1.0 lint E:\Full Stack Jose Carlos\App NutriFlow\apps\api
+@nutriflow/api:lint: > eslint "src/**/*.ts"
+@nutriflow/api:lint: 
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\common\filters\debug-exception.filter.ts
+@nutriflow/api:lint:   22:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   22:63  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   28:78  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   38:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\ai\gemini.service.ts
+@nutriflow/api:lint:   36:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\ai\google-drive.service.ts
+@nutriflow/api:lint:   19:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   27:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   37:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   65:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\auth\strategies\supabase-jwt.strategy.ts
+@nutriflow/api:lint:   40:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   56:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\diet-engine\ai-diet.controller.ts
+@nutriflow/api:lint:   38:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   52:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   58:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\diet-engine\ai-diet.service.spec.ts
+@nutriflow/api:lint:    8:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   13:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   32:76  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\diet-engine\diet-engine-integration.spec.ts
+@nutriflow/api:lint:   15:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   17:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   30:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\diet-engine\llm\llm.router.ts
+@nutriflow/api:lint:   50:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\diet-engine\llm\providers\ollama.provider.ts
+@nutriflow/api:lint:   52:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   59:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\diet-engine\notebooklm-mcp.service.ts
+@nutriflow/api:lint:   55:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   85:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   91:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\exercise-engine\exercise-engine.service.ts
+@nutriflow/api:lint:   212:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   212:75  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   214:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   281:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   286:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\ingredients\ingredients.repository.ts
+@nutriflow/api:lint:   101:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   209:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\plans\plans.repository.ts
+@nutriflow/api:lint:   146:64  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\plans\plans.service.ts
+@nutriflow/api:lint:   24:66  warning  '_useAi' is assigned a value but never used  @typescript-eslint/no-unused-vars
+@nutriflow/api:lint:   91:25  warning  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\profiles\profiles.repository.ts
+@nutriflow/api:lint:   134:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   174:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   181:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\rag\rag.controller.ts
+@nutriflow/api:lint:   19:70  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   47:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   50:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   94:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\rag\rag.service.ts
+@nutriflow/api:lint:    7:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   47:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\shopping-list\shopping-list.repository.ts
+@nutriflow/api:lint:    57:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:    58:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   102:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   112:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   113:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   113:86  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint:   114:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\api\src\modules\shopping-list\shopping-list.service.ts
+@nutriflow/api:lint:   28:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/api:lint: 
+@nutriflow/api:lint: ✖ 53 problems (0 errors, 53 warnings)
+@nutriflow/api:lint: 
+@nutriflow/web:lint: 
+@nutriflow/web:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\web\src\app\dashboard\dashboard-client.tsx
+@nutriflow/web:lint:   62:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint: 
+@nutriflow/web:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\web\src\app\onboarding\page.tsx
+@nutriflow/web:lint:   254:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint: 
+@nutriflow/web:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\web\src\app\register\page.tsx
+@nutriflow/web:lint:   104:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint: 
+@nutriflow/web:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\web\src\app\settings\page.tsx
+@nutriflow/web:lint:   117:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint: 
+@nutriflow/web:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\web\src\app\shopping-list\[id]\page.tsx
+@nutriflow/web:lint:    54:47  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+@nutriflow/web:lint:   285:10  warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+@nutriflow/web:lint:   290:5   warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+@nutriflow/web:lint:   313:9   warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+@nutriflow/web:lint: 
+@nutriflow/web:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\web\src\components\plan\AiDietGenerator.tsx
+@nutriflow/web:lint:    30:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint:    80:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint:   144:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint:   311:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint: 
+@nutriflow/web:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\web\src\components\seo\JsonLd.tsx
+@nutriflow/web:lint:   4:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint: 
+@nutriflow/web:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\web\src\context\LanguageContext.tsx
+@nutriflow/web:lint:   71:5  warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+@nutriflow/web:lint: 
+@nutriflow/web:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\web\src\context\PlansContext.tsx
+@nutriflow/web:lint:   190:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint: 
+@nutriflow/web:lint: E:\Full Stack Jose Carlos\App NutriFlow\apps\web\src\lib\apiClient.ts
+@nutriflow/web:lint:   124:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint:   128:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint:   136:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+@nutriflow/web:lint: 
+@nutriflow/web:lint: ✖ 18 problems (0 errors, 18 warnings)
+@nutriflow/web:lint: 
+
+ Tasks:    3 successful, 3 total
+Cached:    1 cached, 3 total
+  Time:    2.963s 
+

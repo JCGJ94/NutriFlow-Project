@@ -21,7 +21,7 @@ export class PlansService {
         private readonly translationBridgeService: TranslationBridgeService,
     ) { }
 
-    async generateWeeklyPlan(userId: string, weekStart?: string, useAi = false): Promise<PlanResponseDto> {
+    async generateWeeklyPlan(userId: string, weekStart?: string, _useAi = false): Promise<PlanResponseDto> {
         // Check plan limit (Max 3 plans total)
         const existingPlans = await this.repository.findAllByUser(userId);
         if (existingPlans.length >= 3) {
@@ -72,10 +72,6 @@ export class PlansService {
                 allergenIds: i.allergenIds || [],
             }));
 
-            if (useAi) {
-
-            }
-
             // Generate plan using Rules Engine
             generatedPlan = this.dietEngineService.generateWeeklyPlan(
                 userProfile,
@@ -91,10 +87,6 @@ export class PlansService {
                 } catch (translationError) {
                     console.error('⚠️ Failed to translate plan. Falling back to Spanish content.', translationError);
                 }
-            }
-
-            if (useAi) {
-
             }
         } catch (error: any) {
             console.error('❌ Error generating plan [PlansService]:', error);

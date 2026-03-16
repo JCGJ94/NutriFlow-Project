@@ -82,7 +82,7 @@ export default function LoginPage() {
       } else {
         router.push('/dashboard');
       }
-    } catch (err) {
+    } catch {
       showToast(t('common.error'), 'error');
     } finally {
       setIsLoading(false);

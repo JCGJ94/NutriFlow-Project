@@ -159,22 +159,21 @@ export function PlansProvider({ children, initialPlans }: { children: ReactNode,
          localStorage.setItem('nutriflow_plans_cache', JSON.stringify(initialPlans));
       }
       
-      // Shopping Lists Cache
       const cachedLists = localStorage.getItem('nutriflow_shopping_lists_cache');
       if (cachedLists) {
-         try { setCachedShoppingLists(JSON.parse(cachedLists)); } catch(e) {}
+         try { setCachedShoppingLists(JSON.parse(cachedLists)); } catch { /* Ignore */ }
       }
 
       // Plans Details Cache
       const cachedDetails = localStorage.getItem('nutriflow_plan_details_cache');
       if (cachedDetails) {
-         try { setCachedPlanDetails(JSON.parse(cachedDetails)); } catch(e) {}
+         try { setCachedPlanDetails(JSON.parse(cachedDetails)); } catch { /* Ignore */ }
       }
 
       // Exercise Plans Cache
       const cachedExercises = localStorage.getItem('nutriflow_exercise_plans_cache');
       if (cachedExercises) {
-         try { setCachedExercisePlans(JSON.parse(cachedExercises)); } catch(e) {}
+         try { setCachedExercisePlans(JSON.parse(cachedExercises)); } catch { /* Ignore */ }
       }
     }
   }, []);
@@ -256,7 +255,7 @@ export function PlansProvider({ children, initialPlans }: { children: ReactNode,
           const newState = { ...prev, [plan.id]: plan };
           try {
              localStorage.setItem('nutriflow_plan_details_cache', JSON.stringify(newState));
-          } catch (e) {
+          } catch {
              console.warn('LocalStorage full, cannot cache plan details');
           }
           return newState;
@@ -269,7 +268,7 @@ export function PlansProvider({ children, initialPlans }: { children: ReactNode,
           const newState = { ...prev, [planId]: plan };
           try {
               localStorage.setItem('nutriflow_exercise_plans_cache', JSON.stringify(newState));
-          } catch (e) { console.warn('LocalStorage full (exercise)'); }
+          } catch { console.warn('LocalStorage full (exercise)'); }
           return newState;
       });
   }, []);

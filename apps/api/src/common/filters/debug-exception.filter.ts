@@ -4,6 +4,20 @@ import { Request, Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
 
+interface HttpExceptionResponse {
+    message?: string | string[];
+}
+
+interface ExceptionWithStatus {
+    status?: number;
+    statusCode?: number;
+    message?: string;
+}
+
+interface RequestWithUser extends Request {
+    user?: { id: string };
+}
+
 /**
  * Emergency filter to debug unhandled 500 errors
  */
@@ -14,18 +28,18 @@ export class DebugExceptionFilter implements ExceptionFilter {
     catch(exception: unknown, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
-        const request = ctx.getRequest<Request>();
+        const request = ctx.getRequest<RequestWithUser>();
 
         const status =
             exception instanceof HttpException
                 ? exception.getStatus()
-                : (exception as any)?.status || (exception as any)?.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
+                : (exception as ExceptionWithStatus)?.status || (exception as ExceptionWithStatus)?.statusCode || HttpStatus.INTERNAL_SERVER_ERROR;
 
         let message = 'Internal server error';
 
         if (exception instanceof HttpException) {
-            const response = exception.getResponse();
-            message = typeof response === 'string' ? response : (response as any).message || exception.message;
+            const res = exception.getResponse() as string | HttpExceptionResponse;
+            message = typeof res === 'string' ? res : (Array.isArray(res.message) ? res.message[0] : res.message) || exception.message;
         } else if (exception instanceof Error) {
             message = exception.message;
         }
@@ -35,7 +49,7 @@ export class DebugExceptionFilter implements ExceptionFilter {
             timestamp: new Date().toISOString(),
             path: request.url,
             method: request.method,
-            user: (request as any).user?.id || 'anonymous',
+            user: request.user?.id || 'anonymous',
             error: exception instanceof Error ? exception.stack : JSON.stringify(exception),
             message: message,
         };

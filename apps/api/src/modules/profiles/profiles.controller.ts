@@ -7,6 +7,9 @@ import { User } from '../auth/decorators/user.decorator';
 import { AuthUser } from '../auth/strategies/supabase-jwt.strategy';
 import { Public } from '../auth/decorators/public.decorator';
 
+import * as fs from 'fs';
+import * as path from 'path';
+
 @ApiTags('profiles')
 @ApiBearerAuth('supabase-auth')
 @UseGuards(JwtAuthGuard)
@@ -27,8 +30,6 @@ export class ProfilesController {
             console.error('Error in getProfile:', error);
             // Emergency file logging
             try {
-                const fs = require('fs');
-                const path = require('path');
                 const logPath = path.resolve('api-error.log');
                 const errorMessage = error instanceof Error ? error.stack : JSON.stringify(error);
                 fs.appendFileSync(logPath, `\n[${new Date().toISOString()}] Error in getProfile: ${errorMessage}\n`);

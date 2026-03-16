@@ -218,7 +218,7 @@ export class ExerciseEngineService {
 
             const exercises = this.selectExercises(day.muscles, lang);
             const totalDurationMin = this.calculateDuration(exercises);
-            const caloriesBurned = this.estimateCalories(day.type, totalDurationMin, profile);
+            const caloriesBurned = this.estimateCalories(day.type, totalDurationMin);
 
             return {
                 dayOfWeek: index,
@@ -308,7 +308,7 @@ export class ExerciseEngineService {
         return Math.round(totalSeconds / 60);
     }
 
-    private estimateCalories(type: string, durationMin: number, _profile: ExerciseProfile): number {
+    private estimateCalories(type: string, durationMin: number): number {
         // MET values for different exercise types
         const metValues: Record<string, number> = {
             strength: 5,

@@ -63,7 +63,7 @@ export class NotebooklmMcpService implements OnModuleInit, OnModuleDestroy {
         if (this.transport) {
             try {
                 await this.transport.close();
-            } catch (e) {
+            } catch {
                 // Ignore close errors
             }
         }

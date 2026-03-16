@@ -33,8 +33,9 @@ export class GeminiService {
     private async withRetry<T>(operation: () => Promise<T>, retries = 3, delay = 2000): Promise<T> {
         try {
             return await operation();
-        } catch (error: any) {
-            if (retries > 0 && error.message?.includes('429')) {
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            if (retries > 0 && errorMessage?.includes('429')) {
                 console.warn(`⚠️ Gemini API Rate Limit (429). Retrying in ${delay}ms... (${retries} attempts left)`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 return this.withRetry(operation, retries - 1, delay * 2);

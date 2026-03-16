@@ -1,7 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
+import { DebugExceptionFilter } from './common/filters/debug-exception.filter';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -21,7 +23,7 @@ async function bootstrap() {
     });
 
     // Security Headers (Helmet)
-    app.use(require('helmet')());
+    app.use(helmet());
 
 
     // Global validation pipe
@@ -37,7 +39,6 @@ async function bootstrap() {
     );
 
     // DEBUG: Register global exception filter
-    const { DebugExceptionFilter } = require('./common/filters/debug-exception.filter');
     app.useGlobalFilters(new DebugExceptionFilter());
 
     // Swagger documentation

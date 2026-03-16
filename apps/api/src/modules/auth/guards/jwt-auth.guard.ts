@@ -17,11 +17,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         ]);
 
         // DEBUG LOGGING
-        const handlerName = context.getHandler().name;
+        // const handlerName = context.getHandler().name;
         // const className = context.getClass().name; // Removed unused
-        if (handlerName === 'checkUsername') {
-
-        }
 
         if (isPublic) {
             return true;
