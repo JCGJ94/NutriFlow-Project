@@ -67,9 +67,9 @@ export function getMealTypeName(mealType: string, lang: 'es' | 'en' = 'es'): str
  */
 export function formatGrams(grams: number): string {
     if (grams >= 1000) {
-        return `${(grams / 1000).toFixed(1)} kg`;
+        return `${(grams / 1000).toFixed(1)}kg`;
     }
-    return `${Math.round(grams)} g`;
+    return `${Math.round(grams)}g`;
 }
 
 /**
