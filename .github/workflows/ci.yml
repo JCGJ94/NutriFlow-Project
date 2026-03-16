@@ -36,6 +36,23 @@ jobs:
         node-version: '20'
         cache: 'pnpm'
 
+    - name: Verify Supabase environment
+      run: |
+        node -e "
+          const keys = [
+            'SUPABASE_URL',
+            'SUPABASE_ANON_KEY',
+            'NEXT_PUBLIC_SUPABASE_URL',
+            'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+            'SUPABASE_SERVICE_KEY',
+            'SUPABASE_SERVICE_ROLE_KEY',
+            'SUPABASE_JWT_SECRET'
+          ];
+          keys.forEach(key => {
+            console.log(`${key}: ${process.env[key] ? 'present' : 'missing'}`);
+          });
+        "
+
     - name: Install dependencies
       run: pnpm install
 
