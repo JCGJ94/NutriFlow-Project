@@ -1,8 +1,0 @@
-commit 32d46ed3b0260dc8ca5fa417baade6f1e92cc02c
-Author: JCGJ94 <jcgonj1994@gmail.com>
-Date:   Thu Feb 19 11:13:22 2026 +0000
-
-    fix(api): reduce log noise & debug auth
-
- apps/web/next-env.d.ts | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)

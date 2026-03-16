@@ -169,6 +169,12 @@ Automated 7-day meal plans and consolidated shopping lists.
 
 ---
 
+## Environment Configuration
+
+- Duplicate `.env.example` (root or `apps/web/.env.example`) into `.env.local` and populate the secrets with your own Supabase project values before running local commands.
+- Keep every file that stores `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`, `SUPABASE_JWT_SECRET`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY` out of source control; the template keeps placeholders so your keys never flow through git.
+- Build the frontend via `pnpm build` only after ensuring `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are injected (your CI environment should set them as secrets or env vars in the workflow). The API seed script also requires the backend service-role key to be defined in `SUPABASE_SERVICE_KEY` / `SUPABASE_SERVICE_ROLE_KEY`.
+
 ## Role & Responsibilities
 
 **Sole Developer**

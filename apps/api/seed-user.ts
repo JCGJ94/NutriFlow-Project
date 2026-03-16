@@ -1,8 +1,17 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://rbsokakrtclnmralymna.supabase.co';
-const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJic29rYWtydGNsbm1yYWx5bW5hIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MDAyODUwMywiZXhwIjoyMDg1NjA0NTAzfQ.qLDlGuQdC6D1DZ7jM2DABONrvUi-su-ajU0ImmWANuw';
+const SUPABASE_URL = process.env.SUPABASE_URL?.trim();
+const SUPABASE_SERVICE_KEY = (
+    process.env.SUPABASE_SERVICE_KEY?.trim() ??
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()
+);
+
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+    throw new Error(
+        'SUPABASE_URL and SUPABASE_SERVICE_KEY (or SUPABASE_SERVICE_ROLE_KEY) must be configured'
+    );
+}
 
 console.log('Using URL:', SUPABASE_URL);
 

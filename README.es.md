@@ -176,6 +176,14 @@ Planes de comidas automatizados de 7 días y listas de compras consolidadas.
 ### Backend
 - **Caché de Respuestas de IA**: Caché en memoria (TTL 24h) para planes de dieta generados, basado en el hash del perfil de usuario. Reduce costos de IA y latencia.
 
+---
+
+## Configuración de Entorno
+
+- Duplica `apps/web/.env.example` (o el `/.env.example` raíz) como `.env.local` y rellena tus propios valores de Supabase antes de ejecutar comandos locales.
+- Mantén fuera del control de versiones cualquier archivo que contenga `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`, `SUPABASE_JWT_SECRET`, `NEXT_PUBLIC_SUPABASE_URL` o `NEXT_PUBLIC_SUPABASE_ANON_KEY`; el repositorio solo guarda plantillas con marcadores de posición para que tus claves nunca se filtren.
+- El frontend y el proxy requieren que `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` estén disponibles en el momento de la compilación. Inyecta estas variables como secretos en tu CI (por ejemplo, GitHub Actions secrets en el bloque `env`) o configúralas localmente antes de ejecutar `pnpm build`. El script `apps/api/seed-user.ts` también espera que la clave de servicio (`SUPABASE_SERVICE_KEY` o `SUPABASE_SERVICE_ROLE_KEY`) esté definida de forma segura.
+
 ## 📄 Licencia
 
 Distribuido bajo la Licencia MIT. Ver `LICENSE` para más información.
