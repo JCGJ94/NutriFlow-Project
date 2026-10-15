@@ -21,7 +21,7 @@ S7. Honest copy: no invented metrics or claims. The current landing ships "La ap
 | R0 | S3,S4,S5 | inline + researcher | done | Research of the 8 resources (licences, patterns, fit). Result in S4. |
 | R1 | S1,S3,S6 | inline | done | Design system, register B (user choice): dark-first with warm light twin, one amber `signal` accent, Geist + Geist Mono through `next/font`, tokens `--paper/--ink/--rule/--signal` in `globals.css`, new Logo (week ring), legacy v3 class names kept as thin utilities until R4/R5. Original plan text: playful/Hum (cream paper, pear / cyan / coral accents, Plus Jakarta Sans + JetBrains Mono through `next/font`), tokens in the Tailwind 4 `@theme`, rebuilt base styles and component classes (button system, cards, inputs), replacing the converted v3 classes. |
 | R2 | S1,S3,S6,S7 | inline | done (Footer only re-tokenised, structure kept) | Landing page (macrostructure Narrative Workflow: profile, allergens, weekly plan, shopping list, training), new Navbar and Footer archetypes, i18n ES/EN copy, honest claims. Screenshot check desktop/mobile, light/dark. |
-| R3 | S1,S6 | inline | pending | Auth screens: login, register. |
+| R3 | S1,S6 | inline | done (AuthShell, no logic change; e2e not run) | Auth screens: login, register. |
 | R4 | S1,S6 | inline | pending | Authenticated screens: dashboard, plans, plan view, shopping list, onboarding, settings (needs a real Supabase session or mocked data to review; split per screen). |
 | R5 | S6 | inline | pending | Remove the dead v3 classes and tokens from `globals.css`; final verifier on a fresh clone. |
 
