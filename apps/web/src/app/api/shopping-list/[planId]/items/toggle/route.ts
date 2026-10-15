@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireUser, ApiError } from '@/lib/auth/guards';
-import { z } from 'zod';
+import { ToggleShoppingItemSchema } from '@nutriflow/shared';
 
 type RouteContext = { params: Promise<{ planId: string }> };
 
-const ToggleSchema = z.object({
-    ingredientName: z.string().min(1, 'ingredientName is required'),
-});
-
 // ---- POST /api/shopping-list/[planId]/items/toggle ---------------------
+// Sets the checked state of one item. The item is identified by id (names can
+// repeat and custom items have no ingredient) and the new state is explicit,
+// so retries and optimistic UI updates are idempotent.
 
 export async function POST(req: NextRequest, { params }: RouteContext): Promise<NextResponse> {
     try {
@@ -33,7 +32,7 @@ export async function POST(req: NextRequest, { params }: RouteContext): Promise<
             return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
         }
 
-        const parsed = ToggleSchema.safeParse(body);
+        const parsed = ToggleShoppingItemSchema.safeParse(body);
         if (!parsed.success) {
             return NextResponse.json(
                 { error: 'Invalid input', details: parsed.error.errors },
@@ -41,54 +40,29 @@ export async function POST(req: NextRequest, { params }: RouteContext): Promise<
             );
         }
 
-        const { ingredientName } = parsed.data;
+        const { itemId, isChecked } = parsed.data;
 
-        // Get the shopping list for this plan
-        const { data: list, error: listError } = await sb
-            .from('shopping_lists')
-            .select('id')
-            .eq('plan_id', planId)
-            .single();
-
-        if (listError || !list) {
-            return NextResponse.json({ error: 'Shopping list not found' }, { status: 404 });
-        }
-
-        // Find the item by ingredient name (custom_name or via ingredient join)
-        // We look in shopping_list_items joined with ingredients
-        const { data: itemRows, error: itemError } = await sb
+        // Verify the item belongs to this plan's shopping list
+        const { data: item, error: itemError } = await sb
             .from('shopping_list_items')
             .select(`
                 id,
-                is_checked,
-                custom_name,
-                ingredient_id,
-                ingredients (name)
+                shopping_lists (plan_id)
             `)
-            .eq('shopping_list_id', (list as any).id);
+            .eq('id', itemId)
+            .single();
 
-        if (itemError) {
-            throw new Error(`Failed to fetch items: ${itemError.message}`);
-        }
+        const list = (item as any)?.shopping_lists;
+        const itemPlanId = Array.isArray(list) ? list[0]?.plan_id : list?.plan_id;
 
-        const matchedItem = (itemRows ?? []).find((item: any) => {
-            const ingName = Array.isArray(item.ingredients)
-                ? item.ingredients[0]?.name
-                : item.ingredients?.name;
-            const resolvedName = item.ingredient_id ? ingName : item.custom_name;
-            return resolvedName?.toLowerCase() === ingredientName.toLowerCase();
-        });
-
-        if (!matchedItem) {
+        if (itemError || !item || itemPlanId !== planId) {
             return NextResponse.json({ error: 'Item not found' }, { status: 404 });
         }
 
-        const newChecked = !(matchedItem as any).is_checked;
-
         const { data: updated, error: updateError } = await sb
             .from('shopping_list_items')
-            .update({ is_checked: newChecked })
-            .eq('id', (matchedItem as any).id)
+            .update({ is_checked: isChecked })
+            .eq('id', itemId)
             .select('id, is_checked')
             .single();
 

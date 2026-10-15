@@ -1,17 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireUser, ApiError } from '@/lib/auth/guards';
-import { IngredientCategory } from '@nutriflow/shared';
-import { z } from 'zod';
+import { IngredientCategory, AddShoppingItemSchema } from '@nutriflow/shared';
 
 type RouteContext = { params: Promise<{ planId: string }> };
-
-const AddItemSchema = z.object({
-    name: z.string().min(1, 'Name is required'),
-    quantity: z.string().optional(),
-    ingredientId: z.string().optional(),
-    grams: z.number().optional(),
-});
 
 // ---- POST /api/shopping-list/[planId]/items ----------------------------
 
@@ -37,7 +29,7 @@ export async function POST(req: NextRequest, { params }: RouteContext): Promise<
             return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
         }
 
-        const parsed = AddItemSchema.safeParse(body);
+        const parsed = AddShoppingItemSchema.safeParse(body);
         if (!parsed.success) {
             return NextResponse.json(
                 { error: 'Invalid input', details: parsed.error.errors },

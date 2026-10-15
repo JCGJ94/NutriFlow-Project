@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireUser, ApiError } from '@/lib/auth/guards';
-import { z } from 'zod';
-
-const SetAllergensSchema = z.object({
-    allergenIds: z.array(z.string()),
-});
+import { SetAllergensSchema } from '@nutriflow/shared';
 
 function mapAllergenRow(row: Record<string, unknown>) {
     const allergen = row.allergens as Record<string, unknown>;

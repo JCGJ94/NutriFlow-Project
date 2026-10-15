@@ -123,79 +123,133 @@ describe('GET /api/shopping-list/[planId]', () => {
 
 // ---- POST /api/shopping-list/[planId]/items/toggle --------------------
 
+const togglePlanRow = { id: planId, user_id: 'user-123' };
+
+function makeToggleClient(options: {
+    item: unknown;
+    itemError?: unknown;
+    updated?: { id: string; is_checked: boolean };
+    update?: ReturnType<typeof vi.fn>;
+}) {
+    const update =
+        options.update ??
+        vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+                select: vi.fn().mockReturnValue({
+                    single: vi
+                        .fn()
+                        .mockResolvedValue({ data: options.updated ?? null, error: null }),
+                }),
+            }),
+        });
+
+    const from = vi.fn().mockImplementation((table: string) => {
+        if (table === 'plans') {
+            return {
+                select: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                        single: vi.fn().mockResolvedValue({ data: togglePlanRow, error: null }),
+                    }),
+                }),
+            };
+        }
+        if (table === 'shopping_list_items') {
+            return {
+                select: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                        single: vi.fn().mockResolvedValue({
+                            data: options.item,
+                            error: options.itemError ?? null,
+                        }),
+                    }),
+                }),
+                update,
+            };
+        }
+        return { select: vi.fn() };
+    });
+
+    return { client: { from }, update };
+}
+
+function makeToggleRequest(body: object): NextRequest {
+    return makeRequest(
+        'POST',
+        body,
+        `http://localhost/api/shopping-list/${planId}/items/toggle`,
+    );
+}
+
 describe('POST /api/shopping-list/[planId]/items/toggle', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         vi.resetModules();
     });
 
-    it('toggles item checked state and returns new state', async () => {
+    it('sets the item to the requested checked state and returns it', async () => {
         vi.mocked(requireUser).mockResolvedValue(mockUser as any);
-
-        // Mock: plan ownership check, find shopping list, find items, update item
-        const planRow = { id: planId, user_id: 'user-123' };
-        const shoppingListRow = { id: 'list-1', plan_id: planId };
-        // Item with ingredientName matching via custom_name (isCustom item)
-        const itemRows = [
-            {
-                id: 'item-1',
-                is_checked: false,
-                custom_name: 'Chicken breast',
-                ingredient_id: null,
-                ingredients: null,
-            },
-        ];
-        const updatedRow = { id: 'item-1', is_checked: true };
-
-        const fromMock = vi.fn().mockImplementation((table: string) => {
-            if (table === 'plans') {
-                return {
-                    select: vi.fn().mockReturnValue({
-                        eq: vi.fn().mockReturnValue({
-                            single: vi.fn().mockResolvedValue({ data: planRow, error: null }),
-                        }),
-                    }),
-                };
-            }
-            if (table === 'shopping_lists') {
-                return {
-                    select: vi.fn().mockReturnValue({
-                        eq: vi.fn().mockReturnValue({
-                            single: vi.fn().mockResolvedValue({ data: shoppingListRow, error: null }),
-                        }),
-                    }),
-                };
-            }
-            if (table === 'shopping_list_items') {
-                return {
-                    // For SELECT query (find items by shopping_list_id)
-                    select: vi.fn().mockReturnValue({
-                        eq: vi.fn().mockResolvedValue({ data: itemRows, error: null }),
-                    }),
-                    // For UPDATE query
-                    update: vi.fn().mockReturnValue({
-                        eq: vi.fn().mockReturnValue({
-                            select: vi.fn().mockReturnValue({
-                                single: vi.fn().mockResolvedValue({ data: updatedRow, error: null }),
-                            }),
-                        }),
-                    }),
-                };
-            }
-            return { select: vi.fn() };
+        const { client, update } = makeToggleClient({
+            item: { id: 'item-1', shopping_lists: { plan_id: planId } },
+            updated: { id: 'item-1', is_checked: true },
         });
-
-        vi.mocked(createClient).mockResolvedValue({ from: fromMock } as any);
+        vi.mocked(createClient).mockResolvedValue(client as any);
 
         const { POST } = await import('@/app/api/shopping-list/[planId]/items/toggle/route');
-        const res = await POST(
-            makeRequest('POST', { ingredientName: 'Chicken breast' }, `http://localhost/api/shopping-list/${planId}/items/toggle`),
-            { params: Promise.resolve({ planId }) },
-        );
+        const res = await POST(makeToggleRequest({ itemId: 'item-1', isChecked: true }), {
+            params: Promise.resolve({ planId }),
+        });
 
         expect(res.status).toBe(200);
-        const body = await res.json();
-        expect(body).toHaveProperty('checked');
+        expect(await res.json()).toEqual({ checked: true });
+        expect(update).toHaveBeenCalledWith({ is_checked: true });
+    });
+
+    it('is idempotent: re-sending the same state does not flip it', async () => {
+        vi.mocked(requireUser).mockResolvedValue(mockUser as any);
+        const { client, update } = makeToggleClient({
+            item: { id: 'item-1', shopping_lists: { plan_id: planId } },
+            updated: { id: 'item-1', is_checked: false },
+        });
+        vi.mocked(createClient).mockResolvedValue(client as any);
+
+        const { POST } = await import('@/app/api/shopping-list/[planId]/items/toggle/route');
+        const res = await POST(makeToggleRequest({ itemId: 'item-1', isChecked: false }), {
+            params: Promise.resolve({ planId }),
+        });
+
+        expect(res.status).toBe(200);
+        expect(update).toHaveBeenCalledWith({ is_checked: false });
+    });
+
+    it('returns 404 when the item belongs to another plan', async () => {
+        vi.mocked(requireUser).mockResolvedValue(mockUser as any);
+        const { client, update } = makeToggleClient({
+            item: { id: 'item-9', shopping_lists: { plan_id: 'other-plan' } },
+        });
+        vi.mocked(createClient).mockResolvedValue(client as any);
+
+        const { POST } = await import('@/app/api/shopping-list/[planId]/items/toggle/route');
+        const res = await POST(makeToggleRequest({ itemId: 'item-9', isChecked: true }), {
+            params: Promise.resolve({ planId }),
+        });
+
+        expect(res.status).toBe(404);
+        expect((await res.json()).error).toBe('Item not found');
+        expect(update).not.toHaveBeenCalled();
+    });
+
+    it('returns 400 for the previous ingredientName body', async () => {
+        vi.mocked(requireUser).mockResolvedValue(mockUser as any);
+        const { client } = makeToggleClient({ item: null });
+        vi.mocked(createClient).mockResolvedValue(client as any);
+
+        const { POST } = await import('@/app/api/shopping-list/[planId]/items/toggle/route');
+        const res = await POST(makeToggleRequest({ ingredientName: 'Chicken breast' }), {
+            params: Promise.resolve({ planId }),
+        });
+
+        expect(res.status).toBe(400);
+        expect((await res.json()).error).toBe('Invalid input');
     });
 
     it('returns 401 when unauthenticated', async () => {
@@ -203,10 +257,9 @@ describe('POST /api/shopping-list/[planId]/items/toggle', () => {
         vi.mocked(createClient).mockResolvedValue({} as any);
 
         const { POST } = await import('@/app/api/shopping-list/[planId]/items/toggle/route');
-        const res = await POST(
-            makeRequest('POST', { ingredientName: 'Chicken breast' }, `http://localhost/api/shopping-list/${planId}/items/toggle`),
-            { params: Promise.resolve({ planId }) },
-        );
+        const res = await POST(makeToggleRequest({ itemId: 'item-1', isChecked: true }), {
+            params: Promise.resolve({ planId }),
+        });
 
         expect(res.status).toBe(401);
     });
