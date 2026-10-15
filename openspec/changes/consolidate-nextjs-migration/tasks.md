@@ -4,12 +4,12 @@ Delivery strategy: `ask-on-risk` (session preflight). Strict TDD active (`pnpm t
 
 ## Phase 0 — Cutover and hygiene (platform)
 
-- [ ] 0.1 Remove transient artifacts (7 `*.tmp.44556.*` files, `nul`); add `*.tmp.*` and `.mcp.json` to `.gitignore`
-- [ ] 0.2 Fix `apps/web/vitest.config.ts` stale alias to `apps/api/node_modules` (point at `apps/web` dependency); clean checkout builds/tests
-- [ ] 0.3 Upgrade `next` past the critical RCE advisory; run `pnpm audit`, record decisions for remaining high advisories in `docs/` note
-- [ ] 0.4 Fix 2 typecheck errors in migrated tests (`admin.spec.ts:35`, `shopping-list.spec.ts:70`)
-- [ ] 0.5 Archive contradicted docs (Railway/NotebookLM era) under `docs/archive/`; remove `railway.toml`; align README/README.es to single architecture story
-- [ ] 0.6 Commit cutover baseline: stage replacement code + staged `apps/api` deletion together; message: `feat!: consolidate Next.js full-stack migration (cutover)`
+- [x] 0.1 Remove transient artifacts (7 `*.tmp.44556.*` files, `nul`); add `*.tmp.*` and `.mcp.json` to `.gitignore` (also added `.codegraph/` and `.pi/`, beyond the original scope) - commits cbc9df6..0f89396
+- [x] 0.2 Fix `apps/web/vitest.config.ts` stale alias to `apps/api/node_modules` (point at `apps/web` dependency); clean checkout builds/tests - alias removed; clean-checkout verified by an independent verifier: install --frozen-lockfile, lint (0 errors, 242 warnings), 94/94 tests, build and smoke test PASS (tsc needs packages/shared built first)
+- [x] 0.3 Upgrade `next` past the critical RCE advisory; run `pnpm audit`, record decisions for remaining high advisories in `docs/` note - next 16.1.4 -> 16.4.1, jspdf, vitest; critical 4 -> 0, high 63 -> 42; `docs/security/dependency-audit-2026-10-15.md` - commits cbc9df6..0f89396
+- [x] 0.4 Fix 2 typecheck errors in migrated tests (`admin.spec.ts:35`, `shopping-list.spec.ts:70`) - `tsc --noEmit` clean - commits cbc9df6..0f89396
+- [ ] 0.5 PARTIAL. Done: archived `DEPLOYMENT_ARCHITECTURE.md`, `plans/2026-02-06-nextjs-nestjs-upgrade*.md`, `specs/PRD-Railway-MCP-Integration.md` to `docs/archive/`; removed `railway.toml`; README.md and README.es.md aligned. Still mention the old stack: `docs/architecture/{overview.md,overview.es.md,diet-engine-architecture.en.md,diet-engine-architecture.es.md,scaling-plan.md}`, `docs/adr/ADR-005-gemini-hybrid-engine.md`, `docs/architecture/adr/ADR-002-supabase.md`, `docs/runbooks/deploy.md`, `docs/guides/testing.md`, `docs/product/MVP_SCOPE.md`, `docs/CHANGELOG.md`, `docs/CONTRIBUTING*.md`, `docs/security/Security-Audit-Prompt.md`. README.es.md links to `overview.es.md` (still NestJS).
+- [x] 0.6 Commit cutover baseline: stage replacement code + staged `apps/api` deletion together; message: `feat!: consolidate Next.js full-stack migration (cutover)` - 9 commits cbc9df6..0f89396 (local only, not pushed); original single commit kept at branch backup/cutover-87cd740
 
 ## Phase 1 — Shared contracts (contracts)
 
