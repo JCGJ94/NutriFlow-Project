@@ -13,10 +13,10 @@ Delivery strategy: `ask-on-risk` (session preflight). Strict TDD active (`pnpm t
 
 ## Phase 1 — Shared contracts (contracts)
 
-- [ ] 1.1 Add Zod schemas to `packages/shared` for profile, allergens, plan, shopping-list contracts (RED first: schema validation tests)
-- [ ] 1.2 Unify enum casing to lowercase; update `UpsertProfileSchema` to shared schemas; onboarding/settings submit shared values (RED→GREEN)
-- [ ] 1.3 Align endpoint paths: move onboarding/settings calls `/api/me/*` → `/api/profile/*`; add response-shape fixes (`{ allergens }` destructuring)
-- [ ] 1.4 Unify error envelope `{ error: string }` across routes; `apiClient` reads `error`
+- [x] 1.1 Add Zod schemas to `packages/shared` for profile, allergens, plan, shopping-list contracts (RED first: schema validation tests) - profile, allergens, username availability, shopping-list toggle/add and the error envelope are in `packages/shared/src/schemas.ts` (12 tests, commit a2eece0). Plan contracts are DEFERRED to Phase 3/4 because the plan RPC reshapes them.
+- [x] 1.2 Unify enum casing to lowercase; update `UpsertProfileSchema` to shared schemas; onboarding/settings submit shared values (RED→GREEN) - commit d61ae95. The onboarding/settings forms already used the shared enums; their form schemas stay local because they carry i18n error keys.
+- [~] 1.3 Align endpoint paths: move onboarding/settings calls `/api/me/*` → `/api/profile/*`; add response-shape fixes (`{ allergens }` destructuring) - commits 74630ab, b30be4d. PARTIAL: `AiDietGenerator` preview (`/api/diet-engine/generate-ai`) is a known unresolved path awaiting the keep/remove product decision; settings still checks username availability through the Supabase RPC `is_username_available` (task 2.2).
+- [x] 1.4 Unify error envelope `{ error: string }` across routes; `apiClient` reads `error` - every handler already returned `{ error }`; the clients read `message`. Fixed in apiClient, onboarding, settings and plans (commit b30be4d). Validation 400s keep the additive `details` field.
 
 ## Phase 2 — Schema and types (contracts, platform)
 
@@ -59,3 +59,13 @@ Delivery strategy: `ask-on-risk` (session preflight). Strict TDD active (`pnpm t
 - Phase 3 depends on Phase 1 (schemas) and Phase 2 (migrations/types)
 - Phase 4 depends on Phase 3 (RPC pattern)
 - Phase 5 is independent of 3–4 but sequenced last to minimize churn
+
+## Phase 1 decisions (2026-10-15)
+
+- **Verified evidence.** The old NestJS DTO used the shared lowercase enums (`git show 24285a8:apps/api/src/modules/profiles/dto/index.ts`), so onboarding worked against NestJS; the NEW handler validated uppercase enums and would have rejected what the UI sends. Fixed by validating with the shared schema.
+- **Diet patterns.** `KETO`, `MEDITERRANEAN`, `PALEO` and `EXTRA_ACTIVE` were accepted by the route but exist neither in the shared enums nor in the database CHECK constraints; the UI never offered them. Dropped.
+- **List and availability responses stay wrapped** (`{ allergens }`, `{ available }`): extensible and covered by shared schemas. NestJS returned bare values, so the clients were fixed instead.
+- **Shopping-list toggle.** NestJS and the UI used `{ itemId, isChecked }` (set state). The migrated handler flipped by `ingredientName`. Changed to the old contract: names can repeat, custom items have no ingredient, and setting state is idempotent.
+- **Assumption.** The hosted database matches the migration CHECK constraints (lowercase enums). Not verified remotely; task 2.3 owns that.
+- **Not covered by unit tests.** Persistence against the real Supabase (CHECK constraints, missing columns `username`, `language`, `custom_name`) needs a manual run of onboarding and settings. Phase 1 is NOT closed until that run passes.
+- **Delivery hazard.** Do not merge to `main` before that run: `vercel.json` always builds, so `main` presumably deploys production.
