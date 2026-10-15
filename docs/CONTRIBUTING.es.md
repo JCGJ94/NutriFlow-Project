@@ -6,7 +6,7 @@
 
 ## 🛠️ Flujo de Trabajo de Desarrollo
 
-Este proyecto usa **pnpm** y **Turborepo**.
+Este proyecto es una única app Next.js gestionada con **pnpm**.
 
 1.  **Fork y Clonar** el repositorio.
 2.  **Instalar Dependencias**:
@@ -14,7 +14,7 @@ Este proyecto usa **pnpm** y **Turborepo**.
     pnpm install
     ```
 3.  **Variables de Entorno**:
-    -   Copia `.env.example` a `.env.local` en `apps/web` y `.env` en `apps/api`.
+    -   Copia `.env.example` a `.env.local` en la raíz del repositorio.
     -   Rellena con tus credenciales de Supabase y Google AI.
 
 4.  **Iniciar Servidor de Desarrollo**:

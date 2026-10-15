@@ -59,10 +59,10 @@ jobs:
       run: pnpm install
 
     - name: Build
-      run: pnpm turbo run build
+      run: pnpm build
 
     - name: Lint
-      run: pnpm turbo run lint
+      run: pnpm lint
 
     - name: Test
-      run: pnpm turbo run test
+      run: pnpm test

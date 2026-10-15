@@ -19,7 +19,7 @@ S6. Existing behaviour is preserved by unit: 129 tests, `tsc`, lint (0 errors) a
 | ID | Specs | Route | Status | Unit |
 | - | - | - | - | - |
 | M0 | S3,S6 | inline | done | Baseline: manual run dropped by the user (L3); commit and push the pending docs and `e0d5f46`; tag `pre-stack-migration`. `main` stays untouched; merging it is a separate, explicit decision at the end. |
-| M1 | S2,S3,S6 | inline + verifier | pending | Flatten. First read the Vercel PROJECT settings (Root Directory, install/build overrides, Node version), not just `vercel.json`. Then `git mv apps/web/*` to root, merge the two `package.json`/tsconfig/eslint configs, vitest and Playwright configs, `packages/shared/src` to `src/lib/contracts` (28 files import `@nutriflow/shared`), update `.github/workflows/ci.yml` paths, delete `turbo.json`, `pnpm-workspace.yaml`, `packages/`, leftovers of `apps/api`. Still on pnpm. Risk item 5. |
+| M1 | S2,S3,S6 | inline + verifier | done locally (2026-10-15), NOT pushed: waiting on the Vercel project-settings check (Root Directory, install/build overrides, Node version) and the `.env.local` merge by the user | Flatten. Evidence: baseline in the monorepo vs flat root: `tsc` 0 / 0, tests 129 / 129 (21 files), `next build` same 43 routes, lint 0 errors (261 to 262 warnings: the lint scope now also covers root `*.js`/`*.ts` config files). `pnpm-lock.yaml` re-resolved: direct versions unchanged, a few transitives bumped within range (sharp's `@img/colour`, `semver`, `picomatch`, `tinyglobby`, `@emnapi/runtime`) and `turbo` removed. Next rewrote `tsconfig.json` (`jsx: react-jsx`, include `.next/dev/types`), which exposed 6 unused `import React` (removed). Original plan: First read the Vercel PROJECT settings (Root Directory, install/build overrides, Node version), not just `vercel.json`. Then `git mv apps/web/*` to root, merge the two `package.json`/tsconfig/eslint configs, vitest and Playwright configs, `packages/shared/src` to `src/lib/contracts` (28 files import `@nutriflow/shared`), update `.github/workflows/ci.yml` paths, delete `turbo.json`, `pnpm-workspace.yaml`, `packages/`, leftovers of `apps/api`. Still on pnpm. Risk item 5. |
 | M2 | S1,S3,S6 | inline + verifier | pending | Bun. `bun install` from the pnpm lockfile and diff resolved versions; remove `pnpm-lock.yaml`, `packageManager`, `engines.pnpm`; `vercel.json` and project settings; `ci.yml`; README/CONTRIBUTING. Check which dependencies need install scripts (Bun blocks them unless listed in `trustedDependencies`: start with `sharp`, Playwright, `unrs-resolver`). Verify Vercel builds a preview with `bun.lock`. Risk item 5. |
 | M3 | S2,S6 | inline | pending | Toolchain: ESLint 8 to 9 flat config; `typecheck` script; Tailwind 3.4 to 4 with the official upgrade tool plus a smoke check of the main pages (the redesign in M9 owns visual work); React 19 lint rules (no `setState` in `useEffect`). |
 | M4 | S6 | inline + verifier | pending | Auth: `@supabase/ssr` 0.1.0 to current (cookie `getAll`/`setAll`), touches `proxy.ts`, server and browser clients. Login, register, session refresh and logout checked by hand and by tests. Risk item 2. |
@@ -60,7 +60,11 @@ Order rationale: M0 first so a structural migration is never mixed with unverifi
 >
 > esta frase eliminala ¿Autorizas que aplique la migración 007…"
 
+> la carpeta de desarrollo se mantiene donde esta
+
 The user also asked to commit and push without leaving any tool attribution in the history.
+
+Disk decision: the repo stays on `E:`; no move to `C:`. Defender exclusions were not requested.
 
 Effect: M0 no longer waits for a manual run; S4 is confirmed; the stray sentence was removed from the template; commits carry no co-author or tool attribution. The user also pasted a `pnpm dev` run: Next reported "Slow filesystem detected. The benchmark took 425ms" for `E:\...\apps\web\.next\dev` while the server was ready in 3.2 s, which points at the E: drive, not at pnpm (see M1/M2 notes).
 

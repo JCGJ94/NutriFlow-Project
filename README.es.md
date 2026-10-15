@@ -51,7 +51,7 @@ Este enfoque prioriza la **corrección, la claridad y la testabilidad** sobre el
 | **Base de Datos** | [PostgreSQL (Supabase)](https://supabase.com/) | Modelo relacional ideal para datos nutricionales estructurados y escalabilidad a largo plazo. |
 | **Autenticación** | [Supabase Auth (JWT)](https://supabase.com/auth) | Autenticación basada en estándares con un boilerplate mínimo. |
 | **IA Core** | [Gemini 2.0 Flash](https://deepmind.google/technologies/gemini/) | Motor híbrido de generación de contenido con salidas JSON estructuradas. |
-| **Monorepo** | [Turborepo](https://turbo.build/) | Permite compartir DTOs y tipos de TypeScript entre frontend y backend, garantizando la consistencia del contrato. |
+| **Contratos** | `src/lib/contracts` | Permite compartir DTOs, esquemas Zod y tipos de TypeScript entre frontend y API, garantizando la consistencia del contrato. |
 | **Testing** | [Vitest](https://vitest.dev/) & [Playwright](https://playwright.dev/) | Cubren tanto la lógica determinista como los flujos de usuario completos (E2E). |
 
 ---
@@ -109,28 +109,28 @@ El testing se centra en la corrección de las rutas críticas más que en una co
 Entrada de datos metabólicos, condiciones de salud y preferencias dietéticas.
 
 <div align="center">
-  <img src="apps/web/public/demo/landing.png" alt="NutriFlow Landing Page" width="800"/>
+  <img src="public/demo/landing.png" alt="NutriFlow Landing Page" width="800"/>
   <br/>
   <br/>
-  <img src="apps/web/public/demo/login.png" alt="Pantalla de Login" width="400"/>
-  <img src="apps/web/public/demo/register.png" alt="Pantalla de Registro" width="400"/>
+  <img src="public/demo/login.png" alt="Pantalla de Login" width="400"/>
+  <img src="public/demo/register.png" alt="Pantalla de Registro" width="400"/>
 </div>
 
 ### 2. Panel Principal y Generación
 Cálculos científicos combinados con generación de contenido por IA.
 
 <div align="center">
-  <img src="apps/web/public/demo/dashboard.png" alt="Dashboard de Usuario" width="800"/>
+  <img src="public/demo/dashboard.png" alt="Dashboard de Usuario" width="800"/>
 </div>
 
 ### 3. Planes Semanales (Dieta y Ejercicio)
 Planes de comidas automatizados de 7 días y listas de compras consolidadas.
 
 <div align="center">
-  <img src="apps/web/public/demo/weekly-plan-nutritional.png" alt="Plan Nutricional" width="800"/>
+  <img src="public/demo/weekly-plan-nutritional.png" alt="Plan Nutricional" width="800"/>
   <br/>
   <br/>
-  <img src="apps/web/public/demo/weekly-plan-exercise.png" alt="Plan de Ejercicios" width="800"/>
+  <img src="public/demo/weekly-plan-exercise.png" alt="Plan de Ejercicios" width="800"/>
 </div>
 
 
@@ -177,7 +177,7 @@ Planes de comidas automatizados de 7 días y listas de compras consolidadas.
 
 ## Configuración de Entorno
 
-- Duplica `apps/web/.env.example` (o el `/.env.example` raíz) como `.env.local` y rellena tus propios valores de Supabase antes de ejecutar comandos locales.
+- Duplica `.env.example` como `.env.local` y rellena tus propios valores de Supabase antes de ejecutar comandos locales.
 - Mantén fuera del control de versiones cualquier archivo que contenga `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`, `SUPABASE_JWT_SECRET`, `NEXT_PUBLIC_SUPABASE_URL` o `NEXT_PUBLIC_SUPABASE_ANON_KEY`; el repositorio solo guarda plantillas con marcadores de posición para que tus claves nunca se filtren.
 - El frontend y el proxy requieren que `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` estén disponibles en el momento de la compilación. Inyecta estas variables como secretos en tu CI (por ejemplo, GitHub Actions secrets en el bloque `env`) o configúralas localmente antes de ejecutar `pnpm build`. Las rutas de administración y RAG requieren que `SUPABASE_SERVICE_ROLE_KEY` esté definida de forma segura, solo en el servidor.
 

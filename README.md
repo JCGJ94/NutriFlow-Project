@@ -45,7 +45,7 @@ This architecture prioritizes **correctness, clarity, and testability** over rap
 
 ## Architecture & Tech Stack
 
-The project is organized as a **Monorepo** managed by [Turborepo](https://turbo.build/). As of the 2026 architecture migration, all API logic lives in Next.js Route Handlers — there is no separate backend process.
+The project is a single **Next.js app** (flat `src/` layout, shared contracts in `src/lib/contracts`). As of the 2026 architecture migration, all API logic lives in Next.js Route Handlers — there is no separate backend process.
 
 | Layer | Technology | Rationale / Highlights |
 | :--- | :--- | :--- |
@@ -53,7 +53,7 @@ The project is organized as a **Monorepo** managed by [Turborepo](https://turbo.
 | **Database** | [PostgreSQL (Supabase)](https://supabase.com/) | Relational model ideal for structured nutritional data and long-term scalability. |
 | **Auth** | [Supabase Auth (JWT)](https://supabase.com/auth) | Standards-compliant authentication with minimal custom boilerplate. |
 | **AI Core** | [Gemini 2.0 Flash](https://deepmind.google/technologies/gemini/) | Hybrid generative engine delivering structured JSON outputs within predefined constraints. |
-| **Shared** | [Turborepo](https://turbo.build/) | Ensures contract consistency by sharing DTOs, Zod schemas, and TypeScript types across the stack. |
+| **Contracts** | `src/lib/contracts` | Ensures contract consistency by sharing DTOs, Zod schemas, and TypeScript types across the stack. |
 | **Testing** | [Vitest](https://vitest.dev/) & [Playwright](https://playwright.dev/) | Comprehensive coverage for both deterministic logic and full-flow user journeys. |
 
 ---
@@ -115,28 +115,28 @@ Testing focuses on verifying correctness in critical paths rather than achieving
 Input of metabolic data, health conditions, and dietary preferences.
 
 <div align="center">
-  <img src="apps/web/public/demo/landing.png" alt="NutriFlow Landing Page" width="800"/>
+  <img src="public/demo/landing.png" alt="NutriFlow Landing Page" width="800"/>
   <br/>
   <br/>
-  <img src="apps/web/public/demo/login.png" alt="Login Screen" width="400"/>
-  <img src="apps/web/public/demo/register.png" alt="Register Screen" width="400"/>
+  <img src="public/demo/login.png" alt="Login Screen" width="400"/>
+  <img src="public/demo/register.png" alt="Register Screen" width="400"/>
 </div>
 
 ### 2. Dashboard & Plan Generation
 Scientific calculations matched with AI-driven content generation.
 
 <div align="center">
-  <img src="apps/web/public/demo/dashboard.png" alt="User Dashboard" width="800"/>
+  <img src="public/demo/dashboard.png" alt="User Dashboard" width="800"/>
 </div>
 
 ### 3. Weekly Plans (Diet & Exercise)
 Automated 7-day meal plans and consolidated shopping lists.
 
 <div align="center">
-  <img src="apps/web/public/demo/weekly-plan-nutritional.png" alt="Nutritional Plan" width="800"/>
+  <img src="public/demo/weekly-plan-nutritional.png" alt="Nutritional Plan" width="800"/>
   <br/>
   <br/>
-  <img src="apps/web/public/demo/weekly-plan-exercise.png" alt="Exercise Plan" width="800"/>
+  <img src="public/demo/weekly-plan-exercise.png" alt="Exercise Plan" width="800"/>
 </div>
 
 
@@ -168,7 +168,7 @@ Automated 7-day meal plans and consolidated shopping lists.
 
 ## Environment Configuration
 
-- Duplicate `.env.example` (root or `apps/web/.env.example`) into `.env.local` and populate the secrets with your own Supabase project values before running local commands.
+- Duplicate `.env.example` into `.env.local` and populate the secrets with your own Supabase project values before running local commands.
 - Keep every file that stores `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`, `SUPABASE_JWT_SECRET`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY` out of source control; the template keeps placeholders so your keys never flow through git.
 - Build the frontend via `pnpm build` only after ensuring `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are injected (your CI environment should set them as secrets or env vars in the workflow). The admin and RAG routes require `SUPABASE_SERVICE_ROLE_KEY` to be defined securely, server-side only.
 

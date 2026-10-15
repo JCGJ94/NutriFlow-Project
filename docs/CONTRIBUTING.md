@@ -6,7 +6,7 @@ First off, thanks for taking the time to contribute! 🎉
 
 ## 🛠️ Development Workflow
 
-This project uses **pnpm** and **Turborepo**.
+This project is a single Next.js app managed with **pnpm**.
 
 1.  **Fork and Clone** the repository.
 2.  **Install Dependencies**:
@@ -14,7 +14,7 @@ This project uses **pnpm** and **Turborepo**.
     pnpm install
     ```
 3.  **Environment Variables**:
-    -   Copy `.env.example` to `.env.local` in `apps/web` and `.env` in `apps/api`.
+    -   Copy `.env.example` to `.env.local` at the repository root.
     -   Populate with your Supabase and Google AI credentials.
 
 4.  **Start Development Server**:
