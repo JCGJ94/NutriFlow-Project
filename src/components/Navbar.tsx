@@ -63,8 +63,8 @@ export function Navbar() {
           <nav className="hidden md:flex items-center gap-6" data-testid="navbar-desktop">
             {!isDashboard ? (
               <>
-                <a href="/#features" className="nav-link">{t('nav.features')}</a>
-                <a href="/#how-it-works" className="nav-link">{t('nav.howItWorks')}</a>
+                <Link href="/#features" className="nav-link">{t('nav.features')}</Link>
+                <Link href="/#how-it-works" className="nav-link">{t('nav.howItWorks')}</Link>
               </>
             ) : (
               <>

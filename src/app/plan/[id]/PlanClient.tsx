@@ -265,24 +265,6 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
         }
     };
 
-    if (!optimisticPlan) {
-        return (
-            <div className="min-h-screen bg-surface-50 flex items-center justify-center">
-                <div className="text-center">
-                    <h2 className="text-xl font-heading font-semibold text-surface-900 mb-2">
-                        {t('plans.no_plan')}
-                    </h2>
-                    <Link href="/dashboard" className="btn-primary">
-                        {t('plans.back_dashboard')}
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-
-    const selectedDietDayData = optimisticPlan.days.find(d => d.dayOfWeek === selectedDietDay);
-    const selectedExerciseDayData = exercisePlan?.workoutDays.find(d => d.dayOfWeek === selectedExerciseDay);
-
     // Sync horizontal tabs scroll when selectedDay changes
     useEffect(() => {
         if (!isMobile) return;
@@ -315,6 +297,24 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
            scrollToExerciseDay(dayOfWeek);
         }
     }, [isMobile, scrollToExerciseDay]);
+
+    if (!optimisticPlan) {
+        return (
+            <div className="min-h-screen bg-surface-50 flex items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-xl font-heading font-semibold text-surface-900 mb-2">
+                        {t('plans.no_plan')}
+                    </h2>
+                    <Link href="/dashboard" className="btn-primary">
+                        {t('plans.back_dashboard')}
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    const selectedDietDayData = optimisticPlan.days.find(d => d.dayOfWeek === selectedDietDay);
+    const selectedExerciseDayData = exercisePlan?.workoutDays.find(d => d.dayOfWeek === selectedExerciseDay);
 
     return (
         <div className="min-h-screen bg-page-gradient pt-16">
