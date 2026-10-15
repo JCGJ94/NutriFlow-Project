@@ -179,7 +179,7 @@ Planes de comidas automatizados de 7 días y listas de compras consolidadas.
 
 - Duplica `.env.example` como `.env.local` y rellena tus propios valores de Supabase antes de ejecutar comandos locales.
 - Mantén fuera del control de versiones cualquier archivo que contenga `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`, `SUPABASE_JWT_SECRET`, `NEXT_PUBLIC_SUPABASE_URL` o `NEXT_PUBLIC_SUPABASE_ANON_KEY`; el repositorio solo guarda plantillas con marcadores de posición para que tus claves nunca se filtren.
-- El frontend y el proxy requieren que `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` estén disponibles en el momento de la compilación. Inyecta estas variables como secretos en tu CI (por ejemplo, GitHub Actions secrets en el bloque `env`) o configúralas localmente antes de ejecutar `pnpm build`. Las rutas de administración y RAG requieren que `SUPABASE_SERVICE_ROLE_KEY` esté definida de forma segura, solo en el servidor.
+- El frontend y el proxy requieren que `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` estén disponibles en el momento de la compilación. Inyecta estas variables como secretos en tu CI (por ejemplo, GitHub Actions secrets en el bloque `env`) o configúralas localmente antes de ejecutar `bun run build`. Las rutas de administración y RAG requieren que `SUPABASE_SERVICE_ROLE_KEY` esté definida de forma segura, solo en el servidor.
 
 ## 📄 Licencia
 

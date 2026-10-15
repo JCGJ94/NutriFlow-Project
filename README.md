@@ -170,7 +170,7 @@ Automated 7-day meal plans and consolidated shopping lists.
 
 - Duplicate `.env.example` into `.env.local` and populate the secrets with your own Supabase project values before running local commands.
 - Keep every file that stores `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`, `SUPABASE_JWT_SECRET`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY` out of source control; the template keeps placeholders so your keys never flow through git.
-- Build the frontend via `pnpm build` only after ensuring `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are injected (your CI environment should set them as secrets or env vars in the workflow). The admin and RAG routes require `SUPABASE_SERVICE_ROLE_KEY` to be defined securely, server-side only.
+- Build the frontend via `bun run build` only after ensuring `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are injected (your CI environment should set them as secrets or env vars in the workflow). The admin and RAG routes require `SUPABASE_SERVICE_ROLE_KEY` to be defined securely, server-side only.
 
 ## Role & Responsibilities
 

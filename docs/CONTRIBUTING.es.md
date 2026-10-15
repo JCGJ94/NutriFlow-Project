@@ -6,12 +6,12 @@
 
 ## 🛠️ Flujo de Trabajo de Desarrollo
 
-Este proyecto es una única app Next.js gestionada con **pnpm**.
+Este proyecto es una única app Next.js gestionada con **Bun**.
 
 1.  **Fork y Clonar** el repositorio.
 2.  **Instalar Dependencias**:
     ```bash
-    pnpm install
+    bun install
     ```
 3.  **Variables de Entorno**:
     -   Copia `.env.example` a `.env.local` en la raíz del repositorio.
@@ -19,7 +19,7 @@ Este proyecto es una única app Next.js gestionada con **pnpm**.
 
 4.  **Iniciar Servidor de Desarrollo**:
     ```bash
-    pnpm dev
+    bun run dev
     ```
 
 ## 🧩 Estilo de Código y Estándares
@@ -40,8 +40,8 @@ Imponemos altos estándares para mantener la base de código limpia y escalable.
 Antes de enviar un PR, asegúrate de que todos los tests pasen.
 
 ```bash
-pnpm test        # Ejecutar Unit Tests
-pnpm test:e2e    # Ejecutar Playwright E2E Tests
+bun run test        # Ejecutar Unit Tests
+bun run test:e2e    # Ejecutar Playwright E2E Tests
 ```
 
 ## 📦 Proceso de Pull Request

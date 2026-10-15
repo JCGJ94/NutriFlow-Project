@@ -6,12 +6,12 @@ First off, thanks for taking the time to contribute! 🎉
 
 ## 🛠️ Development Workflow
 
-This project is a single Next.js app managed with **pnpm**.
+This project is a single Next.js app managed with **Bun**.
 
 1.  **Fork and Clone** the repository.
 2.  **Install Dependencies**:
     ```bash
-    pnpm install
+    bun install
     ```
 3.  **Environment Variables**:
     -   Copy `.env.example` to `.env.local` at the repository root.
@@ -19,7 +19,7 @@ This project is a single Next.js app managed with **pnpm**.
 
 4.  **Start Development Server**:
     ```bash
-    pnpm dev
+    bun run dev
     ```
 
 ## 🧩 Code Style & Standards
@@ -40,8 +40,8 @@ We enforce high standards to keep the codebase clean and scalable.
 Before submitting a PR, ensure all tests pass.
 
 ```bash
-pnpm test        # Run Unit Tests
-pnpm test:e2e    # Run Playwright E2E Tests
+bun run test        # Run Unit Tests
+bun run test:e2e    # Run Playwright E2E Tests
 ```
 
 ## 📦 Pull Request Process
