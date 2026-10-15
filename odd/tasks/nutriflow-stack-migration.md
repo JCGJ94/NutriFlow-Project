@@ -64,6 +64,10 @@ Order rationale: M0 first so a structural migration is never mixed with unverifi
 
 The user also asked to commit and push without leaving any tool attribution in the history.
 
+> si
+
+Approval to start M1 (answer to "¿apruebas que empiece M1?"). Commits: `4d390f4` (flatten), `b64a26c` (lockfile cleanup after the verifier). Native review declined for the candidate (Stop hook).
+
 Disk decision: the repo stays on `E:`; no move to `C:`. Defender exclusions were not requested.
 
 Effect: M0 no longer waits for a manual run; S4 is confirmed; the stray sentence was removed from the template; commits carry no co-author or tool attribution. The user also pasted a `pnpm dev` run: Next reported "Slow filesystem detected. The benchmark took 425ms" for `E:\...\apps\web\.next\dev` while the server was ready in 3.2 s, which points at the E: drive, not at pnpm (see M1/M2 notes).
