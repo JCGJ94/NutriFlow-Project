@@ -6,6 +6,38 @@ interface ApiClientOptions extends RequestInit {
     params?: Record<string, string>;
 }
 
+/**
+ * Slice 2 — Profiles + Ingredients Route Handlers are now local.
+ * Slice 3 — Plans + Exercise Plans Route Handlers are now local.
+ * Slice 4 — Shopping List + Admin Route Handlers are now local.
+ * Slice 5 — RAG Route Handlers are now local.
+ * Paths listed here bypass the Railway URL and route to local /api/ handlers
+ * when called server-side (client-side already hits /api/* which Next.js routes
+ * to the real handler, taking priority over rewrites).
+ */
+const LOCAL_API_PREFIXES = [
+    'profile',
+    'me/profile',
+    'me/allergens',
+    'allergens',
+    'ingredients',
+    // Slice 3
+    'plans',
+    'exercise-plans',
+    // Slice 4
+    'shopping-list',
+    'admin',
+    // Slice 5
+    'rag',
+];
+
+function isLocalApiPath(endpoint: string): boolean {
+    const clean = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    return LOCAL_API_PREFIXES.some(
+        (prefix) => clean === prefix || clean.startsWith(`${prefix}/`),
+    );
+}
+
 class ApiClient {
     private getBaseUrl(endpoint: string): string {
         const isServer = typeof window === 'undefined';
@@ -13,9 +45,18 @@ class ApiClient {
         const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
 
         if (isServer) {
-            // Server-side: Hit the backend directly
-            // NEXT_PUBLIC_API_URL is likely http://localhost:3001
-            // We assume backend has /v1 prefix based on main.ts global prefix
+            // Slice 2+: endpoints with local Route Handlers use self-referential URL.
+            // Next.js requires an absolute URL for server-side fetch within the same app.
+            if (isLocalApiPath(cleanEndpoint)) {
+                const host =
+                    process.env.NEXT_PUBLIC_SITE_URL ||
+                    process.env.VERCEL_URL ||
+                    'http://localhost:3000';
+                const base = host.startsWith('http') ? host : `https://${host}`;
+                return `${base.replace(/\/$/, '')}/api/${cleanEndpoint}`;
+            }
+
+            // Legacy: Hit the NestJS Railway backend directly
             let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
             // Ensure apiUrl doesn't end with slash
@@ -32,7 +73,7 @@ class ApiClient {
             return `${apiUrl}/${cleanEndpoint}`;
         }
 
-        // Client-side: Use (relative) Next.js rewrites
+        // Client-side: Use (relative) Next.js rewrites / Route Handlers
         return `/api/${cleanEndpoint}`;
     }
 
