@@ -2,62 +2,22 @@
 // NutriFlow Shared Types & Enums
 // ============================================
 
-// ---- Enums ----
+export * from './enums';
+export * from './schemas';
 
-export enum Sex {
-    MALE = 'male',
-    FEMALE = 'female',
-}
+import {
+    MealType,
+    DayOfWeek,
+    PlanStatus,
+    IngredientCategory,
+} from './enums';
+import type {
+    ProfileResponse,
+    UpsertProfile,
+    SetAllergens,
+    Allergen as AllergenContract,
+} from './schemas';
 
-export enum ActivityLevel {
-    SEDENTARY = 'sedentary', // Little or no exercise
-    LIGHTLY_ACTIVE = 'lightly_active', // Light exercise 1-3 days/week
-    MODERATELY_ACTIVE = 'moderately_active', // Moderate exercise 3-5 days/week
-    VERY_ACTIVE = 'very_active', // Hard exercise 6-7 days/week
-    EXTREMELY_ACTIVE = 'extremely_active', // Very hard exercise & physical job
-}
-
-export enum DietPattern {
-    OMNIVORE = 'omnivore',
-    VEGETARIAN = 'vegetarian',
-    VEGAN = 'vegan',
-    PESCATARIAN = 'pescatarian',
-}
-
-export enum MealType {
-    BREAKFAST = 'breakfast',
-    LUNCH = 'lunch',
-    DINNER = 'dinner',
-    SNACK = 'snack',
-}
-
-export enum DayOfWeek {
-    MONDAY = 0,
-    TUESDAY = 1,
-    WEDNESDAY = 2,
-    THURSDAY = 3,
-    FRIDAY = 4,
-    SATURDAY = 5,
-    SUNDAY = 6,
-}
-
-export enum PlanStatus {
-    ACTIVE = 'active',
-    ARCHIVED = 'archived',
-}
-
-export enum IngredientCategory {
-    PROTEIN = 'protein',
-    CARBOHYDRATE = 'carbohydrate',
-    VEGETABLE = 'vegetable',
-    FRUIT = 'fruit',
-    DAIRY = 'dairy',
-    FAT = 'fat',
-    LEGUME = 'legume',
-    GRAIN = 'grain',
-    NUT_SEED = 'nut_seed',
-    CONDIMENT = 'condiment',
-}
 
 // ---- Interfaces ----
 
@@ -69,25 +29,9 @@ export interface MacroNutrients {
     fiber?: number;
 }
 
-export interface Profile {
-    id: string;
-    age: number;
-    sex: Sex;
-    weightKg: number;
-    heightCm: number;
-    activityLevel: ActivityLevel;
-    mealsPerDay: number;
-    dietPattern: DietPattern;
-    weightGoalKg?: number;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface Allergen {
-    id: string;
-    name: string;
-    description?: string;
-}
+// Profile and Allergen are derived from the Zod contracts in ./schemas.
+export type Profile = ProfileResponse;
+export type Allergen = AllergenContract;
 
 export interface Ingredient {
     id: string;
@@ -160,20 +104,8 @@ export interface WeightLog {
 
 // ---- API DTOs ----
 
-export interface UpsertProfileDto {
-    age: number;
-    sex: Sex;
-    weightKg: number;
-    heightCm: number;
-    activityLevel: ActivityLevel;
-    mealsPerDay?: number;
-    dietPattern?: DietPattern;
-    weightGoalKg?: number;
-}
-
-export interface SetAllergensDto {
-    allergenIds: string[];
-}
+export type UpsertProfileDto = UpsertProfile;
+export type SetAllergensDto = SetAllergens;
 
 export interface GenerateWeeklyPlanDto {
     weekStart?: string; // ISO date, defaults to next Monday
