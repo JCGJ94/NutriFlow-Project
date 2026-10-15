@@ -126,7 +126,7 @@ export function SmartRecommendations() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col sm:flex-row items-center justify-center p-8 sm:p-12 bg-white dark:bg-surface-800 rounded-2xl border border-surface-100 dark:border-surface-700 shadow-sm mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row items-center justify-center p-8 sm:p-12 bg-white dark:bg-surface-800 rounded-2xl border border-surface-100 dark:border-surface-700 shadow-xs mb-6 sm:mb-8">
         <Loader2 className="w-8 h-8 text-primary-600 animate-spin mb-2 sm:mb-0 sm:mr-3" />
         <span className="text-sm sm:text-base text-surface-600 dark:text-surface-300 font-medium text-center">
           {t('rec.loading')}
@@ -140,12 +140,12 @@ export function SmartRecommendations() {
   return (
     <section className="mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-        <div className="p-2 sm:p-2.5 bg-gradient-to-br from-primary-500 to-indigo-600 rounded-xl shadow-lg shadow-primary-500/20">
+        <div className="p-2 sm:p-2.5 bg-linear-to-br from-primary-500 to-indigo-600 rounded-xl shadow-lg shadow-primary-500/20">
           <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
         </div>
         <div>
             <h2 className="text-lg sm:text-xl md:text-2xl font-heading font-bold text-surface-900 dark:text-white leading-none mb-1">
-              {t('rec.title')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-indigo-600 dark:from-primary-400 dark:to-indigo-400">{t('rec.title_highlight')}</span>
+              {t('rec.title')} <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-indigo-600 dark:from-primary-400 dark:to-indigo-400">{t('rec.title_highlight')}</span>
             </h2>
             <p className="text-xs sm:text-sm text-surface-500 dark:text-surface-400">{t('rec.subtitle')}</p>
         </div>
@@ -164,7 +164,7 @@ export function SmartRecommendations() {
           >
             {/* Image Header */}
             <div className="relative h-48 overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent z-10" />
                 <img 
                     src={visuals.image} 
                     alt={visuals.label}

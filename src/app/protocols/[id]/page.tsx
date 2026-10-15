@@ -150,7 +150,7 @@ export default function ProtocolPage() {
 
         {/* Action / Disclaimer */}
         <div className="mt-12 p-6 rounded-2xl bg-primary-50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-900/20 flex flex-col md:flex-row items-center gap-6">
-          <div className="p-3 bg-white dark:bg-surface-800 rounded-xl shadow-sm">
+          <div className="p-3 bg-white dark:bg-surface-800 rounded-xl shadow-xs">
             <Sparkles className="w-6 h-6 text-primary-600 dark:text-primary-400" />
           </div>
           <div className="flex-1">

@@ -30,7 +30,7 @@ export function ToastContainer() {
     const { toasts, hideToast } = useToast();
 
     return (
-        <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none max-w-md w-full sm:w-auto items-end">
+        <div className="fixed top-6 right-6 z-9999 flex flex-col gap-3 pointer-events-none max-w-md w-full sm:w-auto items-end">
             <AnimatePresence mode="popLayout">
                 {toasts.map((toast) => (
                     <ToastItem key={toast.id} toast={toast} onHide={hideToast} />
@@ -64,7 +64,7 @@ const ToastItem = React.forwardRef<HTMLDivElement, { toast: Toast; onHide: (id: 
                     toast.type === 'warning' && "bg-amber-500",
                 )} />
 
-                <div className="flex-shrink-0 animate-in zoom-in duration-300">
+                <div className="shrink-0 animate-in zoom-in duration-300">
                     {icons[toast.type]}
                 </div>
 

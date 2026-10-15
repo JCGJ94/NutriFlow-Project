@@ -16,7 +16,7 @@ export function NutritionHeader({ kcal, protein, carbs, fat, title }: NutritionH
   const { t } = useLanguage();
   
   return (
-    <div className="bg-white dark:bg-surface-800 rounded-3xl border border-surface-100 dark:border-surface-700 p-6 md:p-8 shadow-sm transition-colors duration-300">
+    <div className="bg-white dark:bg-surface-800 rounded-3xl border border-surface-100 dark:border-surface-700 p-6 md:p-8 shadow-xs transition-colors duration-300">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <span className="text-xs font-black uppercase tracking-[0.2em] text-primary-600 dark:text-primary-400 mb-2 block">

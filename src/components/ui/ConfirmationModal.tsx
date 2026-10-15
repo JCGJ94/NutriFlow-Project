@@ -71,7 +71,7 @@ export const ConfirmationModal = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs"
             onClick={onClose}
             >
                 {/* Modal */}
@@ -101,14 +101,14 @@ export const ConfirmationModal = ({
                         <div className="flex flex-col-reverse sm:flex-row w-full gap-3 mt-2 sm:justify-end">
                             <button
                                 onClick={onClose}
-                                className="px-4 py-2 text-sm font-medium text-surface-700 bg-surface-100 hover:bg-surface-200 dark:text-surface-200 dark:bg-surface-800 dark:hover:bg-surface-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-surface-400"
+                                className="px-4 py-2 text-sm font-medium text-surface-700 bg-surface-100 hover:bg-surface-200 dark:text-surface-200 dark:bg-surface-800 dark:hover:bg-surface-700 rounded-lg transition-colors focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-surface-400"
                             >
                                 {cancelText || t('common.cancel')}
                             </button>
                             <button
                                 onClick={onConfirm}
                                 className={cn(
-                                    "px-4 py-2 text-sm font-medium rounded-lg transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2",
+                                    "px-4 py-2 text-sm font-medium rounded-lg transition-colors shadow-xs focus:outline-hidden focus:ring-2 focus:ring-offset-2",
                                     styles.button
                                 )}
                             >

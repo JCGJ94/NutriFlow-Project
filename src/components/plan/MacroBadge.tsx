@@ -40,14 +40,14 @@ export function MacroBadge({
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       className={cn(
-        'rounded-2xl bg-white dark:bg-surface-800 border border-surface-100 dark:border-surface-700 shadow-sm flex flex-col items-center justify-center transition-all hover:shadow-md duration-300',
+        'rounded-2xl bg-white dark:bg-surface-800 border border-surface-100 dark:border-surface-700 shadow-xs flex flex-col items-center justify-center transition-all hover:shadow-md duration-300',
         size === 'lg' ? 'min-w-[100px]' : '',
         className
       )}
     >
       <div
         className={cn(
-          'w-2 h-2 rounded-full mb-1 bg-gradient-to-tr',
+          'w-2 h-2 rounded-full mb-1 bg-linear-to-tr',
           colorMap[color]
         )}
       />

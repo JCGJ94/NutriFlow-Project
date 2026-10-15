@@ -42,7 +42,7 @@ export function MealCard({
   return (
     <motion.div
       layout
-      className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-100 dark:border-surface-700 shadow-sm overflow-hidden transition-colors duration-300"
+      className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-100 dark:border-surface-700 shadow-xs overflow-hidden transition-colors duration-300"
     >
       <div className="p-4 md:p-5">
         <div className="flex items-center justify-between">
@@ -82,7 +82,7 @@ export function MealCard({
               className={cn(
                 "p-2 rounded-lg transition-all",
                 meal.isLocked 
-                  ? "bg-white dark:bg-surface-600 shadow-sm text-amber-600 dark:text-amber-400" 
+                  ? "bg-white dark:bg-surface-600 shadow-xs text-amber-600 dark:text-amber-400" 
                   : "text-surface-400 dark:text-surface-300 hover:text-surface-600 dark:hover:text-surface-100"
               )}
               title={meal.isLocked ? t('common.unlock') : t('common.lock')}
@@ -95,7 +95,7 @@ export function MealCard({
               className={cn(
                 "p-2 rounded-lg transition-all",
                 isRegenerating 
-                  ? "bg-white dark:bg-surface-600 shadow-sm" 
+                  ? "bg-white dark:bg-surface-600 shadow-xs" 
                   : "text-surface-400 dark:text-surface-300 hover:text-primary-600 dark:hover:text-primary-400 disabled:opacity-30"
               )}
               title={t('plans.regenerate_meal')}

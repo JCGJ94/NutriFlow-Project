@@ -138,7 +138,7 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
                 <Sparkles className="w-32 h-32 text-primary-600 dark:text-primary-400 rotate-12" />
             </div>
             <div className="relative z-10 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-primary-500/30 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-primary-500/30 group-hover:scale-110 transition-transform">
                 {isGenerating ? (
                   <Loader2 className="w-6 h-6 animate-spin" />
                 ) : (
@@ -166,7 +166,7 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
                 <Settings className="w-32 h-32 text-surface-600 dark:text-surface-400 rotate-12" />
             </div>
             <div className="relative z-10 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-surface-500 to-surface-700 flex items-center justify-center text-white shadow-lg shadow-surface-500/20 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-surface-500 to-surface-700 flex items-center justify-center text-white shadow-lg shadow-surface-500/20 group-hover:scale-110 transition-transform">
                 <Settings className="w-6 h-6" />
               </div>
               <div className="flex-1">
@@ -237,7 +237,7 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
                   <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                       <div className="flex items-start gap-6">
                            {/* Date Box */}
-                          <div className="flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-surface-50 dark:bg-surface-700 border border-surface-100 dark:border-surface-600 shadow-sm text-surface-900 dark:text-white">
+                          <div className="flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-surface-50 dark:bg-surface-700 border border-surface-100 dark:border-surface-600 shadow-xs text-surface-900 dark:text-white">
                              <span className="text-[10px] font-bold uppercase tracking-wider text-surface-500">
                                {t('dash.week')}
                              </span>
@@ -279,7 +279,7 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
                                 e.stopPropagation();
                                 router.push(`/shopping-list/${plan.id}`);
                             }}
-                            className="relative overflow-hidden inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-200 font-medium shadow-sm hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-all group/btn"
+                            className="relative overflow-hidden inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-200 font-medium shadow-xs hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-all group/btn"
                         >
                             <span className="absolute inset-0 bg-primary-50 dark:bg-primary-900/20 opacity-0 group-hover/btn:opacity-100 transition-opacity"></span>
                             <ShoppingCart className="w-4 h-4" />

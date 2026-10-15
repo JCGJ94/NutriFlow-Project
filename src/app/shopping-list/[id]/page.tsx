@@ -413,7 +413,7 @@ export default function ShoppingListPage() {
               <div className="flex gap-2">
                    <button 
                       onClick={handleShare}
-                      className="btn-secondary flex items-center gap-2 bg-white dark:bg-surface-800 shadow-sm border border-surface-200 dark:border-surface-700 hover:shadow-md transition-all"
+                      className="btn-secondary flex items-center gap-2 bg-white dark:bg-surface-800 shadow-xs border border-surface-200 dark:border-surface-700 hover:shadow-md transition-all"
                    >
                        <Share2 className="w-4 h-4" />
                        <span>{t('shop.share')}</span>
@@ -431,7 +431,7 @@ export default function ShoppingListPage() {
           {/* Elegant Progress Bar */}
           <div className="h-2 w-full bg-surface-200 dark:bg-surface-800 rounded-full overflow-hidden">
               <div 
-                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700 ease-out shadow-[0_0_12px_rgba(16,185,129,0.4)]"
+                  className="h-full bg-linear-to-r from-emerald-500 to-teal-400 transition-all duration-700 ease-out shadow-[0_0_12px_rgba(16,185,129,0.4)]"
                   style={{ width: `${progress}%` }}
               />
           </div>
@@ -476,12 +476,12 @@ export default function ShoppingListPage() {
                   const completed = items.every(i => i.isChecked);
 
                   return (
-                      <div key={cat} className={`break-inside-avoid bg-white dark:bg-surface-900 rounded-3xl border ${style.border} shadow-sm transition-all duration-300 ${completed ? 'opacity-80 grayscale-[0.3]' : 'hover:shadow-md'}`}>
+                      <div key={cat} className={`break-inside-avoid bg-white dark:bg-surface-900 rounded-3xl border ${style.border} shadow-xs transition-all duration-300 ${completed ? 'opacity-80 grayscale-[0.3]' : 'hover:shadow-md'}`}>
                           
                           {/* Header */}
                           <div 
                               onClick={() => toggleCategory(cat)}
-                              className={`cursor-pointer px-5 py-4 flex items-center justify-between border-b ${isCollapsed ? 'border-transparent' : style.border} transition-colors bg-gradient-to-br from-transparent to-surface-50/50 dark:to-white/5 rounded-t-3xl`}
+                              className={`cursor-pointer px-5 py-4 flex items-center justify-between border-b ${isCollapsed ? 'border-transparent' : style.border} transition-colors bg-linear-to-br from-transparent to-surface-50/50 dark:to-white/5 rounded-t-3xl`}
                           >
                               <div className="flex items-center gap-3">
                                   <div className={`p-2.5 rounded-xl ${style.bg} ${style.color}`}>
@@ -543,7 +543,7 @@ export default function ShoppingListPage() {
 
               {/* Custom Items Section */}
               {customItems.length > 0 && (
-                  <div className="break-inside-avoid bg-white dark:bg-surface-900 rounded-3xl border border-dashed border-surface-300 dark:border-surface-700 shadow-sm">
+                  <div className="break-inside-avoid bg-white dark:bg-surface-900 rounded-3xl border border-dashed border-surface-300 dark:border-surface-700 shadow-xs">
                       <div className="px-5 py-4 border-b border-surface-200 dark:border-surface-800 flex items-center gap-3">
                           <div className="p-2 bg-surface-100 dark:bg-surface-800 rounded-xl text-surface-500">
                              <Plus className="w-5 h-5" />
@@ -593,7 +593,7 @@ export default function ShoppingListPage() {
 
       {/* PDF Preview Modal */}
       {isPreviewOpen && pdfPreviewUrl && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
               <div className="bg-white dark:bg-surface-900 rounded-3xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
                   {/* Modal Header */}
                   <div className="flex items-center justify-between px-6 py-4 border-b border-surface-100 dark:border-surface-800">

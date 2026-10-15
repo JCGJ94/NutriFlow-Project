@@ -71,7 +71,7 @@ export function LandingContent() {
               
               <motion.h1 variants={itemVariants} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold text-zinc-900 dark:text-white leading-[1.1] tracking-tight mb-6">
                 {t('landing.hero_title_1')}<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-indigo-600 dark:from-primary-400 dark:to-indigo-400">
+                <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-indigo-600 dark:from-primary-400 dark:to-indigo-400">
                   {t('landing.hero_title_2')}
                 </span>
               </motion.h1>
@@ -126,7 +126,7 @@ export function LandingContent() {
               <div className="relative w-full aspect-square max-w-[600px] mx-auto">
                 <motion.div 
                     animate={floatAnimation}
-                    className="absolute inset-0 bg-gradient-to-tr from-primary-100 to-indigo-50 dark:from-primary-900/20 dark:to-indigo-900/20 rounded-[3rem] transform rotate-3" 
+                    className="absolute inset-0 bg-linear-to-tr from-primary-100 to-indigo-50 dark:from-primary-900/20 dark:to-indigo-900/20 rounded-[3rem] transform rotate-3" 
                 />
                 {/* Main Dashboard Image Placeholder */}
                 <motion.div 
@@ -242,7 +242,7 @@ export function LandingContent() {
                        >
                            {/* Image Container with Zoom Effect */}
                            <div className="h-48 overflow-hidden relative">
-                               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
+                               <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent z-10" />
                                <motion.img 
                                    src={feature.image} 
                                    alt={t(`landing.feat_${feature.key}_title`)}
@@ -293,7 +293,7 @@ export function LandingContent() {
                             alt="Nutrition Planning" 
                             className="w-full h-auto object-cover hover:scale-105 transition-transform duration-700"
                           />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+                          <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-8">
                               <div className="text-white">
                                   <div className="flex items-center gap-2 mb-2">
                                       <CheckCircle2 className="w-5 h-5 text-emerald-400" />
@@ -322,7 +322,7 @@ export function LandingContent() {
                       <ul className="space-y-4">
                           {[1, 2, 3].map((i) => (
                               <li key={i} className="flex items-center gap-3">
-                                  <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center flex-shrink-0">
+                                  <div className="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center shrink-0">
                                       <CheckCircle2 className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                                   </div>
                                   <span className="text-zinc-700 dark:text-zinc-300">{t(`landing.how_item_${i}`)}</span>
@@ -347,7 +347,7 @@ export function LandingContent() {
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="max-w-5xl mx-auto bg-gradient-to-br from-primary-600 to-indigo-700 rounded-3xl p-12 lg:p-20 text-center text-white shadow-2xl shadow-primary-900/30 relative overflow-hidden"
+            className="max-w-5xl mx-auto bg-linear-to-br from-primary-600 to-indigo-700 rounded-3xl p-12 lg:p-20 text-center text-white shadow-2xl shadow-primary-900/30 relative overflow-hidden"
           >
               {/* Background patterns */}
               <div className="absolute top-0 left-0 w-full h-full opacity-10">

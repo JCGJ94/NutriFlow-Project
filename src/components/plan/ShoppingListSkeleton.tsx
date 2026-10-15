@@ -25,7 +25,7 @@ export function ShoppingListSkeleton() {
         
         <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="break-inside-avoid bg-white dark:bg-surface-900 rounded-3xl p-4 shadow-sm border border-surface-100 dark:border-surface-800">
+            <div key={i} className="break-inside-avoid bg-white dark:bg-surface-900 rounded-3xl p-4 shadow-xs border border-surface-100 dark:border-surface-800">
                 <div className="flex items-center gap-3 border-b border-surface-100 dark:border-surface-800 pb-4 mb-4">
                     <Skeleton className="w-10 h-10 rounded-xl" />
                     <div className="space-y-2">

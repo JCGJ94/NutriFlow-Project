@@ -88,7 +88,7 @@ export function Navbar() {
                 onClick={() => setLanguage('es')}
                 className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold transition-all duration-300 z-10 ${
                   language === 'es' 
-                    ? 'bg-white dark:bg-surface-700 text-primary-600 dark:text-primary-400 shadow-sm scale-110' 
+                    ? 'bg-white dark:bg-surface-700 text-primary-600 dark:text-primary-400 shadow-xs scale-110' 
                     : 'text-surface-400 hover:text-surface-600 dark:text-surface-500 dark:hover:text-surface-300'
                 }`}
               >
@@ -98,7 +98,7 @@ export function Navbar() {
                 onClick={() => setLanguage('en')}
                 className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold transition-all duration-300 z-10 ${
                   language === 'en' 
-                    ? 'bg-white dark:bg-surface-700 text-primary-600 dark:text-primary-400 shadow-sm scale-110' 
+                    ? 'bg-white dark:bg-surface-700 text-primary-600 dark:text-primary-400 shadow-xs scale-110' 
                     : 'text-surface-400 hover:text-surface-600 dark:text-surface-500 dark:hover:text-surface-300'
                 }`}
               >
@@ -115,7 +115,7 @@ export function Navbar() {
                   className="flex items-center gap-2 p-1 rounded-full border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                   data-testid="profile-menu-button"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-bold shadow-sm">
+                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-bold shadow-xs">
                     {nameInitial.toUpperCase()}
                   </div>
                   <span className="hidden sm:block text-sm font-medium text-surface-700 dark:text-surface-300 max-w-[100px] truncate">

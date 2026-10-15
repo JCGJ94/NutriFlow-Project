@@ -251,7 +251,7 @@ export default function PlansPage() {
                                 deletePlan(plan.id);
                             }}
                             disabled={isDeleting === plan.id}
-                            className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-surface-400 hover:text-red-500 transition-colors"
+                            className="p-1 rounded-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-surface-400 hover:text-red-500 transition-colors"
                          >
                             {isDeleting === plan.id ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -318,7 +318,7 @@ export default function PlansPage() {
                             deletePlan(plan.id);
                         }}
                         disabled={isDeleting === plan.id}
-                        className="p-2 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-surface-400 hover:text-red-500 transition-colors"
+                        className="p-2 rounded-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-surface-400 hover:text-red-500 transition-colors"
                     >
                         {isDeleting === plan.id ? (
                             <Loader2 className="w-4 h-4 animate-spin" />

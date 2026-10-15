@@ -443,7 +443,7 @@ export default function OnboardingPage() {
 
                 {/* Disclaimer */}
                 <div className="flex gap-3 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl">
-                  <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                   <p className="text-sm text-amber-800 dark:text-amber-200">
                     {t('onboarding.disclaimer')}
                   </p>
@@ -466,7 +466,7 @@ export default function OnboardingPage() {
                       : 'border-surface-200 dark:border-surface-700 hover:border-emerald-200 dark:hover:border-emerald-800 hover:bg-surface-50 dark:hover:bg-surface-800'
                   }`}
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent transition-opacity duration-300 ${
+                  <div className={`absolute inset-0 bg-linear-to-r from-emerald-500/10 to-transparent transition-opacity duration-300 ${
                     selectedAllergens?.length === 0 ? 'opacity-100' : 'opacity-0'
                   }`} />
                   
@@ -551,7 +551,7 @@ export default function OnboardingPage() {
                 </div>
 
                  <div className="flex gap-3 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl mt-6">
-                  <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                   <p className="text-sm text-amber-800 dark:text-amber-200">
                     {t('onboarding.disclaimer')}
                   </p>
@@ -560,7 +560,7 @@ export default function OnboardingPage() {
                 {/* Explicit Confirmation Block */}
                 <div className="mt-8 p-6 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-700">
                   <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
                       selectedAllergens?.length > 0 
                         ? 'bg-amber-100 text-amber-600' 
                         : 'bg-green-100 text-green-600'
@@ -627,7 +627,7 @@ export default function OnboardingPage() {
                     </div>
                     <div className="flex flex-col gap-1">
                       <span className="text-xs font-bold uppercase tracking-wider text-surface-400">{t('onboarding.review_conditions')}</span>
-                      <p className="text-sm font-medium text-surface-900 dark:text-white break-words">
+                      <p className="text-sm font-medium text-surface-900 dark:text-white wrap-break-word">
                         {watch('healthConditions') || t('onboarding.none')}
                       </p>
                     </div>
@@ -635,7 +635,7 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="flex items-start gap-3 p-4 bg-primary-50 dark:bg-primary-900/10 rounded-2xl border border-primary-100 dark:border-primary-900/30">
-                  <ShieldCheck className="w-5 h-5 text-primary-600 mt-1 flex-shrink-0" />
+                  <ShieldCheck className="w-5 h-5 text-primary-600 mt-1 shrink-0" />
                   <p className="text-sm text-primary-900 dark:text-primary-300">
                     {t('onboarding.safety_confirmation_text')}
                   </p>

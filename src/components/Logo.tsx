@@ -13,7 +13,7 @@ export const Logo: React.FC<LogoProps> = ({ className = '', size = 32, variant =
       <LogoTitanium size={size} />
       
       {variant === 'full' && (
-        <span className="text-xl font-heading font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-accent-500 dark:from-primary-400 dark:to-accent-400">
+        <span className="text-xl font-heading font-bold bg-clip-text text-transparent bg-linear-to-r from-primary-600 to-accent-500 dark:from-primary-400 dark:to-accent-400">
           NutriFlow
         </span>
       )}

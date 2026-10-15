@@ -416,7 +416,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
 
                             <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
                                 {/* Day Selection — Horizontal (mobile) / Sidebar (desktop) */}
-                                <aside className="lg:w-72 flex-shrink-0">
+                                <aside className="lg:w-72 shrink-0">
                                     {/* Mobile: Horizontal scrollable tabs */}
                                     <div
                                         ref={dietTabsRef}
@@ -434,7 +434,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                                 onClick={() => handleDietDayClick(day.dayOfWeek)}
                                                 data-testid={`diet-day-tab-${day.dayOfWeek}`}
                                                 className={cn(
-                                                    "flex-shrink-0 snap-center flex flex-col items-center gap-1 px-4 py-3 rounded-2xl transition-all duration-300 min-w-[72px]",
+                                                    "shrink-0 snap-center flex flex-col items-center gap-1 px-4 py-3 rounded-2xl transition-all duration-300 min-w-[72px]",
                                                     selectedDietDay === day.dayOfWeek
                                                         ? "bg-primary-600 text-white shadow-lg shadow-primary-200/50 dark:shadow-none"
                                                         : "bg-white dark:bg-surface-800 text-surface-500 dark:text-surface-400 border border-surface-200 dark:border-surface-700"
@@ -598,7 +598,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                     
                                     <div className="flex flex-col lg:flex-row gap-10">
                                         {/* Sidebar Skeleton */}
-                                        <aside className="lg:w-80 flex-shrink-0 space-y-4">
+                                        <aside className="lg:w-80 shrink-0 space-y-4">
                                             {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                                                 <div key={i} className="h-20 rounded-2xl bg-surface-200 dark:bg-surface-800" />
                                             ))}
@@ -611,7 +611,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                             ) : exercisePlan ? (
                                 <>
                                     {/* Exercise Summary Header */}
-                                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white shadow-2xl shadow-blue-200/50">
+                                    <div className="bg-linear-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white shadow-2xl shadow-blue-200/50">
                                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                                             <div>
                                                 <h2 className="text-3xl font-heading font-black mb-2">
@@ -640,7 +640,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
 
                                     <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
                                         {/* Day Selection — Horizontal (mobile) / Sidebar (desktop) */}
-                                        <aside className="lg:w-80 flex-shrink-0">
+                                        <aside className="lg:w-80 shrink-0">
                                             {/* Mobile: Horizontal scrollable */}
                                             <div
                                                 ref={exerciseTabsRef}
@@ -658,7 +658,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                                         onClick={() => handleExerciseDayClick(day.dayOfWeek)}
                                                         data-testid={`exercise-day-tab-${day.dayOfWeek}`}
                                                         className={cn(
-                                                            "flex-shrink-0 snap-center flex flex-col items-center gap-1 px-4 py-3 rounded-2xl transition-all duration-300 min-w-[72px]",
+                                                            "shrink-0 snap-center flex flex-col items-center gap-1 px-4 py-3 rounded-2xl transition-all duration-300 min-w-[72px]",
                                                             selectedExerciseDay === day.dayOfWeek
                                                                 ? "bg-blue-600 text-white shadow-lg shadow-blue-200/50 dark:shadow-none"
                                                                 : "bg-white dark:bg-surface-800 text-surface-500 dark:text-surface-400 border border-surface-200 dark:border-surface-700"
