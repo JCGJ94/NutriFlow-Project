@@ -137,7 +137,7 @@ export default function ShoppingListPage() {
     updateShoppingListCache(planId, updatedList);
 
     try {
-      await fetch('/api/shopping-list/items/toggle', {
+      await fetch(`/api/shopping-list/${planId}/items/toggle`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ itemId, isChecked: !currentChecked })
@@ -175,7 +175,7 @@ export default function ShoppingListPage() {
     updateShoppingListCache(planId, updatedList);
 
     try {
-      await fetch(`/api/shopping-list/items/${itemId}`, { method: 'DELETE' });
+      await fetch(`/api/shopping-list/${planId}/items/${itemId}`, { method: 'DELETE' });
     } catch (error) {
       console.error('Error deleting item:', error);
       showToast(t('common.error'), 'error');
@@ -196,7 +196,7 @@ export default function ShoppingListPage() {
       const response = await fetch(`/api/shopping-list/${planId}/items`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customName: name })
+        body: JSON.stringify({ name })
       });
 
       if (response.ok) {

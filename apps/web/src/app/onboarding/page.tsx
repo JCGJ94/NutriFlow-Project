@@ -18,17 +18,18 @@ import {
   AlertTriangle,
   ShieldCheck,
 } from 'lucide-react';
-import { Sex, ActivityLevel, DietPattern } from '@nutriflow/shared';
+import {
+  Sex,
+  ActivityLevel,
+  DietPattern,
+  AllergensResponseSchema,
+  CheckUsernameResponseSchema,
+} from '@nutriflow/shared';
+import type { Allergen } from '@nutriflow/shared';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
 import { useUser } from '@/context/UserContext';
 import { useLanguage } from '@/context/LanguageContext';
-
-interface Allergen {
-  id: string;
-  name: string;
-  description?: string;
-}
 
 const profileSchema = z.object({
   username: z.string().min(3, 'username_short').max(20)
@@ -94,8 +95,8 @@ export default function OnboardingPage() {
       try {
         const res = await fetch('/api/allergens');
         if (res.ok) {
-           const data = await res.json();
-           setAllergens(data);
+           const parsed = AllergensResponseSchema.safeParse(await res.json());
+           if (parsed.success) setAllergens(parsed.data.allergens);
         }
       } catch (err) {
         console.error('Error loading allergens', err);
@@ -134,10 +135,10 @@ export default function OnboardingPage() {
         const username = watch('username');
         setIsLoading(true);
         try {
-          const res = await fetch(`/api/me/check-username/${username}`);
+          const res = await fetch(`/api/profile/check-username/${encodeURIComponent(username)}`);
           if (res.ok) {
-            const isAvailable = await res.json();
-            if (!isAvailable) {
+            const parsed = CheckUsernameResponseSchema.safeParse(await res.json());
+            if (parsed.success && !parsed.data.available) {
               setError('username', { 
                 type: 'manual', 
                 message: 'username_taken' 
@@ -193,7 +194,7 @@ export default function OnboardingPage() {
       
 
       
-      const profileRes = await fetch('/api/me/profile', {
+      const profileRes = await fetch('/api/profile', {
         method: 'PUT',
         headers,
         body: JSON.stringify(profileData),
@@ -202,7 +203,7 @@ export default function OnboardingPage() {
       if (!profileRes.ok) {
         const errorData = await profileRes.json().catch(() => ({}));
         console.error('Profile save error:', errorData);
-        throw new Error(errorData.message || 'Error saving profile');
+        throw new Error(errorData.error || 'Error saving profile');
       }
 
       // Sync Navbar / Profile immediately
@@ -212,7 +213,7 @@ export default function OnboardingPage() {
       if (allergenIds && allergenIds.length > 0) {
         setLoadingStep(t('onboarding.loading_allergens'));
 
-        const allergensRes = await fetch('/api/me/allergens', {
+        const allergensRes = await fetch('/api/profile/allergens', {
           method: 'PUT',
           headers,
           body: JSON.stringify({ allergenIds }),

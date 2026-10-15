@@ -14,7 +14,7 @@ import {
   Activity,
   AlertTriangle as AlertIcon,
 } from 'lucide-react';
-import { Sex, ActivityLevel, DietPattern } from '@nutriflow/shared';
+import { Sex, ActivityLevel, DietPattern, AllergensResponseSchema } from '@nutriflow/shared';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/context/ToastContext';
 import { useUser } from '@/context/UserContext';
@@ -109,12 +109,12 @@ export default function SettingsPage() {
       };
 
       // Load user allergens
-      const allergensRes = await fetch('/api/me/allergens', { headers });
+      const allergensRes = await fetch('/api/profile/allergens', { headers });
       if (allergensRes.ok) {
-        const allergens = await allergensRes.json();
-        // Ensure we map the backend IDs to our frontend IDs if they differ, 
-        // but assuming they match or we filter valid ones:
-        setSelectedAllergens(allergens.map((a: any) => a.id));
+        const parsed = AllergensResponseSchema.safeParse(await allergensRes.json());
+        if (parsed.success) {
+          setSelectedAllergens(parsed.data.allergens.map((a) => a.id));
+        }
       }
     } catch (error) {
       console.error('Error loading allergens:', error);
@@ -163,14 +163,14 @@ export default function SettingsPage() {
       };
 
       // Update profile
-      const profileRes = await fetch('/api/me/profile', {
+      const profileRes = await fetch('/api/profile', {
         method: 'PUT',
         headers,
         body: JSON.stringify(data),
       });
 
       // Update allergens
-      await fetch('/api/me/allergens', {
+      await fetch('/api/profile/allergens', {
         method: 'PUT',
         headers,
         body: JSON.stringify({ allergenIds: selectedAllergens }),
@@ -183,7 +183,7 @@ export default function SettingsPage() {
         showToast(t('settings.success'), 'success');
       } else {
         const errorData = await profileRes.json().catch(() => ({}));
-        showToast(errorData.message || t('settings.error'), 'error');
+        showToast(errorData.error || t('settings.error'), 'error');
       }
     } catch (error) {
       console.error('Error saving profile:', error);

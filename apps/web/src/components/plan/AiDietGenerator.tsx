@@ -62,7 +62,7 @@ export function AiDietGenerator() {
         language: language // Pass current language for AI generation
       };
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/diet-engine/generate-ai`, {
+      const response = await fetch('/api/diet-engine/generate-ai', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export function AiDietGenerator() {
 
         const formData = getValues();
 
-        // 1. Update Profile (PUT /me/profile)
+        // 1. Update Profile (PUT /api/profile)
         const profilePayload = {
             age: Number(formData.age),
             sex: formData.sex,
@@ -107,7 +107,7 @@ export function AiDietGenerator() {
             language: language // Sync current UI language to profile
         };
 
-        const profileRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/me/profile`, {
+        const profileRes = await fetch('/api/profile', {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ export function AiDietGenerator() {
         if (!profileRes.ok) throw new Error(t('settings.error'));
 
         // 3. Generate Official Plan (POST /plans/generate-week)
-        const planRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/plans/generate-week`, {
+        const planRes = await fetch('/api/plans/generate-week', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

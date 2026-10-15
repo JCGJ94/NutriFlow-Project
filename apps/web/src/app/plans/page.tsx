@@ -114,11 +114,7 @@ export default function PlansPage() {
         let errorMessage = t('plans.gen_error');
         try {
             const errorJson = JSON.parse(errorText);
-            errorMessage = errorJson.message || errorMessage;
-             // Handle "bad request" array of messages (class-validator)
-            if (Array.isArray(errorMessage)) {
-                errorMessage = errorMessage.join(', ');
-            }
+            errorMessage = errorJson.error || errorMessage;
         } catch (e) {
             console.warn('Could not parse error response JSON', e);
         }
