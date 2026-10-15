@@ -72,3 +72,25 @@ Delivery strategy: `ask-on-risk` (session preflight). Strict TDD active (`pnpm t
 - **Native review.** Skipped by the user for the Phase 0 cutover range and for Phase 1 (`review_due: high_risk`, `lens_context_budget_exceeded`). Slice 0a53b1c was approved; the routes slice 02872f2 was left unresolved. Phase 1 relies on an independent verifier instead.
 - **Checked, no change needed.** `GET /api/shopping-list/[planId]` already returns `id`, `isChecked` and `isCustom` per item (now asserted in the spec), every client HTTP method is exported by its route, and the errors thrown by `lib/google-drive.ts` carry Google's message or the HTTP status, not the request URL.
 - **Risk.** Item 3 (internal contract changes): shopping-list toggle body, `apiClient` error parsing and legacy-branch removal, and the shared `Profile`/`Allergen` type shapes (`createdAt` is a string, `description` is nullable).
+
+## Log
+
+### L2 - 2026-10-15 - requirement change from the user (verbatim, Spanish)
+
+> si autorizo pero no compliquemos mas el funcionamiento objetivo final de esta aplicacion a donde va termiar es;
+>
+> Quiero que esta aplicación, su objetivo final sea la misma idea, pero diferente arquitectura.
+> Quiero que el usuario se lo vea, se registre y llegue a todo el login como está, tal cual. ¿Qué quiero luego? Quiero que un agente sea quien genere este plan nutritivo según los datos del cliente.
+>
+> ¿Cómo va a recibir los datos? Los datos los va a recibir mediante input. Al agente le llegarán, mediante las pantallas de información que selecciona el cliente, una ficha de ese cliente.
+>
+> El agente cargará la ficha de cliente y, según sus datos, su peso, su alérgeno y su información, generará dietas según la selección de cliente. Generará plan nutritivo y plan de ejercicio. Esa es la idea, basándose en documentos oficiales.
+>
+> Entonces, ¿qué lleva esto? El agente tiene que tener un rack y debe tener una documentación fiable. El agente debe tener herramientas con las que pueda consultar en internet y en documentaciones oficiales. Debe hacer una búsqueda de información sobre APIs y sobre los mercados en España, porque le vamos a dar al cliente una nutrición basada en los productos vendidos en los mercados de España.
+
+Effect on this plan: Phases 3-4 (deterministic engine work: allergen query, atomic plan RPC, regeneration) are PAUSED until the agent design is decided; Phase 2 (exercise_plans, generated types), Phase 5, the monorepo flatten and the redesign still apply. The AI preview question (generate-ai) is subsumed by the agent screen. Open question for the user: deterministic guardrails around the agent (recommended) or free generation.
+
+### L3 - 2026-10-15 - hosted database (project rbsokakrtclnmralymna)
+
+- Applied with the user's explicit authorization: migration 005 (drop the signup profile trigger). Verified: trigger and function gone, 3 users and 3 profiles unchanged.
+- RLS check (read-only): profiles has INSERT/SELECT/UPDATE for own rows, so onboarding can create the profile. shopping_lists and shopping_list_items have RLS on and NO policies, so the whole shopping list is denied for user sessions. Fix prepared as 006_shopping_list_rls_policies.sql, NOT applied (awaiting authorization).
