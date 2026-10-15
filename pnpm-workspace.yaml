@@ -1,3 +1,4 @@
 packages:
-  - "apps/*"
+  - "apps/web"
   - "packages/*"
+  # apps/api and apps/mcp-railway are pending removal — excluded from workspace

@@ -17,9 +17,9 @@
         "GEMINI_API_KEY",
         "GOOGLE_DRIVE_FOLDER_ID",
         "NOTEBOOKLM_ID",
-        "CORS_ORIGIN",
-        "FRONTEND_URL",
-        "PORT"
+        "LLM_PRIMARY",
+        "LLM_FALLBACK",
+        "OLLAMA_BASE_URL"
     ],
     "tasks": {
         "build": {
