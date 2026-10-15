@@ -87,6 +87,8 @@ describe('GET /api/shopping-list/[planId]', () => {
         const body = await res.json();
         expect(body).toHaveProperty('planId', planId);
         expect(Array.isArray(body.items)).toBe(true);
+        // The toggle and delete calls identify an item by this id.
+        expect(body.items[0]).toMatchObject({ id: 'item-1', isChecked: false, isCustom: false });
     });
 
     it('returns 404 when plan does not exist or does not belong to user', async () => {
