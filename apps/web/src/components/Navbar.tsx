@@ -33,10 +33,8 @@ export function Navbar() {
     try {
       await signOut();
       router.push('/');
-      router.refresh(); // Ensure clean state
     } catch (error) {
       console.error('Logout error:', error);
-      // Fallback redirect even if error
       window.location.href = '/';
     }
   };

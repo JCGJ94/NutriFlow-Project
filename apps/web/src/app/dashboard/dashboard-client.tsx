@@ -38,23 +38,23 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const { t, language } = useLanguage();
-  const { profile, isLoading: isUserLoading } = useUser();
+  const { user, profile, isLoading: isUserLoading } = useUser();
   const { refreshPlans } = usePlans(); // Keep using context refresh to sync other parts of app if needed?
-  
+
   // Use props for rendering, but allow local override if we want optimistic updates?
-  // For now, rely on router.refresh() 
+  // For now, rely on router.refresh()
   const displayPlans = initialPlans;
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isUserLoading && (!profile || !profile.id)) {
-
-        // showToast(t('dash.welcome_new'), 'info'); // Avoid toast on server redirect if possible, but this is client
+    // Only redirect to onboarding if there IS an authenticated user but no profile.
+    // Do NOT redirect when user is null (logging out) — that causes a race with handleLogout.
+    if (!isUserLoading && user && (!profile || !profile.id)) {
         router.push('/onboarding');
     }
-  }, [isUserLoading, profile, router]);
+  }, [isUserLoading, user, profile, router]);
 
   const generateNewPlan = async () => {
     setIsGenerating(true);

@@ -5,18 +5,8 @@ const nextConfig = {
     typedRoutes: true,
     transpilePackages: ['@nutriflow/shared'],
 
-    // API rewrites to backend
-    async rewrites() {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-        const apiBase = apiUrl.replace(/\/v1$/, ''); // Remove /v1 suffix if present
-
-        return [
-            {
-                source: '/api/:path*',
-                destination: `${apiBase}/v1/:path*`,
-            },
-        ];
-    },
+    // All API paths are served by Next.js Route Handlers.
+    // Railway backend proxy removed in Slice 6 — no rewrites needed.
 
     // Security Headers
     async headers() {
