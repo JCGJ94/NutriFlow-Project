@@ -2,7 +2,6 @@
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square&logo=typescript)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
-![NestJS](https://img.shields.io/badge/NestJS-11-e0234e?style=flat-square&logo=nestjs)
 ![Supabase](https://img.shields.io/badge/PostgreSQL-Supabase-3ecf8e?style=flat-square&logo=supabase)
 ![Gemini AI](https://img.shields.io/badge/Gemini_2.0-Flash-4285F4?style=flat-square&logo=google-gemini)
 
@@ -48,8 +47,7 @@ Este enfoque prioriza la **corrección, la claridad y la testabilidad** sobre el
 
 | Capa | Tecnología | Racional |
 |------|-----------|-----------|
-| **Frontend** | [Next.js 16 (App Router)](https://nextjs.org/) | Permite Componentes de Servidor, reduce la complejidad en el cliente y mantiene la lógica sensible en el servidor. |
-| **Backend** | [NestJS 11](https://nestjs.com/) | Proporciona un backend estructurado y modular con inyección de dependencias y una clara separación de responsabilidades. |
+| **Frontend + API** | [Next.js 16 (App Router)](https://nextjs.org/) | Full-stack: Componentes de Servidor para la UI y Route Handlers para todos los endpoints de la API, sin proceso de backend separado. |
 | **Base de Datos** | [PostgreSQL (Supabase)](https://supabase.com/) | Modelo relacional ideal para datos nutricionales estructurados y escalabilidad a largo plazo. |
 | **Autenticación** | [Supabase Auth (JWT)](https://supabase.com/auth) | Autenticación basada en estándares con un boilerplate mínimo. |
 | **IA Core** | [Gemini 2.0 Flash](https://deepmind.google/technologies/gemini/) | Motor híbrido de generación de contenido con salidas JSON estructuradas. |
@@ -64,8 +62,7 @@ El proyecto está organizado como un **monorepo** para mantener las responsabili
 
 ```text
 ├── apps/
-│   ├── web/    # Frontend en Next.js (App Router)
-│   └── api/    # REST API en NestJS
+│   └── web/    # App full-stack en Next.js (App Router + Route Handlers)
 └── packages/
     └── shared/ # DTOs compartidos, esquemas Zod y tipos de TypeScript
 ```
@@ -182,7 +179,7 @@ Planes de comidas automatizados de 7 días y listas de compras consolidadas.
 
 - Duplica `apps/web/.env.example` (o el `/.env.example` raíz) como `.env.local` y rellena tus propios valores de Supabase antes de ejecutar comandos locales.
 - Mantén fuera del control de versiones cualquier archivo que contenga `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`, `SUPABASE_JWT_SECRET`, `NEXT_PUBLIC_SUPABASE_URL` o `NEXT_PUBLIC_SUPABASE_ANON_KEY`; el repositorio solo guarda plantillas con marcadores de posición para que tus claves nunca se filtren.
-- El frontend y el proxy requieren que `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` estén disponibles en el momento de la compilación. Inyecta estas variables como secretos en tu CI (por ejemplo, GitHub Actions secrets en el bloque `env`) o configúralas localmente antes de ejecutar `pnpm build`. El script `apps/api/seed-user.ts` también espera que la clave de servicio (`SUPABASE_SERVICE_KEY` o `SUPABASE_SERVICE_ROLE_KEY`) esté definida de forma segura.
+- El frontend y el proxy requieren que `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` estén disponibles en el momento de la compilación. Inyecta estas variables como secretos en tu CI (por ejemplo, GitHub Actions secrets en el bloque `env`) o configúralas localmente antes de ejecutar `pnpm build`. Las rutas de administración y RAG requieren que `SUPABASE_SERVICE_ROLE_KEY` esté definida de forma segura, solo en el servidor.
 
 ## 📄 Licencia
 

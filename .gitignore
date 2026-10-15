@@ -44,3 +44,15 @@ coverage
 *.tsbuildinfo
 GUIA_PRESENTACION_TECNICA.md
 .agent/
+
+# agents
+.agents
+.atl
+.claude
+skills-lock.json
+.codegraph/
+.pi/
+.mcp.json
+
+# Transient editor/tool artifacts
+*.tmp.*

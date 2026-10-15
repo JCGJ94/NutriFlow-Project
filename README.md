@@ -2,7 +2,6 @@
 
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat-square&logo=typescript)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
-![NestJS](https://img.shields.io/badge/NestJS-11-e0234e?style=flat-square&logo=nestjs)
 ![Supabase](https://img.shields.io/badge/PostgreSQL-Supabase-3ecf8e?style=flat-square&logo=supabase)
 ![Gemini AI](https://img.shields.io/badge/Gemini_2.0-Flash-4285F4?style=flat-square&logo=google-gemini)
 
@@ -46,12 +45,11 @@ This architecture prioritizes **correctness, clarity, and testability** over rap
 
 ## Architecture & Tech Stack
 
-The project is organized as a **Monorepo** managed by [Turborepo](https://turbo.build/), designed for scale and developer experience.
+The project is organized as a **Monorepo** managed by [Turborepo](https://turbo.build/). As of the 2026 architecture migration, all API logic lives in Next.js Route Handlers — there is no separate backend process.
 
 | Layer | Technology | Rationale / Highlights |
 | :--- | :--- | :--- |
-| **Frontend** | [Next.js 16 (App Router)](https://nextjs.org/) | Leverages Server Components, reduces client-side overhead, and keeps sensitive logic server-side. |
-| **Backend** | [NestJS 11](https://nestjs.com/) | Provides a modular, structured architecture with Dependency Injection and clean separation of concerns. |
+| **Frontend + API** | [Next.js 16 (App Router)](https://nextjs.org/) | Full-stack: Server Components for UI, Route Handlers for all API endpoints — no separate backend process. |
 | **Database** | [PostgreSQL (Supabase)](https://supabase.com/) | Relational model ideal for structured nutritional data and long-term scalability. |
 | **Auth** | [Supabase Auth (JWT)](https://supabase.com/auth) | Standards-compliant authentication with minimal custom boilerplate. |
 | **AI Core** | [Gemini 2.0 Flash](https://deepmind.google/technologies/gemini/) | Hybrid generative engine delivering structured JSON outputs within predefined constraints. |
@@ -66,8 +64,7 @@ Responsibilities are strictly isolated while sharing contracts where necessary:
 
 ```text
 ├── apps/
-│   ├── web/    # Next.js Frontend (App Router)
-│   └── api/    # NestJS REST API (Modular Architecture)
+│   └── web/    # Next.js full-stack app (App Router + Route Handlers)
 └── packages/
     └── shared/ # Shared DTOs, Zod schemas, and TypeScript types
 
@@ -173,7 +170,7 @@ Automated 7-day meal plans and consolidated shopping lists.
 
 - Duplicate `.env.example` (root or `apps/web/.env.example`) into `.env.local` and populate the secrets with your own Supabase project values before running local commands.
 - Keep every file that stores `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`, `SUPABASE_JWT_SECRET`, `NEXT_PUBLIC_SUPABASE_URL`, and `NEXT_PUBLIC_SUPABASE_ANON_KEY` out of source control; the template keeps placeholders so your keys never flow through git.
-- Build the frontend via `pnpm build` only after ensuring `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are injected (your CI environment should set them as secrets or env vars in the workflow). The API seed script also requires the backend service-role key to be defined in `SUPABASE_SERVICE_KEY` / `SUPABASE_SERVICE_ROLE_KEY`.
+- Build the frontend via `pnpm build` only after ensuring `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are injected (your CI environment should set them as secrets or env vars in the workflow). The admin and RAG routes require `SUPABASE_SERVICE_ROLE_KEY` to be defined securely, server-side only.
 
 ## Role & Responsibilities
 
