@@ -1,5 +1,3 @@
 {
-    "framework": "nextjs",
-    "installCommand": "NODE_ENV=development pnpm install --frozen-lockfile",
-    "ignoreCommand": "exit 1"
+    "framework": "nextjs"
 }

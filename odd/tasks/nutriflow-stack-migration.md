@@ -66,6 +66,10 @@ The user also asked to commit and push without leaving any tool attribution in t
 
 > si
 
+> apps/web eso pone root directory
+
+Vercel project setting (user answer): Root Directory = `apps/web`. Consequence: the old root `vercel.json` was never applied (Vercel reads it from the Root Directory), and after the flatten the project must use an empty or `./` Root Directory. Root `vercel.json` reduced to `{"framework":"nextjs"}` so no untested override goes live. Production (`main`) still has the old layout, so changing the setting breaks a redeploy of `main` until the branch is merged.
+
 Approval to start M1 (answer to "¿apruebas que empiece M1?"). Commits: `4d390f4` (flatten), `b64a26c` (lockfile cleanup after the verifier). Native review declined for the candidate (Stop hook).
 
 Disk decision: the repo stays on `E:`; no move to `C:`. Defender exclusions were not requested.
