@@ -51,7 +51,7 @@ export function Navbar() {
   if (isAuthPage) return null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass dark:glass-dark transition-colors duration-300">
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-rule bg-paper">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -68,11 +68,11 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <Link href="/dashboard" className={`nav-link ${pathname === '/dashboard' ? 'text-primary-600 dark:text-primary-400' : ''}`} data-testid="link-dashboard">
+                <Link href="/dashboard" className={`nav-link ${pathname === '/dashboard' ? 'text-signal-text' : ''}`} data-testid="link-dashboard">
                   <LayoutDashboard className="w-4 h-4 inline mr-1" />
                   {t('nav.dashboard')}
                 </Link>
-                <Link href="/plans" className={`nav-link ${pathname.startsWith('/plans') ? 'text-primary-600 dark:text-primary-400' : ''}`} data-testid="link-plans">
+                <Link href="/plans" className={`nav-link ${pathname.startsWith('/plans') ? 'text-signal-text' : ''}`} data-testid="link-plans">
                   <Calendar className="w-4 h-4 inline mr-1" />
                   {t('nav.plans')}
                 </Link>
@@ -83,23 +83,23 @@ export function Navbar() {
           {/* Right Actions */}
           <div className="flex items-center gap-3">
             {/* Premium Language Toggle */}
-            <div className="flex bg-surface-100 dark:bg-surface-800 p-1 rounded-xl items-center relative gap-1 border border-surface-200 dark:border-surface-700 shadow-inner">
+            <div className="flex bg-paper-2 p-1 rounded-full items-center relative gap-1 border border-rule">
               <button
                 onClick={() => setLanguage('es')}
-                className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold transition-all duration-300 z-10 ${
+                className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-colors duration-200 z-10 ${
                   language === 'es' 
-                    ? 'bg-white dark:bg-surface-700 text-primary-600 dark:text-primary-400 shadow-xs scale-110' 
-                    : 'text-surface-400 hover:text-surface-600 dark:text-surface-500 dark:hover:text-surface-300'
+                    ? 'bg-signal text-signal-ink' 
+                    : 'text-muted hover:text-ink'
                 }`}
               >
                 ES
               </button>
               <button
                 onClick={() => setLanguage('en')}
-                className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs font-bold transition-all duration-300 z-10 ${
+                className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-colors duration-200 z-10 ${
                   language === 'en' 
-                    ? 'bg-white dark:bg-surface-700 text-primary-600 dark:text-primary-400 shadow-xs scale-110' 
-                    : 'text-surface-400 hover:text-surface-600 dark:text-surface-500 dark:hover:text-surface-300'
+                    ? 'bg-signal text-signal-ink' 
+                    : 'text-muted hover:text-ink'
                 }`}
               >
                 EN
@@ -112,13 +112,13 @@ export function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-2 p-1 rounded-full border border-surface-200 dark:border-surface-700 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                  className="flex items-center gap-2 p-1 rounded-full border border-rule hover:bg-paper-2 transition-colors"
                   data-testid="profile-menu-button"
                 >
-                  <div className="w-8 h-8 rounded-full bg-linear-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-bold shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-signal flex items-center justify-center text-signal-ink font-bold">
                     {nameInitial.toUpperCase()}
                   </div>
-                  <span className="hidden sm:block text-sm font-medium text-surface-700 dark:text-surface-300 max-w-[100px] truncate">
+                  <span className="hidden sm:block text-sm font-medium text-ink max-w-[100px] truncate">
                     {displayName}
                   </span>
                 </button>
@@ -130,15 +130,15 @@ export function Navbar() {
                       className="fixed inset-0 z-10" 
                       onClick={() => setIsProfileOpen(false)} 
                     />
-                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-surface-900 rounded-2xl shadow-xl border border-surface-100 dark:border-surface-800 py-2 z-20 animate-in fade-in zoom-in-95">
-                      <div className="px-4 py-3 border-b border-surface-50 dark:border-surface-800 mb-2">
-                        <p className="text-sm font-bold text-surface-900 dark:text-white truncate">{displayName}</p>
-                        <p className="text-xs text-surface-500 dark:text-surface-400 truncate">{user.email}</p>
+                    <div className="absolute right-0 mt-2 w-56 bg-paper-2 rounded-2xl border border-rule py-2 z-20">
+                      <div className="px-4 py-3 border-b border-rule mb-2">
+                        <p className="text-sm font-bold text-ink truncate">{displayName}</p>
+                        <p className="text-xs text-muted truncate">{user.email}</p>
                       </div>
                       
                       <Link 
                         href="/dashboard"
-                        className="flex items-center gap-3 px-4 py-2 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-ink hover:bg-paper-3 transition-colors"
                         onClick={() => setIsProfileOpen(false)}
                         data-testid="profile-dropdown-dashboard"
                       >
@@ -147,7 +147,7 @@ export function Navbar() {
                       </Link>
                       <Link 
                         href="/settings"
-                        className="flex items-center gap-3 px-4 py-2 text-sm text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                        className="flex items-center gap-3 px-4 py-2 text-sm text-ink hover:bg-paper-3 transition-colors"
                         onClick={() => setIsProfileOpen(false)}
                         data-testid="profile-dropdown-settings"
                       >
@@ -155,11 +155,11 @@ export function Navbar() {
                         {t('nav.settings')}
                       </Link>
                       
-                      <div className="h-px bg-surface-50 dark:bg-surface-800 my-2" />
+                      <div className="h-px bg-rule my-2" />
                       
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-500 hover:bg-paper-3 transition-colors"
                       >
                         <LogOut className="w-4 h-4" />
                         {t('nav.logout')}
@@ -170,7 +170,7 @@ export function Navbar() {
               </div>
             ) : (
               <div className="hidden sm:flex items-center gap-4">
-                <Link href="/login" className="text-sm font-medium text-surface-600 dark:text-surface-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                <Link href="/login" className="text-sm font-medium text-muted hover:text-ink transition-colors">
                   {t('nav.login')}
                 </Link>
                 <Link href="/register" className="btn-primary py-2 px-5 text-sm">
@@ -181,7 +181,7 @@ export function Navbar() {
 
             {/* Mobile Menu Button */}
             <button 
-              className="md:hidden p-2 text-surface-600 dark:text-surface-300"
+              className="md:hidden p-2 text-muted"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -192,24 +192,24 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-surface-900 border-b border-surface-100 dark:border-surface-800 animate-in slide-in-from-top-4">
+        <div className="md:hidden bg-paper border-b border-rule">
           <div className="px-4 py-6 space-y-4">
             {!isDashboard ? (
               <>
-                <a href="#features" className="block text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>{t('nav.features')}</a>
-                <a href="#how-it-works" className="block text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)}>{t('nav.howItWorks')}</a>
+                <a href="#features" className="block text-lg font-medium text-ink px-2 py-1" onClick={() => setIsMenuOpen(false)}>{t('nav.features')}</a>
+                <a href="#how-it-works" className="block text-lg font-medium text-ink px-2 py-1" onClick={() => setIsMenuOpen(false)}>{t('nav.howItWorks')}</a>
               </>
             ) : (
               <>
-                <Link href="/dashboard" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)} data-testid="mobile-link-dashboard">
+                <Link href="/dashboard" className="flex items-center gap-3 text-lg font-medium text-ink px-2 py-1" onClick={() => setIsMenuOpen(false)} data-testid="mobile-link-dashboard">
                   <LayoutDashboard className="w-5 h-5" />
                   {t('nav.dashboard')}
                 </Link>
-                 <Link href="/plans" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)} data-testid="mobile-link-plans">
+                 <Link href="/plans" className="flex items-center gap-3 text-lg font-medium text-ink px-2 py-1" onClick={() => setIsMenuOpen(false)} data-testid="mobile-link-plans">
                   <Calendar className="w-5 h-5" />
                   {t('nav.plans')}
                 </Link>
-                <Link href="/settings" className="flex items-center gap-3 text-lg font-medium text-surface-700 dark:text-surface-300 px-2 py-1" onClick={() => setIsMenuOpen(false)} data-testid="mobile-link-settings">
+                <Link href="/settings" className="flex items-center gap-3 text-lg font-medium text-ink px-2 py-1" onClick={() => setIsMenuOpen(false)} data-testid="mobile-link-settings">
                   <Settings className="w-5 h-5" />
                   {t('nav.settings')}
                 </Link>

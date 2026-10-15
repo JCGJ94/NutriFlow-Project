@@ -27,7 +27,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="bg-white dark:bg-surface-950 border-t border-surface-200 dark:border-surface-800 transition-colors duration-300">
+    <footer className="bg-paper border-t border-rule">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-16">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           
@@ -36,7 +36,7 @@ export function Footer() {
             <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 group w-fit">
               <Logo size={32} className="transition-transform group-hover:scale-105" />
             </Link>
-            <p className="text-surface-600 dark:text-surface-400 text-sm leading-relaxed max-w-xs">
+            <p className="text-muted text-sm leading-relaxed max-w-xs">
               {t('footer.tagline')}
             </p>
             <div className="flex items-center gap-4 pt-2">
@@ -45,7 +45,7 @@ export function Footer() {
                 target="_blank" 
                 rel="noopener noreferrer"
                 onClick={handlePlaceholder}
-                className="text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors p-1"
+                className="text-muted hover:text-signal-text transition-colors p-1"
                 aria-label="Twitter"
               >
                 <Twitter className="w-5 h-5" />
@@ -55,7 +55,7 @@ export function Footer() {
                 target="_blank" 
                 rel="noopener noreferrer"
                 onClick={handlePlaceholder}
-                className="text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors p-1"
+                className="text-muted hover:text-signal-text transition-colors p-1"
                 aria-label="Instagram"
               >
                 <Instagram className="w-5 h-5" />
@@ -65,7 +65,7 @@ export function Footer() {
                 href="https://github.com/JCGJ94/NutriFlow-Project" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors p-1"
+                className="text-muted hover:text-signal-text transition-colors p-1"
                 aria-label="GitHub"
               >
                 <Github className="w-5 h-5" />
@@ -75,27 +75,27 @@ export function Footer() {
 
           {/* Product Links */}
           <div className="col-span-1">
-            <h3 className="text-xs font-bold text-surface-900 dark:text-white uppercase tracking-wider mb-4">
+            <h3 className="font-mono text-xs text-ink uppercase tracking-widest mb-4">
               {t('footer.product')}
             </h3>
             <ul className="space-y-3">
               <li>
-                <Link href={user ? "/dashboard" : "/#features"} className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <Link href={user ? "/dashboard" : "/#features"} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
                   {t('footer.features')}
                 </Link>
               </li>
               <li>
-                <Link href={user ? "/dashboard" : "/#how-it-works"} className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <Link href={user ? "/dashboard" : "/#how-it-works"} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
                   {t('footer.how_it_works')}
                 </Link>
               </li>
               <li>
-                <a href="#" onClick={handlePlaceholder} className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <a href="#" onClick={handlePlaceholder} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
                   {t('footer.pricing')}
                 </a>
               </li>
               <li>
-                <a href="#" onClick={handlePlaceholder} className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <a href="#" onClick={handlePlaceholder} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
                   {t('footer.testimonials')}
                 </a>
               </li>
@@ -104,22 +104,22 @@ export function Footer() {
 
           {/* Company/Support */}
           <div className="col-span-1">
-            <h3 className="text-xs font-bold text-surface-900 dark:text-white uppercase tracking-wider mb-4">
+            <h3 className="font-mono text-xs text-ink uppercase tracking-widest mb-4">
               {t('footer.company')}
             </h3>
             <ul className="space-y-3">
               <li>
-                <a href="#" onClick={handlePlaceholder} className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <a href="#" onClick={handlePlaceholder} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
                   {t('footer.about')}
                 </a>
               </li>
               <li>
-                <a href="#" onClick={handlePlaceholder} className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <a href="#" onClick={handlePlaceholder} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
                   {t('footer.blog')}
                 </a>
               </li>
               <li>
-                <a href="mailto:hola@nutriflow.app" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <a href="mailto:hola@nutriflow.app" className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
                   {t('footer.contact')}
                 </a>
               </li>
@@ -128,39 +128,39 @@ export function Footer() {
 
           {/* Legal / Contact Info - Spans 2 columns on mobile if needed, but let's keep it 1 for grid symmetry or 2 if we want footer-bottom style */}
           <div className="col-span-2 lg:col-span-1">
-            <h3 className="text-xs font-bold text-surface-900 dark:text-white uppercase tracking-wider mb-4">
+            <h3 className="font-mono text-xs text-ink uppercase tracking-widest mb-4">
               {t('footer.legal')}
             </h3>
             <ul className="space-y-3 mb-6">
               <li>
-                <Link href="/privacy" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <Link href="/privacy" className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
                   {t('footer.privacy')}
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <Link href="/terms" className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
                   {t('footer.terms')}
                 </Link>
               </li>
               <li>
-                <Link href="/cookies" className="text-surface-600 dark:text-surface-400 hover:text-primary-600 dark:hover:text-primary-400 text-sm transition-colors block py-0.5">
+                <Link href="/cookies" className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
                   {t('footer.cookies')}
                 </Link>
               </li>
             </ul>
             
-            <div className="flex items-center gap-2 text-sm text-surface-600 dark:text-surface-400 bg-surface-50 dark:bg-surface-900/50 p-3 rounded-xl border border-surface-100 dark:border-surface-800 w-fit">
-               <Mail className="w-4 h-4 text-primary-600" />
-               <a href="mailto:hola@nutriflow.app" className="hover:text-primary-600 transition-colors font-medium">hola@nutriflow.app</a>
+            <div className="flex items-center gap-2 text-sm text-muted bg-paper-2 p-3 rounded-xl border border-rule w-fit">
+               <Mail className="w-4 h-4 text-signal-text" />
+               <a href="mailto:hola@nutriflow.app" className="hover:text-ink transition-colors font-medium">hola@nutriflow.app</a>
             </div>
           </div>
         </div>
         
-        <div className="mt-12 pt-8 border-t border-surface-200 dark:border-surface-800 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-center md:text-left text-surface-500 text-xs">
+        <div className="mt-12 pt-8 border-t border-rule flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-center md:text-left text-muted text-xs">
             © {currentYear} NutriFlow. {t('footer.rights')}
           </p>
-          <div className="flex gap-4 text-xs text-surface-500">
+          <div className="flex gap-4 text-xs text-muted">
              <span>v0.3.0 Beta</span>
           </div>
         </div>
