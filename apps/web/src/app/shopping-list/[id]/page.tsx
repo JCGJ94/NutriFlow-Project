@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { IngredientCategory } from '@nutriflow/shared';
 import { formatGrams } from '@/lib/utils';
+import { apiClient } from '@/lib/apiClient';
 import { useLanguage } from '@/context/LanguageContext';
 import { usePlans } from '@/context/PlansContext';
 import { useToast } from '@/context/ToastContext';
@@ -124,12 +125,21 @@ export default function ShoppingListPage() {
     }));
   };
 
+  // Undo an optimistic update after the server rejected the request. The cache
+  // is restored too, otherwise a later getShoppingList would replay the failed state.
+  const revertTo = (previousList: ShoppingList, error: unknown) => {
+    setShoppingList(previousList);
+    updateShoppingListCache(planId, previousList);
+    showToast(error instanceof Error ? error.message : t('common.error'), 'error');
+  };
+
   const toggleItem = async (itemId: string, currentChecked: boolean) => {
     if (!shoppingList) return;
 
+    const previousList = shoppingList;
     const updatedList = {
         ...shoppingList,
-        items: shoppingList.items.map(item => 
+        items: shoppingList.items.map(item =>
             item.id === itemId ? { ...item, isChecked: !currentChecked } : item
         )
     };
@@ -137,16 +147,13 @@ export default function ShoppingListPage() {
     updateShoppingListCache(planId, updatedList);
 
     try {
-      await fetch(`/api/shopping-list/${planId}/items/toggle`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemId, isChecked: !currentChecked })
+      await apiClient.post(`/shopping-list/${planId}/items/toggle`, {
+        itemId,
+        isChecked: !currentChecked,
       });
     } catch (error) {
       console.error('Error toggling item:', error);
-      // Revert on error
-      const data = await getShoppingList(planId);
-      if (data) setShoppingList(data);
+      revertTo(previousList, error);
     }
   };
 
@@ -165,8 +172,9 @@ export default function ShoppingListPage() {
 
   const deleteCustomItem = async (itemId: string) => {
     if (!shoppingList) return;
-    
+
     // Optimistic Delete
+    const previousList = shoppingList;
     const updatedList = {
         ...shoppingList,
         items: shoppingList.items.filter(item => item.id !== itemId)
@@ -175,13 +183,10 @@ export default function ShoppingListPage() {
     updateShoppingListCache(planId, updatedList);
 
     try {
-      await fetch(`/api/shopping-list/${planId}/items/${itemId}`, { method: 'DELETE' });
+      await apiClient.delete(`/shopping-list/${planId}/items/${itemId}`);
     } catch (error) {
       console.error('Error deleting item:', error);
-      showToast(t('common.error'), 'error');
-      // Revert
-      const data = await getShoppingList(planId);
-      if (data) setShoppingList(data);
+      revertTo(previousList, error);
     }
   };
 
@@ -193,29 +198,21 @@ export default function ShoppingListPage() {
     setNewItemName('');
 
     try {
-      const response = await fetch(`/api/shopping-list/${planId}/items`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
-      });
+      const newItem = await apiClient.post<ShoppingListItem>(
+        `/shopping-list/${planId}/items`,
+        { name },
+      );
 
-      if (response.ok) {
-        // Correctly typed response now
-        const newItem = await response.json(); 
-        
-        if (shoppingList) {
-             const updatedList = {
-                 ...shoppingList,
-                 items: [...shoppingList.items, newItem]
-             };
-             setShoppingList(updatedList);
-             updateShoppingListCache(planId, updatedList);
-             showToast(t('shop.item_added'), 'success');
-        }
-      }
+      const updatedList = {
+          ...shoppingList,
+          items: [...shoppingList.items, newItem]
+      };
+      setShoppingList(updatedList);
+      updateShoppingListCache(planId, updatedList);
+      showToast(t('shop.item_added'), 'success');
     } catch (error) {
       console.error('Error adding custom item:', error);
-      showToast(t('common.error'), 'error');
+      showToast(error instanceof Error ? error.message : t('common.error'), 'error');
     }
   };
 
