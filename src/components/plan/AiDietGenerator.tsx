@@ -157,14 +157,14 @@ export function AiDietGenerator() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center space-y-4"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-50 border border-primary-100 text-primary-600 text-xs font-black uppercase tracking-widest shadow-xs">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-paper-3 border border-rule text-signal-text text-xs font-black uppercase tracking-widest shadow-xs">
           <Sparkles className="w-4 h-4" />
           Powered by NotebookLM
         </div>
-        <h2 className="text-5xl font-heading font-black text-surface-900 dark:text-white tracking-tight">
+        <h2 className="text-5xl font-heading font-black text-ink tracking-tight">
           {t('gen.title')}
         </h2>
-        <p className="text-surface-500 dark:text-surface-400 max-w-2xl mx-auto text-lg">
+        <p className="text-muted max-w-2xl mx-auto text-lg">
           {t('gen.subtitle')}
         </p>
       </motion.div>
@@ -174,26 +174,26 @@ export function AiDietGenerator() {
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="bg-white dark:bg-surface-800 rounded-3xl border border-surface-100 dark:border-surface-700 shadow-xl p-8 sticky top-24 transition-colors duration-300"
+          className="bg-paper-2 rounded-3xl border border-rule shadow-xl p-8 sticky top-24 transition-colors duration-300"
         >
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <h3 className="text-xl font-heading font-black text-surface-900 dark:text-white border-b border-surface-50 dark:border-surface-700 pb-4">
+            <h3 className="text-xl font-heading font-black text-ink border-b border-rule pb-4">
               {t('gen.profile_title')}
             </h3>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase font-black tracking-widest text-surface-400 ml-1">{t('gen.age')}</label>
+                <label className="text-[10px] uppercase font-black tracking-widest text-muted ml-1">{t('gen.age')}</label>
                 <input 
                   type="number" 
                   {...register('age', { required: true, min: 18 })}
-                  className="w-full p-4 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border-none focus:ring-2 focus:ring-primary-500 transition-all font-bold text-surface-900 dark:text-white"
+                  className="w-full p-4 rounded-2xl bg-paper-2 border-none focus:ring-2 focus:ring-signal transition-all font-bold text-ink"
                   placeholder="30"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase font-black tracking-widest text-surface-400 ml-1">{t('gen.sex')}</label>
-                <select {...register('sex')} className="w-full p-4 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border-none focus:ring-2 focus:ring-primary-500 appearance-none font-bold text-surface-900 dark:text-white">
+                <label className="text-[10px] uppercase font-black tracking-widest text-muted ml-1">{t('gen.sex')}</label>
+                <select {...register('sex')} className="w-full p-4 rounded-2xl bg-paper-2 border-none focus:ring-2 focus:ring-signal appearance-none font-bold text-ink">
                   <option value={Sex.MALE}>{t('onboarding.sex_male')}</option>
                   <option value={Sex.FEMALE}>{t('onboarding.sex_female')}</option>
                 </select>
@@ -202,20 +202,20 @@ export function AiDietGenerator() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase font-black tracking-widest text-surface-400 ml-1">{t('gen.weight')}</label>
+                <label className="text-[10px] uppercase font-black tracking-widest text-muted ml-1">{t('gen.weight')}</label>
                 <input 
                   type="number" 
                   {...register('weightKg', { required: true })}
-                  className="w-full p-4 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border-none focus:ring-2 focus:ring-primary-500 font-bold text-surface-900 dark:text-white"
+                  className="w-full p-4 rounded-2xl bg-paper-2 border-none focus:ring-2 focus:ring-signal font-bold text-ink"
                   placeholder="75"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] uppercase font-black tracking-widest text-surface-400 ml-1">{t('gen.height')}</label>
+                <label className="text-[10px] uppercase font-black tracking-widest text-muted ml-1">{t('gen.height')}</label>
                 <input 
                   type="number" 
                   {...register('heightCm', { required: true })}
-                  className="w-full p-4 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border-none focus:ring-2 focus:ring-primary-500 font-bold text-surface-900 dark:text-white"
+                  className="w-full p-4 rounded-2xl bg-paper-2 border-none focus:ring-2 focus:ring-signal font-bold text-ink"
                   placeholder="175"
                 />
               </div>
@@ -223,8 +223,8 @@ export function AiDietGenerator() {
 
             <div className="space-y-4 pt-4">
                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-black tracking-widest text-surface-400 ml-1">{t('gen.diet_type')}</label>
-                  <select {...register('dietPattern')} className="w-full p-4 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border-none focus:ring-2 focus:ring-primary-500 font-bold text-surface-900 dark:text-white">
+                  <label className="text-[10px] uppercase font-black tracking-widest text-muted ml-1">{t('gen.diet_type')}</label>
+                  <select {...register('dietPattern')} className="w-full p-4 rounded-2xl bg-paper-2 border-none focus:ring-2 focus:ring-signal font-bold text-ink">
                     <option value={DietPattern.OMNIVORE}>{t('onboarding.diet_omnivore')}</option>
                     <option value={DietPattern.VEGETARIAN}>{t('onboarding.diet_vegetarian')}</option>
                     <option value={DietPattern.VEGAN}>{t('onboarding.diet_vegan')}</option>
@@ -232,11 +232,11 @@ export function AiDietGenerator() {
                 </div>
                 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-black tracking-widest text-surface-400 ml-1">{t('gen.restrictions')}</label>
+                  <label className="text-[10px] uppercase font-black tracking-widest text-muted ml-1">{t('gen.restrictions')}</label>
                   <input 
                     type="text" 
                     {...register('allergens')}
-                    className="w-full p-4 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border-none focus:ring-2 focus:ring-primary-500 font-bold text-sm text-surface-900 dark:text-white"
+                    className="w-full p-4 rounded-2xl bg-paper-2 border-none focus:ring-2 focus:ring-signal font-bold text-sm text-ink"
                     placeholder={t('gen.restrictions_placeholder')}
                   />
                 </div>
@@ -245,7 +245,7 @@ export function AiDietGenerator() {
             <button 
               type="submit" 
               disabled={isLoading}
-              className="w-full bg-surface-900 dark:bg-white text-white dark:text-surface-900 hover:bg-surface-800 dark:hover:bg-surface-100 font-black py-5 rounded-3xl transition-all flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl disabled:opacity-70 mt-8 group"
+              className="w-full bg-ink text-paper hover:bg-ink/90 font-black py-5 rounded-3xl transition-all flex items-center justify-center gap-3 shadow-xl hover:shadow-2xl disabled:opacity-70 mt-8 group"
             >
               {isLoading ? (
                 <>
@@ -274,14 +274,14 @@ export function AiDietGenerator() {
         </motion.div>
 
         {/* Results Column */}
-        <div className="space-y-8 min-h-[600px] flex flex-col items-center justify-center border-2 border-dashed border-surface-100 dark:border-surface-700 rounded-[40px] p-12 bg-white/30 dark:bg-surface-800/20 transition-colors duration-300">
+        <div className="space-y-8 min-h-[600px] flex flex-col items-center justify-center border-2 border-dashed border-rule rounded-[40px] p-12 bg-white/30 transition-colors duration-300">
           {!plan && !isLoading && (
             <div className="text-center space-y-4 opacity-30 select-none">
-              <div className="w-24 h-24 bg-surface-50 dark:bg-surface-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Utensils className="w-10 h-10 text-surface-300 dark:text-surface-600" />
+              <div className="w-24 h-24 bg-paper-2 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Utensils className="w-10 h-10 text-muted" />
               </div>
-              <h4 className="text-xl font-heading font-black text-surface-900 dark:text-white">{t('gen.empty_title')}</h4>
-              <p className="max-w-xs mx-auto font-bold text-sm text-surface-500 dark:text-surface-400">{t('gen.empty_desc')}</p>
+              <h4 className="text-xl font-heading font-black text-ink">{t('gen.empty_title')}</h4>
+              <p className="max-w-xs mx-auto font-bold text-sm text-muted">{t('gen.empty_desc')}</p>
             </div>
           )}
 
@@ -292,10 +292,10 @@ export function AiDietGenerator() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="w-full space-y-10"
               >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-surface-50 dark:border-surface-700 pb-8">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-rule pb-8">
                   <div>
-                    <h3 className="text-4xl font-heading font-black text-surface-900 dark:text-white tracking-tight">{t('gen.result_title')}</h3>
-                    <p className="text-primary-600 dark:text-primary-400 font-bold mt-2">
+                    <h3 className="text-4xl font-heading font-black text-ink tracking-tight">{t('gen.result_title')}</h3>
+                    <p className="text-signal-text font-bold mt-2">
                        {t('gen.result_subtitle').replace('{{count}}', (plan.days?.length || 0).toString())}
                     </p>
                   </div>
@@ -318,20 +318,20 @@ export function AiDietGenerator() {
                   ))}
                 </div>
                 
-                <div className="bg-primary-50 dark:bg-primary-900/10 rounded-3xl p-6 flex items-center justify-between gap-6 border border-primary-100 dark:border-primary-800 transition-colors duration-300">
+                <div className="bg-paper-3 rounded-3xl p-6 flex items-center justify-between gap-6 border border-rule transition-colors duration-300">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-primary-600 flex items-center justify-center shadow-lg shadow-primary-200">
-                      <Sparkles className="w-6 h-6 text-white" />
+                    <div className="w-12 h-12 rounded-2xl bg-signal flex items-center justify-center">
+                      <Sparkles className="w-6 h-6 text-signal-ink" />
                     </div>
                     <div>
-                      <h5 className="font-heading font-black text-surface-900 dark:text-white">{t('gen.save_title')}</h5>
-                      <p className="text-xs font-bold text-surface-500 dark:text-surface-400">{t('gen.save_desc')}</p>
+                      <h5 className="font-heading font-black text-ink">{t('gen.save_title')}</h5>
+                      <p className="text-xs font-bold text-muted">{t('gen.save_desc')}</p>
                     </div>
                   </div>
                   <button 
                       onClick={handleSavePlan}
                       disabled={isSaving}
-                      className="bg-white dark:bg-surface-800 px-6 py-3 rounded-2xl font-black text-sm text-surface-900 dark:text-white hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                      className="bg-paper-2 px-6 py-3 rounded-2xl font-black text-sm text-ink hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                     {isSaving ? t('gen.saving') : t('gen.save_btn')}
@@ -344,12 +344,12 @@ export function AiDietGenerator() {
           {isLoading && (
             <div className="text-center space-y-6">
               <div className="relative">
-                <div className="w-24 h-24 border-4 border-primary-50 dark:border-primary-900 rounded-full mx-auto" />
+                <div className="w-24 h-24 border-4 border-rule rounded-full mx-auto" />
                 <div className="w-24 h-24 border-4 border-t-primary-600 border-transparent rounded-full mx-auto animate-spin absolute inset-0" />
               </div>
               <div className="space-y-2">
-                <h4 className="text-xl font-heading font-black text-primary-600 animate-pulse">{t('gen.analyzing_library')}</h4>
-                <p className="max-w-xs mx-auto font-bold text-sm text-surface-400 dark:text-surface-500">{t('gen.analyzing_desc')}</p>
+                <h4 className="text-xl font-heading font-black text-signal-text animate-pulse">{t('gen.analyzing_library')}</h4>
+                <p className="max-w-xs mx-auto font-bold text-sm text-muted">{t('gen.analyzing_desc')}</p>
               </div>
             </div>
           )}

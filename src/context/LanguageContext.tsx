@@ -76,8 +76,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
       {children}
       {isLiveTranslating && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center space-x-2 bg-surface-900/80 text-white px-4 py-2 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
-           <div className="w-2 h-2 bg-primary-500 rounded-full animate-bounce" />
+        <div className="fixed bottom-4 right-4 z-50 flex items-center space-x-2 bg-paper-2 border border-rule text-ink px-4 py-2 rounded-full shadow-lg backdrop-blur-sm animate-pulse">
+           <div className="w-2 h-2 bg-signal rounded-full animate-bounce" />
            <span className="text-xs font-medium">NutriFlow IA Translating...</span>
         </div>
       )}

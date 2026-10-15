@@ -267,15 +267,15 @@ export default function OnboardingPage() {
         {/* Header */}
         <div className="text-center mb-6 sm:mb-8">
           <div className="inline-flex items-center gap-2 mb-3 sm:mb-4">
-            <Utensils className="w-8 h-8 sm:w-10 sm:h-10 text-primary-600" />
-            <span className="text-xl sm:text-2xl font-heading font-bold text-primary-600 dark:text-primary-400">
+            <Utensils className="w-8 h-8 sm:w-10 sm:h-10 text-signal-text" />
+            <span className="text-xl sm:text-2xl font-heading font-bold text-signal-text">
               NutriFlow
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-heading font-bold text-surface-900 dark:text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl font-heading font-bold text-ink mb-2">
             {t('onboarding.title')}
           </h1>
-          <p className="text-sm sm:text-base text-surface-600 dark:text-surface-300">
+          <p className="text-sm sm:text-base text-muted">
             {t('onboarding.subtitle')}
           </p>
         </div>
@@ -287,8 +287,8 @@ export default function OnboardingPage() {
               <div
                 className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center ${
                   index <= currentStep
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-surface-200 text-surface-500'
+                    ? 'bg-signal text-signal-ink'
+                    : 'bg-paper-3 text-muted'
                 }`}
               >
                 <step.icon className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -296,7 +296,7 @@ export default function OnboardingPage() {
               {index < STEPS.length - 1 && (
                 <div
                   className={`w-8 sm:w-12 h-1 mx-1 sm:mx-2 ${
-                    index < currentStep ? 'bg-primary-600' : 'bg-surface-200'
+                    index < currentStep ? 'bg-signal' : 'bg-paper-3'
                   }`}
                 />
               )}
@@ -306,7 +306,7 @@ export default function OnboardingPage() {
 
         {/* Form Card */}
         <div className="card">
-          <h2 className="text-xl font-heading font-semibold text-surface-900 dark:text-white mb-6">
+          <h2 className="text-xl font-heading font-semibold text-ink mb-6">
             {STEPS[currentStep].title}
           </h2>
 
@@ -436,7 +436,7 @@ export default function OnboardingPage() {
                     className="input"
                     placeholder={currentWeight ? String(currentWeight - 5) : '70'}
                   />
-                  <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
+                  <p className="mt-1 text-sm text-muted">
                     {t('onboarding.current_weight_ref')}: {currentWeight || '--'} kg
                   </p>
                 </div>
@@ -454,7 +454,7 @@ export default function OnboardingPage() {
              {/* Step 4: Allergens */}
              {currentStep === 3 && (
               <div className="space-y-4">
-                <p className="text-surface-600 dark:text-surface-300 mb-4">
+                <p className="text-muted mb-4">
                   {t('onboarding.allergens_desc')}
                 </p>
 
@@ -463,10 +463,10 @@ export default function OnboardingPage() {
                   className={`relative flex items-center p-5 rounded-2xl cursor-pointer transition-all duration-300 border-2 overflow-hidden group mb-6 ${
                     selectedAllergens?.length === 0
                       ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-900/10 shadow-[0_0_20px_rgba(16,185,129,0.15)]'
-                      : 'border-surface-200 dark:border-surface-700 hover:border-emerald-200 dark:hover:border-emerald-800 hover:bg-surface-50 dark:hover:bg-surface-800'
+                      : 'border-rule hover:border-emerald-200 dark:hover:border-emerald-800 hover:bg-paper-3'
                   }`}
                 >
-                  <div className={`absolute inset-0 bg-linear-to-r from-emerald-500/10 to-transparent transition-opacity duration-300 ${
+                  <div className={`absolute inset-0 bg-signal transition-opacity duration-300 ${
                     selectedAllergens?.length === 0 ? 'opacity-100' : 'opacity-0'
                   }`} />
                   
@@ -478,21 +478,21 @@ export default function OnboardingPage() {
                     <span className={`block font-heading font-bold text-lg mb-0.5 transition-colors ${
                       selectedAllergens?.length === 0
                         ? 'text-emerald-800 dark:text-emerald-300'
-                        : 'text-surface-700 dark:text-surface-200'
+                        : 'text-ink'
                     }`}>
                       {t('onboarding.allergens_none_label')}
                     </span>
-                    <p className="text-sm text-surface-500 dark:text-surface-400 font-medium">
+                    <p className="text-sm text-muted font-medium">
                       {t('onboarding.allergens_plan_confirm')}
                     </p>
                   </div>
 
                   <div className={`relative z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300 ${
                      selectedAllergens?.length === 0
-                       ? 'border-emerald-500 bg-emerald-500 scale-110'
-                       : 'border-surface-300 dark:border-surface-600'
+                       ? 'border-signal bg-signal scale-110'
+                       : 'border-rule'
                   }`}>
-                     {selectedAllergens?.length === 0 && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+                     {selectedAllergens?.length === 0 && <Check className="w-4 h-4 text-signal-ink" strokeWidth={3} />}
                   </div>
 
                   <input
@@ -509,7 +509,7 @@ export default function OnboardingPage() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {allergens.length === 0 && (
-                    <div className="col-span-2 text-center py-6 text-surface-500">
+                    <div className="col-span-2 text-center py-6 text-muted">
                       {t('onboarding.allergens_none_found')}
                     </div>
                   )}
@@ -518,8 +518,8 @@ export default function OnboardingPage() {
                       key={allergen.id}
                       className={`relative flex items-center p-4 border rounded-xl cursor-pointer transition-all ${
                         selectedAllergens?.includes(allergen.id)
-                          ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
-                          : 'border-surface-200 dark:border-surface-700 hover:border-surface-300'
+                          ? 'border-rule bg-paper-3'
+                          : 'border-rule hover:border-rule'
                       }`}
                     >
                       <input
@@ -531,8 +531,8 @@ export default function OnboardingPage() {
                       <div className="flex-1">
                          <span className={`font-medium ${
                             selectedAllergens?.includes(allergen.id)
-                            ? 'text-primary-700 dark:text-primary-300' 
-                            : 'text-surface-700 dark:text-surface-200'
+                            ? 'text-signal-text' 
+                            : 'text-ink'
                          }`}>
                            {/* Try to translate using name (e.g. 'allergen.gluten') or fallback to name/id */}
                            {t('allergen.' + (allergen.name?.toLowerCase() || '')) !== 'allergen.' + (allergen.name?.toLowerCase() || '') 
@@ -540,11 +540,11 @@ export default function OnboardingPage() {
                               : (allergen.name || t('allergen.' + allergen.id))}
                          </span>
                          {allergen.description && (
-                            <p className="text-xs text-surface-500 mt-0.5">{allergen.description}</p>
+                            <p className="text-xs text-muted mt-0.5">{allergen.description}</p>
                          )}
                       </div>
                       {selectedAllergens?.includes(allergen.id) && (
-                        <Check className="w-5 h-5 text-primary-600" />
+                        <Check className="w-5 h-5 text-signal-text" />
                       )}
                     </label>
                   ))}
@@ -558,7 +558,7 @@ export default function OnboardingPage() {
                 </div>
 
                 {/* Explicit Confirmation Block */}
-                <div className="mt-8 p-6 rounded-2xl bg-surface-50 dark:bg-surface-900/50 border border-surface-200 dark:border-surface-700">
+                <div className="mt-8 p-6 rounded-2xl bg-paper-2 border border-rule">
                   <div className="flex items-center gap-4">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${
                       selectedAllergens?.length > 0 
@@ -568,12 +568,12 @@ export default function OnboardingPage() {
                       {selectedAllergens?.length > 0 ? <Shield className="w-6 h-6" /> : <Check className="w-6 h-6" />}
                     </div>
                     <div>
-                      <h3 className="font-heading font-bold text-surface-900 dark:text-white">
+                      <h3 className="font-heading font-bold text-ink">
                         {selectedAllergens?.length > 0 
                           ? `${selectedAllergens.length} ${t('onboarding.allergens_selected')}` 
                           : t('onboarding.allergens_none_selected')}
                       </h3>
-                      <p className="text-sm text-surface-600 dark:text-surface-400">
+                      <p className="text-sm text-muted">
                         {selectedAllergens?.length > 0 
                           ? t('onboarding.allergens_plan_avoid') 
                           : t('onboarding.allergens_plan_confirm')}
@@ -585,7 +585,7 @@ export default function OnboardingPage() {
                 {/* Health Conditions Free Text */}
                 <div className="mt-8">
                   <label className="label mb-2 flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-primary-500" />
+                    <Activity className="w-4 h-4 text-signal-text" />
                     {t('onboarding.health_conditions_label')}
                   </label>
                   <textarea
@@ -593,7 +593,7 @@ export default function OnboardingPage() {
                     className="input min-h-[100px] text-sm"
                     placeholder={t('onboarding.health_conditions_placeholder')}
                   />
-                  <p className="mt-2 text-xs text-surface-500 italic">
+                  <p className="mt-2 text-xs text-muted italic">
                     {t('onboarding.health_conditions_hint')}
                   </p>
                 </div>
@@ -618,25 +618,25 @@ export default function OnboardingPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-4 bg-white dark:bg-surface-800 p-4 rounded-xl border border-amber-100 dark:border-amber-900/20">
+                  <div className="space-y-4 bg-paper-2 p-4 rounded-xl border border-amber-100 dark:border-amber-900/20">
                     <div className="flex justify-between items-start">
-                      <span className="text-xs font-bold uppercase tracking-wider text-surface-400">{t('onboarding.review_allergens')}</span>
-                      <span className="text-sm font-medium text-surface-900 dark:text-white">
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted">{t('onboarding.review_allergens')}</span>
+                      <span className="text-sm font-medium text-ink">
                         {selectedAllergens?.length > 0 ? selectedAllergens.length : t('onboarding.none')}
                       </span>
                     </div>
                     <div className="flex flex-col gap-1">
-                      <span className="text-xs font-bold uppercase tracking-wider text-surface-400">{t('onboarding.review_conditions')}</span>
-                      <p className="text-sm font-medium text-surface-900 dark:text-white wrap-break-word">
+                      <span className="text-xs font-bold uppercase tracking-wider text-muted">{t('onboarding.review_conditions')}</span>
+                      <p className="text-sm font-medium text-ink wrap-break-word">
                         {watch('healthConditions') || t('onboarding.none')}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-4 bg-primary-50 dark:bg-primary-900/10 rounded-2xl border border-primary-100 dark:border-primary-900/30">
-                  <ShieldCheck className="w-5 h-5 text-primary-600 mt-1 shrink-0" />
-                  <p className="text-sm text-primary-900 dark:text-primary-300">
+                <div className="flex items-start gap-3 p-4 bg-paper-3 rounded-2xl border border-rule">
+                  <ShieldCheck className="w-5 h-5 text-signal-text mt-1 shrink-0" />
+                  <p className="text-sm text-signal-text">
                     {t('onboarding.safety_confirmation_text')}
                   </p>
                 </div>
@@ -674,7 +674,7 @@ export default function OnboardingPage() {
                   className={`btn-primary flex items-center justify-center gap-2 min-w-[200px] py-4 text-lg shadow-xl transition-all duration-500 ${
                     selectedAllergens?.length === 0 
                       ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20' 
-                      : 'bg-primary-600 hover:bg-primary-700 shadow-primary-500/20'
+                      : 'bg-signal hover:bg-signal/90'
                   }`}
                 >
                   {isLoading ? (

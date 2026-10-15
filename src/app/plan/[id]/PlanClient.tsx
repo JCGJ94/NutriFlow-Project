@@ -300,9 +300,9 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
 
     if (!optimisticPlan) {
         return (
-            <div className="min-h-screen bg-surface-50 flex items-center justify-center">
+            <div className="min-h-screen bg-paper-2 flex items-center justify-center">
                 <div className="text-center">
-                    <h2 className="text-xl font-heading font-semibold text-surface-900 mb-2">
+                    <h2 className="text-xl font-heading font-semibold text-ink mb-2">
                         {t('plans.no_plan')}
                     </h2>
                     <Link href="/dashboard" className="btn-primary">
@@ -320,27 +320,27 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
         <div className="min-h-screen bg-page-gradient pt-16">
 
             {/* Header */}
-            <header className="bg-white/80 dark:bg-surface-900/80 backdrop-blur-xl border-b border-surface-200 dark:border-surface-800 sticky top-16 z-30 transition-colors duration-300">
+            <header className="bg-white/80 backdrop-blur-xl border-b border-rule sticky top-16 z-30 transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-20">
                         <div className="flex items-center gap-6">
                             <Link
                                 href="/dashboard"
-                                className="group p-2.5 rounded-2xl bg-surface-50 dark:bg-surface-800 hover:bg-white dark:hover:bg-surface-700 hover:shadow-md transition-all duration-300"
+                                className="group p-2.5 rounded-2xl bg-paper-2 hover:bg-paper-2 hover:shadow-md transition-all duration-300"
                             >
-                                <ArrowLeft className="w-5 h-5 text-surface-600 dark:text-surface-300 group-hover:-translate-x-1 transition-transform" />
+                                <ArrowLeft className="w-5 h-5 text-muted group-hover:-translate-x-1 transition-transform" />
                             </Link>
                             <div className="flex items-center gap-2.5">
-                                <div className="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center shadow-lg shadow-primary-200">
-                                    <Calendar className="w-6 h-6 text-white" />
+                                <div className="w-10 h-10 rounded-xl bg-signal flex items-center justify-center shadow-lg">
+                                    <Calendar className="w-6 h-6 text-signal-ink" />
                                 </div>
                                 <div>
-                                    <span className="text-xl font-heading font-black text-surface-900 dark:text-white tracking-tight">
+                                    <span className="text-xl font-heading font-black text-ink tracking-tight">
                                         {t('plans.weekly_plan')}
                                     </span>
                                     <div className="flex items-center gap-1.5">
                                         <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-surface-400">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-muted">
                                             {t('plans.diet_exercise')}
                                         </span>
                                     </div>
@@ -350,7 +350,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
 
                         <Link
                             href={`/shopping-list/${planId}`}
-                            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-surface-900 text-white font-bold hover:bg-surface-800 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+                            className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-ink text-paper font-bold hover:bg-ink/90 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
                             data-testid="nav-shopping-list"
                             onMouseEnter={() => router.prefetch(`/shopping-list/${planId}`)}
                         >
@@ -362,7 +362,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
             </header>
 
             {/* Tab Navigation */}
-            <div className="bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-800 transition-colors duration-300">
+            <div className="bg-paper-2 border-b border-rule transition-colors duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex gap-4 py-4">
                         <button
@@ -370,8 +370,8 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                             className={cn(
                                 "flex items-center gap-3 px-6 py-3 rounded-2xl font-bold transition-all duration-300",
                                 activeTab === 'diet'
-                                    ? "bg-primary-600 text-white shadow-lg shadow-primary-200"
-                                    : "bg-surface-50 dark:bg-surface-800 text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-700"
+                                    ? "bg-signal text-signal-ink shadow-lg"
+                                    : "bg-paper-2 text-muted hover:bg-paper-3"
                             )}
                             data-testid="tab-diet"
                         >
@@ -383,8 +383,8 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                             className={cn(
                                 "flex items-center gap-3 px-6 py-3 rounded-2xl font-bold transition-all duration-300",
                                 activeTab === 'exercise'
-                                    ? "bg-blue-600 text-white shadow-lg shadow-blue-200"
-                                    : "bg-surface-50 dark:bg-surface-800 text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-700"
+                                    ? "bg-signal text-signal-ink"
+                                    : "bg-paper-2 text-muted hover:bg-paper-3"
                             )}
                             data-testid="tab-exercise"
                         >
@@ -436,8 +436,8 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                                 className={cn(
                                                     "shrink-0 snap-center flex flex-col items-center gap-1 px-4 py-3 rounded-2xl transition-all duration-300 min-w-[72px]",
                                                     selectedDietDay === day.dayOfWeek
-                                                        ? "bg-primary-600 text-white shadow-lg shadow-primary-200/50 dark:shadow-none"
-                                                        : "bg-white dark:bg-surface-800 text-surface-500 dark:text-surface-400 border border-surface-200 dark:border-surface-700"
+                                                        ? "bg-signal text-signal-ink shadow-lg dark:shadow-none"
+                                                        : "bg-paper-2 text-muted border border-rule"
                                                 )}
                                             >
                                                 <span className="text-xs font-black uppercase tracking-wide">
@@ -452,7 +452,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
 
                                     {/* Desktop: Vertical sidebar (original) */}
                                     <div className="hidden lg:block sticky top-40 space-y-2">
-                                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-surface-400 mb-6 pl-2">
+                                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted mb-6 pl-2">
                                             {t('plans.calendar')}
                                         </h3>
                                         {optimisticPlan.days.map((day) => (
@@ -465,15 +465,15 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                                 className={cn(
                                                     "w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 group",
                                                     selectedDietDay === day.dayOfWeek
-                                                        ? "bg-white dark:bg-surface-800 shadow-xl shadow-primary-100/50 dark:shadow-none border border-primary-100 dark:border-primary-900 text-primary-600 dark:text-primary-400"
-                                                        : "text-surface-500 dark:text-surface-400 hover:bg-white dark:hover:bg-surface-800 hover:shadow-md border border-transparent"
+                                                        ? "bg-paper-2 shadow-xl dark:shadow-none border border-rule text-signal-text"
+                                                        : "text-muted hover:bg-paper-2 hover:shadow-md border border-transparent"
                                                 )}
                                             >
                                                 <div className={cn(
                                                     "w-10 h-10 rounded-xl flex items-center justify-center font-black transition-all",
                                                     selectedDietDay === day.dayOfWeek
-                                                        ? "bg-primary-600 text-white rotate-3"
-                                                        : "bg-surface-100 dark:bg-surface-800 text-surface-400 dark:text-surface-500 group-hover:bg-primary-50 dark:group-hover:bg-primary-900/30 group-hover:text-primary-500 dark:group-hover:text-primary-400"
+                                                        ? "bg-signal text-signal-ink rotate-3"
+                                                        : "bg-paper-2 text-muted group-hover:bg-paper-3 group-hover:text-signal-text"
                                                 )}>
                                                     {getDayName(day.dayOfWeek, language).charAt(0)}
                                                 </div>
@@ -504,12 +504,12 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                                 data-testid={`diet-day-content-${dayData.dayOfWeek}`}
                                                 className="space-y-6"
                                             >
-                                                <div className="flex items-end justify-between px-2 pt-4 border-t border-surface-200 dark:border-surface-800 first:border-t-0 first:pt-0">
+                                                <div className="flex items-end justify-between px-2 pt-4 border-t border-rule first:border-t-0 first:pt-0">
                                                     <div>
-                                                        <h3 className="text-2xl sm:text-3xl font-heading font-black text-surface-900 dark:text-white">
+                                                        <h3 className="text-2xl sm:text-3xl font-heading font-black text-ink">
                                                             {getDayName(dayData.dayOfWeek, language)}
                                                         </h3>
-                                                        <p className="text-primary-600 dark:text-primary-400 font-bold mt-1 text-sm">
+                                                        <p className="text-signal-text font-bold mt-1 text-sm">
                                                             {dayData.totalKcal} kcal · {dayData.meals.length} {t('plans.meals')}
                                                         </p>
                                                     </div>
@@ -546,10 +546,10 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                             >
                                                 <div className="flex items-end justify-between px-2">
                                                     <div>
-                                                        <h3 className="text-4xl font-heading font-black text-surface-900 dark:text-white">
+                                                        <h3 className="text-4xl font-heading font-black text-ink">
                                                             {getDayName(selectedDietDayData.dayOfWeek, language)}
                                                         </h3>
-                                                        <p className="text-primary-600 dark:text-primary-400 font-bold mt-1">
+                                                        <p className="text-signal-text font-bold mt-1">
                                                             {selectedDietDayData.totalKcal} kcal · {selectedDietDayData.meals.length} {t('plans.meals')}
                                                         </p>
                                                     </div>
@@ -594,30 +594,30 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                             {isLoadingExercise && !exercisePlan ? (
                                 <div className="animate-pulse space-y-10">
                                     {/* Header Skeleton */}
-                                    <div className="h-48 rounded-3xl bg-surface-200 dark:bg-surface-800" />
+                                    <div className="h-48 rounded-3xl bg-paper-3" />
                                     
                                     <div className="flex flex-col lg:flex-row gap-10">
                                         {/* Sidebar Skeleton */}
                                         <aside className="lg:w-80 shrink-0 space-y-4">
                                             {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-                                                <div key={i} className="h-20 rounded-2xl bg-surface-200 dark:bg-surface-800" />
+                                                <div key={i} className="h-20 rounded-2xl bg-paper-3" />
                                             ))}
                                         </aside>
                                         
                                         {/* Detail Skeleton */}
-                                        <div className="flex-1 h-[600px] rounded-3xl bg-surface-200 dark:bg-surface-800" />
+                                        <div className="flex-1 h-[600px] rounded-3xl bg-paper-3" />
                                     </div>
                                 </div>
                             ) : exercisePlan ? (
                                 <>
                                     {/* Exercise Summary Header */}
-                                    <div className="bg-linear-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 text-white shadow-2xl shadow-blue-200/50">
+                                    <div className="bg-signal rounded-3xl p-8 text-signal-ink">
                                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                                             <div>
                                                 <h2 className="text-3xl font-heading font-black mb-2">
                                                     {t('exercise.title')}
                                                 </h2>
-                                                <p className="text-blue-100">
+                                                <p className="text-signal-ink/80">
                                                     {t('exercise.days_per_week').replace('{{count}}', exercisePlan.daysPerWeek.toString())}
                                                 </p>
                                             </div>
@@ -626,13 +626,13 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                                     <div className="text-4xl font-black">
                                                         {exercisePlan.workoutDays.filter(d => !d.isRestDay).length}
                                                     </div>
-                                                    <div className="text-sm text-blue-200">{t('exercise.active_days')}</div>
+                                                    <div className="text-sm text-signal-ink/70">{t('exercise.active_days')}</div>
                                                 </div>
                                                 <div className="text-center">
                                                     <div className="text-4xl font-black">
                                                         {exercisePlan.workoutDays.reduce((sum, d) => sum + d.caloriesBurned, 0)}
                                                     </div>
-                                                    <div className="text-sm text-blue-200">{t('exercise.kcal_week')}</div>
+                                                    <div className="text-sm text-signal-ink/70">{t('exercise.kcal_week')}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -660,8 +660,8 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                                         className={cn(
                                                             "shrink-0 snap-center flex flex-col items-center gap-1 px-4 py-3 rounded-2xl transition-all duration-300 min-w-[72px]",
                                                             selectedExerciseDay === day.dayOfWeek
-                                                                ? "bg-blue-600 text-white shadow-lg shadow-blue-200/50 dark:shadow-none"
-                                                                : "bg-white dark:bg-surface-800 text-surface-500 dark:text-surface-400 border border-surface-200 dark:border-surface-700"
+                                                                ? "bg-signal text-signal-ink"
+                                                                : "bg-paper-2 text-muted border border-rule"
                                                         )}
                                                     >
                                                         <span className="text-xs font-black uppercase tracking-wide">
@@ -676,7 +676,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
 
                                             {/* Desktop: Vertical sidebar (original) */}
                                             <div className="hidden lg:block sticky top-40 space-y-2">
-                                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-surface-400 mb-6 pl-2">
+                                                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-muted mb-6 pl-2">
                                                     {t('exercise.routine')}
                                                 </h3>
                                                 {exercisePlan.workoutDays.map((day) => (
@@ -720,7 +720,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
                                     </div>
                                 </>
                             ) : (
-                                <div className="text-center py-20 text-surface-500">
+                                <div className="text-center py-20 text-muted">
                                     <p>{t('exercise.no_plan')}</p>
                                 </div>
                             )}

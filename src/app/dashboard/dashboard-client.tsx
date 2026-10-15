@@ -106,8 +106,8 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
 
   if (isUserLoading) {
     return (
-      <div className="min-h-screen bg-surface-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+      <div className="min-h-screen bg-paper-2 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-signal-text animate-spin" />
       </div>
     );
   }
@@ -118,10 +118,10 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {/* Welcome */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-surface-900 dark:text-white mb-2">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-ink mb-2">
             {t('dash.welcome')}
           </h1>
-          <p className="text-sm sm:text-base text-surface-600 dark:text-surface-300">
+          <p className="text-sm sm:text-base text-muted">
             {t('dash.subtitle')}
           </p>
         </div>
@@ -131,14 +131,14 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
           <button
             onClick={generateNewPlan}
             disabled={isGenerating}
-            className="group relative overflow-hidden rounded-2xl border border-primary-100 dark:border-primary-900 bg-white dark:bg-surface-800 p-5 sm:p-6 transition-all hover:shadow-lg hover:border-primary-300 dark:hover:border-primary-700 text-left min-h-[120px] sm:min-h-auto"
+            className="group relative overflow-hidden rounded-2xl border border-rule bg-paper-2 p-5 sm:p-6 transition-all hover:shadow-lg hover:border-signal text-left min-h-[120px] sm:min-h-auto"
             data-testid="quick-action-generate"
           >
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                <Sparkles className="w-32 h-32 text-primary-600 dark:text-primary-400 rotate-12" />
+                <Sparkles className="w-32 h-32 text-signal-text rotate-12" />
             </div>
             <div className="relative z-10 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-primary-500/30 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-xl bg-signal flex items-center justify-center text-signal-ink group-hover:scale-110 transition-transform">
                 {isGenerating ? (
                   <Loader2 className="w-6 h-6 animate-spin" />
                 ) : (
@@ -146,38 +146,38 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
                 )}
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-heading font-semibold text-surface-900 dark:text-white mb-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                <h3 className="text-lg font-heading font-semibold text-ink mb-1 group-hover:text-signal-text transition-colors">
                   {t('dash.generate_plan')}
                 </h3>
-                <p className="text-surface-600 dark:text-surface-300 text-sm">
+                <p className="text-muted text-sm">
                   {t('dash.generate_subtitle')}
                 </p>
               </div>
-              <ChevronRight className="w-5 h-5 text-surface-400 group-hover:text-primary-600 transition-colors" />
+              <ChevronRight className="w-5 h-5 text-muted group-hover:text-signal-text transition-colors" />
             </div>
           </button>
 
           <Link
             href="/settings"
-            className="group relative overflow-hidden rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 p-5 sm:p-6 transition-all hover:shadow-lg hover:border-surface-300 dark:hover:border-surface-600 text-left min-h-[120px] sm:min-h-auto"
+            className="group relative overflow-hidden rounded-2xl border border-rule bg-paper-2 p-5 sm:p-6 transition-all hover:shadow-lg hover:border-rule text-left min-h-[120px] sm:min-h-auto"
             data-testid="quick-action-profile"
           >
             <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                <Settings className="w-32 h-32 text-surface-600 dark:text-surface-400 rotate-12" />
+                <Settings className="w-32 h-32 text-muted rotate-12" />
             </div>
             <div className="relative z-10 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-surface-500 to-surface-700 flex items-center justify-center text-white shadow-lg shadow-surface-500/20 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 rounded-xl bg-paper-3 flex items-center justify-center text-ink group-hover:scale-110 transition-transform">
                 <Settings className="w-6 h-6" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-heading font-semibold text-surface-900 dark:text-white mb-1 group-hover:text-surface-700 dark:group-hover:text-surface-200 transition-colors">
+                <h3 className="text-lg font-heading font-semibold text-ink mb-1 group-hover:text-ink transition-colors">
                   {t('dash.configure_profile')}
                 </h3>
-                <p className="text-surface-600 dark:text-surface-300 text-sm">
+                <p className="text-muted text-sm">
                   {t('dash.configure_subtitle')}
                 </p>
               </div>
-              <ChevronRight className="w-5 h-5 text-surface-400 group-hover:text-surface-600 transition-colors" />
+              <ChevronRight className="w-5 h-5 text-muted group-hover:text-ink transition-colors" />
             </div>
           </Link>
         </div>
@@ -185,27 +185,27 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
         {/* Active Plan or CTA */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-heading font-semibold text-surface-900 dark:text-white flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-primary-500" />
+            <h2 className="text-xl font-heading font-semibold text-ink flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-signal-text" />
               {t('dash.active_plan')}
             </h2>
             <Link 
               href="/plans"
-              className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 flex items-center gap-1"
+              className="text-sm font-medium text-signal-text hover:text-signal-text flex items-center gap-1"
             >
               {t('dash.view_history')} <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
 
           {!displayPlans.find(p => p.status === 'active') ? (
-            <div className="card text-center py-12 border-dashed border-2 border-surface-200 dark:border-surface-700 bg-transparent shadow-none">
-              <div className="w-16 h-16 rounded-full bg-surface-100 dark:bg-surface-800 flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="w-8 h-8 text-surface-400" />
+            <div className="card text-center py-12 border-dashed border-2 border-rule bg-transparent shadow-none">
+              <div className="w-16 h-16 rounded-full bg-paper-2 flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="w-8 h-8 text-muted" />
               </div>
-              <h3 className="text-lg font-medium text-surface-700 dark:text-surface-200 mb-2">
+              <h3 className="text-lg font-medium text-ink mb-2">
                 {t('dash.no_active_plan')}
               </h3>
-              <p className="text-surface-500 dark:text-surface-400 mb-6 max-w-sm mx-auto">
+              <p className="text-muted mb-6 max-w-sm mx-auto">
                 {t('dash.no_plan_subtitle')}
               </p>
               <button
@@ -228,17 +228,17 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
                 <div
                   key={plan.id}
                   onClick={() => router.push(`/plan/${plan.id}`)}
-                  className="group relative overflow-hidden rounded-2xl border border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 p-6 md:p-8 transition-all hover:shadow-xl hover:border-primary-200 dark:hover:border-primary-800 cursor-pointer"
+                  className="group relative overflow-hidden rounded-2xl border border-rule bg-paper-2 p-6 md:p-8 transition-all hover:shadow-xl hover:border-signal cursor-pointer"
                   data-testid="active-plan-card"
                 >
                   {/* Subtle Background Decoration */}
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-primary-50 dark:bg-primary-900/10 rounded-full blur-3xl -mr-32 -mt-32 opacity-50 pointer-events-none"></div>
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-paper-3 rounded-full blur-3xl -mr-32 -mt-32 opacity-50 pointer-events-none"></div>
 
                   <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                       <div className="flex items-start gap-6">
                            {/* Date Box */}
-                          <div className="flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-surface-50 dark:bg-surface-700 border border-surface-100 dark:border-surface-600 shadow-xs text-surface-900 dark:text-white">
-                             <span className="text-[10px] font-bold uppercase tracking-wider text-surface-500">
+                          <div className="flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-paper-2 border border-rule shadow-xs text-ink">
+                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
                                {t('dash.week')}
                              </span>
                              <span className="text-2xl font-bold font-heading">{new Date(plan.weekStart).getDate()}</span>
@@ -246,7 +246,7 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
                           
                           <div>
                             <div className="flex items-center gap-3 mb-2">
-                                <h3 className="font-heading font-bold text-xl md:text-2xl text-surface-900 dark:text-white">
+                                <h3 className="font-heading font-bold text-xl md:text-2xl text-ink">
                                     {t('dash.smart_plan_title')}
                                 </h3>
                                 <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800">
@@ -260,12 +260,12 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
                                 </div>
                             </div>
                             
-                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-surface-500 dark:text-surface-400">
+                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted">
                                 <span className="flex items-center gap-2">
-                                    <Target className="w-4 h-4 text-primary-500" />
-                                    <span className="font-medium text-surface-700 dark:text-surface-300">{plan.targetKcal} kcal</span> {t('dash.daily')}
+                                    <Target className="w-4 h-4 text-signal-text" />
+                                    <span className="font-medium text-ink">{plan.targetKcal} kcal</span> {t('dash.daily')}
                                 </span>
-                                <span className="hidden sm:inline w-1 h-1 rounded-full bg-surface-300 dark:bg-surface-600"></span>
+                                <span className="hidden sm:inline w-1 h-1 rounded-full bg-paper-3"></span>
                                 <span>
                                   {t('dash.created')} {new Date(plan.createdAt).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                                 </span>
@@ -279,9 +279,9 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
                                 e.stopPropagation();
                                 router.push(`/shopping-list/${plan.id}`);
                             }}
-                            className="relative overflow-hidden inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 text-surface-700 dark:text-surface-200 font-medium shadow-xs hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-all group/btn"
+                            className="relative overflow-hidden inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-paper-2 border border-rule text-ink font-medium shadow-xs hover:border-signal hover:text-signal-text transition-all group/btn"
                         >
-                            <span className="absolute inset-0 bg-primary-50 dark:bg-primary-900/20 opacity-0 group-hover/btn:opacity-100 transition-opacity"></span>
+                            <span className="absolute inset-0 bg-paper-3 opacity-0 group-hover/btn:opacity-100 transition-opacity"></span>
                             <ShoppingCart className="w-4 h-4" />
                             <span>{t('dash.shopping_list')}</span>
                         </button>
@@ -292,7 +292,7 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
                                 deletePlan(plan.id);
                             }}
                             disabled={isDeleting === plan.id}
-                            className="p-2.5 rounded-xl text-surface-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+                            className="p-2.5 rounded-xl text-muted hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
                             title={t('common.delete')}
                         >
                             {isDeleting === plan.id ? (
@@ -302,7 +302,7 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
                             )}
                         </button>
                         
-                        <div className="hidden lg:flex items-center justify-center w-10 h-10 rounded-full border border-transparent group-hover:border-surface-200 dark:group-hover:border-surface-700 text-surface-300 group-hover:text-primary-600 transition-all">
+                        <div className="hidden lg:flex items-center justify-center w-10 h-10 rounded-full border border-transparent group-hover:border-rule text-muted group-hover:text-signal-text transition-all">
                             <ChevronRight className="w-5 h-5" />
                         </div>
                       </div>

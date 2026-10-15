@@ -205,8 +205,8 @@ export default function SettingsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-surface-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+      <div className="min-h-screen bg-paper-2 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-signal-text animate-spin" />
       </div>
     );
   }
@@ -214,17 +214,17 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-page-gradient pt-16 pb-8">
       {/* Header */}
-      <header className="bg-white dark:bg-surface-900 border-b border-surface-200 dark:border-surface-800 sticky top-16 z-10 transition-colors duration-300">
+      <header className="bg-paper-2 border-b border-rule sticky top-16 z-10 transition-colors duration-300">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
               <Link
                 href="/dashboard"
-                className="p-2 rounded-lg hover:bg-surface-100 transition-colors"
+                className="p-2 rounded-lg hover:bg-paper-3 transition-colors"
               >
-                <ArrowLeft className="w-5 h-5 text-surface-600 dark:text-surface-300" />
+                <ArrowLeft className="w-5 h-5 text-muted" />
               </Link>
-              <h1 className="text-lg sm:text-xl font-heading font-bold text-surface-900 dark:text-white">
+              <h1 className="text-lg sm:text-xl font-heading font-bold text-ink">
                 {t('settings.title')}
               </h1>
             </div>
@@ -241,10 +241,10 @@ export default function SettingsPage() {
           {/* Personal Data */}
           <div className="card">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
-                <User className="w-5 h-5 text-primary-600" />
+              <div className="w-10 h-10 rounded-xl bg-paper-3 flex items-center justify-center">
+                <User className="w-5 h-5 text-signal-text" />
               </div>
-              <h2 className="text-base sm:text-lg font-heading font-semibold text-surface-900 dark:text-white">
+              <h2 className="text-base sm:text-lg font-heading font-semibold text-ink">
                 {t('settings.personal_data')}
               </h2>
             </div>
@@ -253,7 +253,7 @@ export default function SettingsPage() {
               <div>
                 <label className="label">{t('onboarding.username_label')}</label>
                 <div className="flex items-center gap-2">
-                  <span className="text-surface-400">@</span>
+                  <span className="text-muted">@</span>
                   <input
                     {...register('username')}
                     placeholder={t('settings.username_placeholder')}
@@ -261,7 +261,7 @@ export default function SettingsPage() {
                     data-testid="settings-username"
                   />
                 </div>
-                <p className="mt-1 text-xs text-surface-500">{t('settings.username_hint')}</p>
+                <p className="mt-1 text-xs text-muted">{t('settings.username_hint')}</p>
                 {errors.username && (
                   <p className="mt-1 text-sm text-red-600">
                     {t(`errors.${errors.username.message}`)}
@@ -340,9 +340,9 @@ export default function SettingsPage() {
           <div className="card">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-accent-100 flex items-center justify-center">
-                <Activity className="w-5 h-5 text-accent-600" />
+                <Activity className="w-5 h-5 text-signal-text" />
               </div>
-              <h2 className="text-base sm:text-lg font-heading font-semibold text-surface-900 dark:text-white">
+              <h2 className="text-base sm:text-lg font-heading font-semibold text-ink">
                 {t('settings.activity_diet')}
               </h2>
             </div>
@@ -384,7 +384,7 @@ export default function SettingsPage() {
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
                 <AlertIcon className="w-5 h-5 text-amber-600" />
               </div>
-              <h2 className="text-lg font-heading font-semibold text-surface-900 dark:text-white">
+              <h2 className="text-lg font-heading font-semibold text-ink">
                 {t('settings.allergens_title')}
               </h2>
             </div>
@@ -400,7 +400,7 @@ export default function SettingsPage() {
                     className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                       isSelected
                         ? 'bg-amber-500 text-white'
-                        : 'bg-surface-100 text-surface-600 hover:bg-surface-200 dark:bg-surface-700 dark:text-surface-300 dark:hover:bg-surface-600'
+                        : 'bg-paper-2 text-muted hover:bg-paper-3'
                     }`}
                     data-testid={`allergen-${allergen.id}`}
                   >
@@ -410,9 +410,9 @@ export default function SettingsPage() {
               })}
             </div>
 
-            <div className="mt-8 border-t border-surface-100 dark:border-surface-800 pt-6">
+            <div className="mt-8 border-t border-rule pt-6">
               <label className="label mb-2 flex items-center gap-2">
-                <Activity className="w-4 h-4 text-primary-500" />
+                <Activity className="w-4 h-4 text-signal-text" />
                 {t('settings.conditions_label')}
               </label>
               <textarea
@@ -420,7 +420,7 @@ export default function SettingsPage() {
                 className="input min-h-[100px] text-sm"
                 placeholder={t('settings.conditions_placeholder')}
               />
-              <p className="mt-2 text-xs text-surface-500 italic">
+              <p className="mt-2 text-xs text-muted italic">
                 {t('settings.conditions_hint')}
               </p>
             </div>

@@ -49,29 +49,29 @@ export function ExerciseDayCard({ day, isSelected, onClick }: ExerciseCardProps)
             className={cn(
                 "w-full flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 group text-left",
                 isSelected
-                    ? "bg-white dark:bg-surface-800 shadow-xl shadow-blue-100/50 dark:shadow-none border border-blue-100 dark:border-blue-900"
-                    : "hover:bg-white dark:hover:bg-surface-800 hover:shadow-md border border-transparent"
+                    ? "bg-paper-2 border border-signal"
+                    : "hover:bg-paper-2 hover:shadow-md border border-transparent"
             )}
         >
             <div className={cn(
                 "w-12 h-12 rounded-xl flex items-center justify-center font-black transition-all",
                 isSelected
-                    ? `${TYPE_COLORS[day.type as keyof typeof TYPE_COLORS] || 'bg-gray-500'} text-white rotate-3`
-                    : "bg-surface-100 dark:bg-surface-700 text-surface-400 dark:text-surface-300 group-hover:bg-blue-50 dark:group-hover:bg-blue-900/30 group-hover:text-blue-500 dark:group-hover:text-blue-400"
+                    ? `${TYPE_COLORS[day.type as keyof typeof TYPE_COLORS] || 'bg-muted'} text-white rotate-3`
+                    : "bg-paper-2 text-muted group-hover:bg-paper-3 group-hover:text-signal-text"
             )}>
                 {day.isRestDay ? '😴' : <Dumbbell size={20} />}
             </div>
             <div className="flex-1">
-                <div className="font-heading font-black text-sm uppercase tracking-wide text-surface-900 dark:text-white">
+                <div className="font-heading font-black text-sm uppercase tracking-wide text-ink">
                     {getDayName(day.dayOfWeek, language)}
                 </div>
-                <div className="text-xs font-medium text-surface-500 dark:text-surface-400">
+                <div className="text-xs font-medium text-muted">
                     {day.name}
                 </div>
             </div>
             {!day.isRestDay && (
                 <div className="flex items-center gap-3 text-xs">
-                    <div className="flex items-center gap-1 text-surface-400 dark:text-surface-500">
+                    <div className="flex items-center gap-1 text-muted">
                         <Clock size={12} />
                         <span>{day.totalDurationMin}min</span>
                     </div>
@@ -83,7 +83,7 @@ export function ExerciseDayCard({ day, isSelected, onClick }: ExerciseCardProps)
             )}
             <ChevronRight className={cn(
                 "w-5 h-5 transition-transform",
-                isSelected ? "text-blue-500 rotate-90" : "text-surface-300"
+                isSelected ? "text-signal-text rotate-90" : "text-muted"
             )} />
         </motion.button>
     );
@@ -98,12 +98,12 @@ export function ExerciseDetail({ day }: ExerciseDetailProps) {
     
     if (day.isRestDay) {
         return (
-            <div className="bg-white dark:bg-surface-800 rounded-3xl p-8 shadow-xl shadow-surface-200/50 dark:shadow-none text-center transition-colors duration-300">
+            <div className="bg-paper-2 rounded-3xl p-8 shadow-xl dark:shadow-none text-center transition-colors duration-300">
                 <div className="text-6xl mb-4">🧘‍♂️</div>
-                <h3 className="text-2xl font-heading font-black text-surface-900 dark:text-white mb-2">
+                <h3 className="text-2xl font-heading font-black text-ink mb-2">
                     {t('exercise.rest_day')}
                 </h3>
-                <p className="text-surface-500 dark:text-surface-400">
+                <p className="text-muted">
                     {t('exercise.rest_desc')}
                 </p>
             </div>
@@ -130,11 +130,11 @@ export function ExerciseDetail({ day }: ExerciseDetailProps) {
     };
 
     return (
-        <div className="bg-white dark:bg-surface-800 rounded-3xl shadow-xl shadow-surface-200/50 dark:shadow-none overflow-hidden transition-colors duration-300">
+        <div className="bg-paper-2 rounded-3xl shadow-xl dark:shadow-none overflow-hidden transition-colors duration-300">
             {/* Header */}
             <div className={cn(
                 "p-6 text-white",
-                TYPE_COLORS[day.type as keyof typeof TYPE_COLORS] || 'bg-gray-500'
+                TYPE_COLORS[day.type as keyof typeof TYPE_COLORS] || 'bg-muted'
             )}>
                 <div className="flex items-center justify-between">
                     <div>
@@ -166,16 +166,16 @@ export function ExerciseDetail({ day }: ExerciseDetailProps) {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.05 }}
-                        className="flex items-center gap-4 p-4 rounded-2xl bg-surface-50 dark:bg-surface-700 hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
+                        className="flex items-center gap-4 p-4 rounded-2xl bg-paper-2 hover:bg-paper-3 transition-colors"
                     >
-                        <div className="w-10 h-10 rounded-xl bg-surface-200 dark:bg-surface-600 flex items-center justify-center font-black text-surface-600 dark:text-surface-200">
+                        <div className="w-10 h-10 rounded-xl bg-paper-3 flex items-center justify-center font-black text-muted">
                             {idx + 1}
                         </div>
                         <div className="flex-1">
-                            <div className="font-bold text-surface-900 dark:text-white">
+                            <div className="font-bold text-ink">
                                 {exercise.exerciseName}
                             </div>
-                            <div className="text-sm text-surface-500 dark:text-surface-400">
+                            <div className="text-sm text-muted">
                                 {exercise.sets} series × {exercise.reps ? `${exercise.reps} reps` : `${exercise.durationSec}s`}
                                 <span className="mx-2">·</span>
                                 <span className="text-orange-500">

@@ -68,13 +68,13 @@ const ToastItem = React.forwardRef<HTMLDivElement, { toast: Toast; onHide: (id: 
                     {icons[toast.type]}
                 </div>
 
-                <p className="flex-1 text-sm font-bold text-surface-900 dark:text-white mb-0 leading-tight">
+                <p className="flex-1 text-sm font-bold text-ink mb-0 leading-tight">
                     {toast.message}
                 </p>
 
                 <button
                     onClick={() => onHide(toast.id)}
-                    className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-surface-400 hover:text-surface-900 dark:hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                    className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-muted hover:text-ink transition-all opacity-0 group-hover:opacity-100"
                 >
                     <X size={16} />
                 </button>

@@ -173,8 +173,8 @@ export default function PlansPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-surface-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+      <div className="min-h-screen bg-paper-2 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-signal-text animate-spin" />
       </div>
     );
   }
@@ -184,10 +184,10 @@ export default function PlansPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-heading font-bold text-surface-900 dark:text-white mb-2">
+            <h1 className="text-2xl font-heading font-bold text-ink mb-2">
               {t('plans.title')}
             </h1>
-            <p className="text-surface-600 dark:text-surface-300">
+            <p className="text-muted">
               {t('plans.subtitle')}
             </p>
           </div>
@@ -209,20 +209,20 @@ export default function PlansPage() {
 
         {/* Active Plans */}
         <section className="mb-12" data-testid="active-plans-section">
-          <h2 className="text-xl font-heading font-semibold text-surface-900 dark:text-white mb-4 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-primary-500" />
+          <h2 className="text-xl font-heading font-semibold text-ink mb-4 flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-signal-text" />
             {t('plans.active_title')}
           </h2>
 
           {activePlans.length === 0 ? (
             <div className="card text-center py-12 border-dashed">
-              <p className="text-surface-500 dark:text-surface-400 mb-4">
+              <p className="text-muted mb-4">
                 {t('plans.no_active')}
               </p>
               <button
                 onClick={generateNewPlan}
                 disabled={isGenerating}
-                className="text-primary-600 hover:text-primary-700 font-medium"
+                className="text-signal-text hover:text-signal-text font-medium"
               >
                 {t('plans.generate_now')} &rarr;
               </button>
@@ -233,13 +233,13 @@ export default function PlansPage() {
                 <div
                   key={plan.id}
                   onClick={() => router.push(`/plan/${plan.id}`)}
-                  className="card hover:border-primary-300 transition-all duration-200 group cursor-pointer relative overflow-hidden"
+                  className="card hover:border-signal transition-all duration-200 group cursor-pointer relative overflow-hidden"
                   data-testid={`plan-item-${plan.id}`}
                 >
-                  <div className="absolute top-0 left-0 w-1 h-full bg-primary-500"></div>
+                  <div className="absolute top-0 left-0 w-1 h-full bg-signal"></div>
                   <div className="flex items-start justify-between mb-4">
-                    <div className="p-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
-                      <Calendar className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                    <div className="p-2 bg-paper-3 rounded-lg">
+                      <Calendar className="w-6 h-6 text-signal-text" />
                     </div>
                     <div className="flex gap-2">
                          <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
@@ -251,7 +251,7 @@ export default function PlansPage() {
                                 deletePlan(plan.id);
                             }}
                             disabled={isDeleting === plan.id}
-                            className="p-1 rounded-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-surface-400 hover:text-red-500 transition-colors"
+                            className="p-1 rounded-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-muted hover:text-red-500 transition-colors"
                          >
                             {isDeleting === plan.id ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -262,24 +262,24 @@ export default function PlansPage() {
                     </div>
                   </div>
                   
-                  <h3 className="font-semibold text-lg text-surface-900 dark:text-white mb-1">
+                  <h3 className="font-semibold text-lg text-ink mb-1">
                     {t('plans.week_of')} {formatDate(plan.weekStart)}
                   </h3>
-                  <p className="text-surface-500 dark:text-surface-400 text-sm mb-4">
+                  <p className="text-muted text-sm mb-4">
                     {plan.targetKcal} {t('plans.kcal_day')}
                   </p>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-surface-100 dark:border-surface-800">
+                  <div className="flex items-center justify-between pt-4 border-t border-rule">
                     <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                        <Link
                         href={`/shopping-list/${plan.id}`}
-                        className="text-sm font-medium text-surface-600 hover:text-primary-600 flex items-center gap-1 transition-colors"
+                        className="text-sm font-medium text-muted hover:text-signal-text flex items-center gap-1 transition-colors"
                       >
                         <ShoppingCart className="w-4 h-4" />
                         {t('dash.shopping_list')}
                        </Link>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-surface-400 group-hover:text-primary-600 transition-colors" />
+                    <ChevronRight className="w-5 h-5 text-muted group-hover:text-signal-text transition-colors" />
                   </div>
                 </div>
               ))}
@@ -290,8 +290,8 @@ export default function PlansPage() {
         {/* Archived Plans */}
         {archivedPlans.length > 0 && (
           <section>
-            <h2 className="text-xl font-heading font-semibold text-surface-900 dark:text-white mb-4 flex items-center gap-2">
-              <Archive className="w-5 h-5 text-surface-500" />
+            <h2 className="text-xl font-heading font-semibold text-ink mb-4 flex items-center gap-2">
+              <Archive className="w-5 h-5 text-muted" />
               {t('plans.history_title')}
             </h2>
             <div className="space-y-3">
@@ -299,17 +299,17 @@ export default function PlansPage() {
                  <div
                   key={plan.id}
                   onClick={() => router.push(`/plan/${plan.id}`)}
-                  className="card flex items-center gap-4 hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors cursor-pointer py-3"
+                  className="card flex items-center gap-4 hover:bg-paper-3 transition-colors cursor-pointer py-3"
                 >
-                  <div className="p-2 bg-surface-100 dark:bg-surface-800 rounded-lg text-surface-500">
+                  <div className="p-2 bg-paper-2 rounded-lg text-muted">
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-medium text-surface-700 dark:text-surface-200">
+                    <h3 className="font-medium text-ink">
                       {t('plans.week_of')} {formatDate(plan.weekStart)}
                     </h3>
                   </div>
-                  <div className="text-sm text-surface-500 dark:text-surface-400 mr-2">
+                  <div className="text-sm text-muted mr-2">
                     {plan.targetKcal} kcal
                   </div>
                    <button
@@ -318,7 +318,7 @@ export default function PlansPage() {
                             deletePlan(plan.id);
                         }}
                         disabled={isDeleting === plan.id}
-                        className="p-2 rounded-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-surface-400 hover:text-red-500 transition-colors"
+                        className="p-2 rounded-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-muted hover:text-red-500 transition-colors"
                     >
                         {isDeleting === plan.id ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -326,7 +326,7 @@ export default function PlansPage() {
                             <Trash2 className="w-4 h-4" />
                         )}
                     </button>
-                  <ChevronRight className="w-4 h-4 text-surface-400" />
+                  <ChevronRight className="w-4 h-4 text-muted" />
                 </div>
               ))}
             </div>

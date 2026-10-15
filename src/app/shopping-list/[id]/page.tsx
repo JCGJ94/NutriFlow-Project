@@ -58,12 +58,12 @@ const CATEGORY_STYLES: Record<string, { icon: any, color: string, bg: string, bo
   [IngredientCategory.PROTEIN]: { icon: Beef, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/10', border: 'border-rose-100 dark:border-rose-800/30' },
   [IngredientCategory.DAIRY]: { icon: Milk, color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-900/10', border: 'border-sky-100 dark:border-sky-800/30' },
   [IngredientCategory.GRAIN]: { icon: Wheat, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/10', border: 'border-amber-100 dark:border-amber-800/30' },
-  [IngredientCategory.LEGUME]: { icon: Bean, color: 'text-teal-600 dark:text-teal-400', bg: 'bg-teal-50 dark:bg-teal-900/10', border: 'border-teal-100 dark:border-teal-800/30' },
+  [IngredientCategory.LEGUME]: { icon: Bean, color: 'text-signal-text', bg: 'bg-teal-50', border: 'border-teal-100' },
   [IngredientCategory.FAT]: { icon: Droplet, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/10', border: 'border-yellow-100 dark:border-yellow-800/30' },
   [IngredientCategory.NUT_SEED]: { icon: Leaf, color: 'text-lime-600 dark:text-lime-400', bg: 'bg-lime-50 dark:bg-lime-900/10', border: 'border-lime-100 dark:border-lime-800/30' },
-  [IngredientCategory.CONDIMENT]: { icon: Info, color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-50 dark:bg-slate-900/10', border: 'border-slate-100 dark:border-slate-800/30' },
+  [IngredientCategory.CONDIMENT]: { icon: Info, color: 'text-muted', bg: 'bg-slate-50', border: 'border-slate-100' },
   [IngredientCategory.CARBOHYDRATE]: { icon: Wheat, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/10', border: 'border-amber-100 dark:border-amber-800/30' },
-  ['default']: { icon: Info, color: 'text-primary-600 dark:text-primary-400', bg: 'bg-primary-50 dark:bg-primary-900/10', border: 'border-primary-100 dark:border-primary-800/30' },
+  ['default']: { icon: Info, color: 'text-signal-text', bg: 'bg-paper-3', border: 'border-rule' },
 };
 
 // Logical Display Order
@@ -391,21 +391,21 @@ export default function ShoppingListPage() {
   const progress = totalItems > 0 ? (checkedItems / totalItems) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-surface-50 dark:bg-surface-950 pb-20 pt-24 transition-colors duration-300">
+    <div className="min-h-screen bg-paper-2 pb-20 pt-24 transition-colors duration-300">
       
       {/* Dynamic Header */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 fade-in-up">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
               <div>
                   <div className="flex items-center gap-3 mb-2">
-                       <button onClick={() => router.back()} className="p-2 -ml-2 text-surface-400 hover:text-surface-900 dark:hover:text-white transition-colors">
+                       <button onClick={() => router.back()} className="p-2 -ml-2 text-muted hover:text-ink transition-colors">
                            <ArrowLeft className="w-6 h-6" />
                        </button>
-                       <h1 className="text-3xl font-heading font-bold text-surface-900 dark:text-white">
+                       <h1 className="text-3xl font-heading font-bold text-ink">
                            {t('shop.title')}
                        </h1>
                   </div>
-                  <p className="text-surface-500 dark:text-surface-400 font-medium">
+                  <p className="text-muted font-medium">
                       {t('shop.progress').replace('{{checked}}', checkedItems.toString()).replace('{{total}}', totalItems.toString())}
                   </p>
               </div>
@@ -413,14 +413,14 @@ export default function ShoppingListPage() {
               <div className="flex gap-2">
                    <button 
                       onClick={handleShare}
-                      className="btn-secondary flex items-center gap-2 bg-white dark:bg-surface-800 shadow-xs border border-surface-200 dark:border-surface-700 hover:shadow-md transition-all"
+                      className="btn-secondary flex items-center gap-2 bg-paper-2 shadow-xs border border-rule hover:shadow-md transition-all"
                    >
                        <Share2 className="w-4 h-4" />
                        <span>{t('shop.share')}</span>
                    </button>
                    <button 
                       onClick={handlePreviewPDF}
-                      className="btn-primary flex items-center gap-2 bg-surface-900 text-white dark:bg-white dark:text-surface-900 hover:scale-[1.02] shadow-lg shadow-surface-900/10 transition-transform"
+                      className="btn-primary flex items-center gap-2 bg-ink text-paper hover:scale-[1.02] shadow-lg transition-transform"
                    >
                        <Printer className="w-4 h-4" />
                        <span>PDF</span>
@@ -429,9 +429,9 @@ export default function ShoppingListPage() {
           </div>
 
           {/* Elegant Progress Bar */}
-          <div className="h-2 w-full bg-surface-200 dark:bg-surface-800 rounded-full overflow-hidden">
+          <div className="h-2 w-full bg-paper-3 rounded-full overflow-hidden">
               <div 
-                  className="h-full bg-linear-to-r from-emerald-500 to-teal-400 transition-all duration-700 ease-out shadow-[0_0_12px_rgba(16,185,129,0.4)]"
+                  className="h-full bg-signal transition-all duration-700 ease-out"
                   style={{ width: `${progress}%` }}
               />
           </div>
@@ -441,21 +441,21 @@ export default function ShoppingListPage() {
           
           {/* Custom Item Input (Capsule Style) */}
           <form onSubmit={handleAddCustomItem} className="relative z-10 group max-w-xl mx-auto">
-              <div className="relative flex items-center bg-white dark:bg-surface-800 rounded-full shadow-lg shadow-surface-900/5 dark:shadow-black/20 hover:shadow-xl transition-all duration-300 border border-surface-100 dark:border-surface-700/50">
+              <div className="relative flex items-center bg-paper-2 rounded-full shadow-lg dark:shadow-black/20 hover:shadow-xl transition-all duration-300 border border-rule">
                   <input 
                       type="text" 
                       value={newItemName}
                       onChange={(e) => setNewItemName(e.target.value)}
                       placeholder={t('shop.add_custom')}
-                      className="w-full bg-transparent border-none text-lg py-3.5 pl-6 pr-14 placeholder:text-surface-400 text-surface-900 dark:text-white focus:ring-0 rounded-full bg-transparent"
+                      className="w-full bg-transparent border-none text-lg py-3.5 pl-6 pr-14 placeholder:text-ink text-ink focus:ring-0 rounded-full"
                   />
                   <div className="absolute right-1.5 top-1.5 bottom-1.5">
                       <button 
                           type="submit"
                           disabled={!newItemName.trim()}
                           className={`h-full aspect-square rounded-full flex items-center justify-center transition-all duration-300 ${newItemName.trim() 
-                              ? 'bg-primary-500 text-white shadow-md hover:bg-primary-600 hover:scale-105 rotate-0 opacity-100' 
-                              : 'bg-surface-100 dark:bg-surface-700 text-surface-300 dark:text-surface-500 -rotate-90 opacity-0 pointer-events-none scale-75'
+                              ? 'bg-signal text-signal-ink shadow-md hover:bg-signal/90 hover:scale-105 rotate-0 opacity-100' 
+                              : 'bg-paper-2 text-muted -rotate-90 opacity-0 pointer-events-none scale-75'
                           }`}
                       >
                           <Plus className="w-5 h-5" />
@@ -476,12 +476,12 @@ export default function ShoppingListPage() {
                   const completed = items.every(i => i.isChecked);
 
                   return (
-                      <div key={cat} className={`break-inside-avoid bg-white dark:bg-surface-900 rounded-3xl border ${style.border} shadow-xs transition-all duration-300 ${completed ? 'opacity-80 grayscale-[0.3]' : 'hover:shadow-md'}`}>
+                      <div key={cat} className={`break-inside-avoid bg-paper-2 rounded-3xl border ${style.border} shadow-xs transition-all duration-300 ${completed ? 'opacity-80 grayscale-[0.3]' : 'hover:shadow-md'}`}>
                           
                           {/* Header */}
                           <div 
                               onClick={() => toggleCategory(cat)}
-                              className={`cursor-pointer px-5 py-4 flex items-center justify-between border-b ${isCollapsed ? 'border-transparent' : style.border} transition-colors bg-linear-to-br from-transparent to-surface-50/50 dark:to-white/5 rounded-t-3xl`}
+                              className={`cursor-pointer px-5 py-4 flex items-center justify-between border-b ${isCollapsed ? 'border-transparent' : style.border} transition-colors rounded-t-3xl`}
                           >
                               <div className="flex items-center gap-3">
                                   <div className={`p-2.5 rounded-xl ${style.bg} ${style.color}`}>
@@ -491,12 +491,12 @@ export default function ShoppingListPage() {
                                       <h3 className={`font-bold text-lg leading-none mb-1 ${style.color.split(' ')[0]}`}>
                                           {t(`cat.${cat.toUpperCase()}`) || cat}
                                       </h3>
-                                      <p className="text-xs text-surface-400 font-medium">
+                                      <p className="text-xs text-muted font-medium">
                                           {t('common.ingredientes_count').replace('{{count}}', items.length.toString())}
                                       </p>
                                   </div>
                               </div>
-                              <ChevronDown className={`w-5 h-5 text-surface-400 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`} />
+                              <ChevronDown className={`w-5 h-5 text-muted transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`} />
                           </div>
 
                           {/* Items */}
@@ -506,18 +506,18 @@ export default function ShoppingListPage() {
                                       <div 
                                           key={item.id}
                                           onClick={() => toggleItem(item.id, item.isChecked)}
-                                          className={`group flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all ${item.isChecked ? 'bg-surface-50 dark:bg-surface-800/50' : 'hover:bg-surface-50 dark:hover:bg-surface-800/50 check-mode'}`}
+                                          className={`group flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all ${item.isChecked ? 'bg-paper-2' : 'hover:bg-paper-3 check-mode'}`}
                                       >
-                                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${item.isChecked ? 'bg-surface-400 border-surface-400 dark:bg-surface-600 dark:border-surface-600' : 'border-surface-300 dark:border-surface-600 group-hover:border-primary-400'}`}>
-                                              <Check className={`w-3 h-3 text-white transition-opacity ${item.isChecked ? 'opacity-100' : 'opacity-0'}`} />
+                                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${item.isChecked ? 'bg-muted border-muted' : 'border-rule group-hover:border-signal'}`}>
+                                              <Check className={`w-3 h-3 text-paper transition-opacity ${item.isChecked ? 'opacity-100' : 'opacity-0'}`} />
                                           </div>
                                           
                                           <div className="flex-1 min-w-0">
-                                              <p className={`font-medium truncate transition-all ${item.isChecked ? 'text-surface-400 line-through' : 'text-surface-700 dark:text-surface-200'}`}>
+                                              <p className={`font-medium truncate transition-all ${item.isChecked ? 'text-muted line-through' : 'text-ink'}`}>
                                                   {cleanIngredientName(language === 'en' && item.ingredientNameEn ? item.ingredientNameEn : item.ingredientName, language)}
                                               </p>
                                               {item.totalGrams && !item.isChecked && (
-                                                  <p className="text-xs text-surface-400 font-medium">
+                                                  <p className="text-xs text-muted font-medium">
                                                       {formatGrams(item.totalGrams)}
                                                   </p>
                                               )}
@@ -527,7 +527,7 @@ export default function ShoppingListPage() {
                                           {item.isChecked && (
                                               <button 
                                                   onClick={(e) => { e.stopPropagation(); handleDeleteClick(item); }}
-                                                  className="p-1.5 rounded-lg text-surface-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all opacity-100"
+                                                  className="p-1.5 rounded-lg text-muted hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all opacity-100"
                                                   title={t('common.delete')} // Actually "Uncheck" effectively
                                               >
                                                   <Trash2 className="w-4 h-4" />
@@ -543,12 +543,12 @@ export default function ShoppingListPage() {
 
               {/* Custom Items Section */}
               {customItems.length > 0 && (
-                  <div className="break-inside-avoid bg-white dark:bg-surface-900 rounded-3xl border border-dashed border-surface-300 dark:border-surface-700 shadow-xs">
-                      <div className="px-5 py-4 border-b border-surface-200 dark:border-surface-800 flex items-center gap-3">
-                          <div className="p-2 bg-surface-100 dark:bg-surface-800 rounded-xl text-surface-500">
+                  <div className="break-inside-avoid bg-paper-2 rounded-3xl border border-dashed border-rule shadow-xs">
+                      <div className="px-5 py-4 border-b border-rule flex items-center gap-3">
+                          <div className="p-2 bg-paper-2 rounded-xl text-muted">
                              <Plus className="w-5 h-5" />
                           </div>
-                          <h3 className="font-bold text-lg text-surface-900 dark:text-white">
+                          <h3 className="font-bold text-lg text-ink">
                               {t('shop.custom_section')}
                           </h3>
                       </div>
@@ -557,17 +557,17 @@ export default function ShoppingListPage() {
                               <div 
                                   key={item.id}
                                   onClick={() => toggleItem(item.id, item.isChecked)}
-                                  className={`group flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all ${item.isChecked ? 'bg-surface-50 dark:bg-surface-800/50' : 'hover:bg-surface-50 dark:hover:bg-surface-800/50'}`}
+                                  className={`group flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all ${item.isChecked ? 'bg-paper-2' : 'hover:bg-paper-3'}`}
                               >
-                                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${item.isChecked ? 'bg-surface-400 border-surface-400' : 'border-surface-300 group-hover:border-primary-400'}`}>
-                                      <Check className={`w-3 h-3 text-white transition-opacity ${item.isChecked ? 'opacity-100' : 'opacity-0'}`} />
+                                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${item.isChecked ? 'bg-muted border-muted' : 'border-rule group-hover:border-signal'}`}>
+                                      <Check className={`w-3 h-3 text-paper transition-opacity ${item.isChecked ? 'opacity-100' : 'opacity-0'}`} />
                                   </div>
-                                  <p className={`flex-1 font-medium truncate transition-all ${item.isChecked ? 'text-surface-400 line-through' : 'text-surface-900 dark:text-white'}`}>
+                                  <p className={`flex-1 font-medium truncate transition-all ${item.isChecked ? 'text-muted line-through' : 'text-ink'}`}>
                                       {item.ingredientName}
                                   </p>
                                   <button 
                                       onClick={(e) => { e.stopPropagation(); handleDeleteClick(item); }}
-                                      className="p-1.5 rounded-lg text-surface-300 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+                                      className="p-1.5 rounded-lg text-muted hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
                                   >
                                       <Trash2 className="w-4 h-4" />
                                   </button>
@@ -581,11 +581,11 @@ export default function ShoppingListPage() {
           {/* Empty State */}
           {totalItems === 0 && (
               <div className="text-center py-20 animate-fade-in">
-                  <div className="w-24 h-24 bg-surface-100 dark:bg-surface-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <LayoutGrid className="w-10 h-10 text-surface-400" />
+                  <div className="w-24 h-24 bg-paper-2 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <LayoutGrid className="w-10 h-10 text-muted" />
                   </div>
-                  <h2 className="text-xl font-bold text-surface-900 dark:text-white mb-2">{t('shop.empty')}</h2>
-                  <p className="text-surface-500 max-w-sm mx-auto">{t('shop.no_custom')}</p>
+                  <h2 className="text-xl font-bold text-ink mb-2">{t('shop.empty')}</h2>
+                  <p className="text-muted max-w-sm mx-auto">{t('shop.no_custom')}</p>
               </div>
           )}
 
@@ -594,26 +594,26 @@ export default function ShoppingListPage() {
       {/* PDF Preview Modal */}
       {isPreviewOpen && pdfPreviewUrl && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-              <div className="bg-white dark:bg-surface-900 rounded-3xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="bg-paper-2 rounded-3xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
                   {/* Modal Header */}
-                  <div className="flex items-center justify-between px-6 py-4 border-b border-surface-100 dark:border-surface-800">
-                      <h3 className="text-lg font-bold text-surface-900 dark:text-white flex items-center gap-2">
-                          <Printer className="w-5 h-5 text-primary-500" />
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-rule">
+                      <h3 className="text-lg font-bold text-ink flex items-center gap-2">
+                          <Printer className="w-5 h-5 text-signal-text" />
                           {t('shop.pdf_preview')}
                       </h3>
                       <button 
                           onClick={closePreview}
-                          className="p-2 rounded-full hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
+                          className="p-2 rounded-full hover:bg-paper-3 transition-colors"
                       >
                           <span className="sr-only">Close</span>
-                          <svg className="w-6 h-6 text-surface-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="w-6 h-6 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
                       </button>
                   </div>
 
                   {/* PDF Viewer (Iframe) */}
-                  <div className="flex-1 bg-surface-100 dark:bg-surface-950 p-0 overflow-hidden relative group">
+                  <div className="flex-1 bg-paper-2 p-0 overflow-hidden relative group">
                       <iframe 
                           src={pdfPreviewUrl} 
                           className="w-full h-full border-0" 
@@ -622,16 +622,16 @@ export default function ShoppingListPage() {
                   </div>
 
                   {/* Modal Footer */}
-                  <div className="p-4 border-t border-surface-100 dark:border-surface-800 bg-white dark:bg-surface-900 flex justify-end gap-3">
+                  <div className="p-4 border-t border-rule bg-paper-2 flex justify-end gap-3">
                       <button 
                           onClick={closePreview}
-                          className="px-5 py-2.5 rounded-full text-surface-600 font-medium hover:bg-surface-50 dark:text-surface-300 dark:hover:bg-surface-800 transition-colors"
+                          className="px-5 py-2.5 rounded-full text-muted font-medium hover:bg-paper-3 transition-colors"
                       >
                           {t('common.close')}
                       </button>
                       <button 
                           onClick={() => { handleDownloadPDF(); closePreview(); }}
-                          className="px-6 py-2.5 rounded-full bg-surface-900 text-white dark:bg-white dark:text-surface-900 font-bold hover:shadow-lg hover:scale-[1.02] transition-all flex items-center gap-2"
+                          className="px-6 py-2.5 rounded-full bg-ink text-paper font-bold hover:shadow-lg hover:scale-[1.02] transition-all flex items-center gap-2"
                       >
                           <Download className="w-4 h-4" />
                           {t('common.download')}

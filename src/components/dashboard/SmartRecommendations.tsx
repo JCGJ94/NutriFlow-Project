@@ -126,9 +126,9 @@ export function SmartRecommendations() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col sm:flex-row items-center justify-center p-8 sm:p-12 bg-white dark:bg-surface-800 rounded-2xl border border-surface-100 dark:border-surface-700 shadow-xs mb-6 sm:mb-8">
-        <Loader2 className="w-8 h-8 text-primary-600 animate-spin mb-2 sm:mb-0 sm:mr-3" />
-        <span className="text-sm sm:text-base text-surface-600 dark:text-surface-300 font-medium text-center">
+      <div className="flex flex-col sm:flex-row items-center justify-center p-8 sm:p-12 bg-paper-2 rounded-2xl border border-rule shadow-xs mb-6 sm:mb-8">
+        <Loader2 className="w-8 h-8 text-signal-text animate-spin mb-2 sm:mb-0 sm:mr-3" />
+        <span className="text-sm sm:text-base text-muted font-medium text-center">
           {t('rec.loading')}
         </span>
       </div>
@@ -140,14 +140,14 @@ export function SmartRecommendations() {
   return (
     <section className="mb-8 sm:mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-        <div className="p-2 sm:p-2.5 bg-linear-to-br from-primary-500 to-indigo-600 rounded-xl shadow-lg shadow-primary-500/20">
-          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+        <div className="p-2 sm:p-2.5 rounded-xl bg-signal">
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-signal-ink" />
         </div>
         <div>
-            <h2 className="text-lg sm:text-xl md:text-2xl font-heading font-bold text-surface-900 dark:text-white leading-none mb-1">
-              {t('rec.title')} <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-600 to-indigo-600 dark:from-primary-400 dark:to-indigo-400">{t('rec.title_highlight')}</span>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-heading font-bold text-ink leading-none mb-1">
+              {t('rec.title')} <span className="text-signal-text">{t('rec.title_highlight')}</span>
             </h2>
-            <p className="text-xs sm:text-sm text-surface-500 dark:text-surface-400">{t('rec.subtitle')}</p>
+            <p className="text-xs sm:text-sm text-muted">{t('rec.subtitle')}</p>
         </div>
       </div>
 
@@ -160,7 +160,7 @@ export function SmartRecommendations() {
           return (
           <div 
             key={rec.doc_id}
-            className="group relative bg-white dark:bg-surface-800 rounded-3xl overflow-hidden shadow-xl shadow-surface-200/50 dark:shadow-black/20 border border-surface-100 dark:border-surface-700 hover:border-primary-300 dark:hover:border-primary-600 transition-all duration-500 flex flex-col"
+            className="group relative bg-paper-2 rounded-3xl overflow-hidden shadow-xl dark:shadow-black/20 border border-rule hover:border-signal transition-all duration-500 flex flex-col"
           >
             {/* Image Header */}
             <div className="relative h-48 overflow-hidden">
@@ -181,7 +181,7 @@ export function SmartRecommendations() {
                     <div className={`p-3 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg ${
                         visuals.color === 'amber' ? 'bg-amber-500/20 text-amber-300' :
                         visuals.color === 'blue' ? 'bg-blue-500/20 text-blue-300' :
-                        visuals.color === 'purple' ? 'bg-purple-500/20 text-purple-300' :
+                        visuals.color === 'purple' ? 'bg-purple-500/20 text-signal-text' :
                         'bg-emerald-500/20 text-emerald-300'
                     }`}>
                         <Icon className="w-6 h-6" />
@@ -191,23 +191,23 @@ export function SmartRecommendations() {
 
             <div className="p-6 flex-1 flex flex-col relative">
                 {/* Content */}
-                <h3 className="text-xl font-heading font-bold text-surface-900 dark:text-white mb-2 leading-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                <h3 className="text-xl font-heading font-bold text-ink mb-2 leading-tight group-hover:text-signal-text transition-colors">
                   {localizedContent.title}
                 </h3>
                 
-                <div className="w-12 h-1 bg-surface-100 dark:bg-surface-700 rounded-full mb-4 group-hover:bg-primary-500 transition-colors duration-500" />
+                <div className="w-12 h-1 bg-paper-2 rounded-full mb-4 group-hover:bg-paper-3 transition-colors duration-500" />
                 
-                <p className="text-surface-600 dark:text-surface-300 text-sm leading-relaxed mb-6 line-clamp-3">
+                <p className="text-muted text-sm leading-relaxed mb-6 line-clamp-3">
                   {localizedContent.content.replace(/[#*]/g, '').substring(0, 150)}...
                 </p>
 
-                <div className="mt-auto pt-4 border-t border-surface-100 dark:border-surface-700/50 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-surface-400 uppercase tracking-wider">
+                <div className="mt-auto pt-4 border-t border-rule flex items-center justify-between">
+                    <span className="text-xs font-semibold text-muted uppercase tracking-wider">
                         {t('rec.ai_engine')}
                     </span>
                     <Link 
                     href={`/protocols/${rec.doc_id}`}
-                    className="flex items-center text-sm font-bold text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 transition-colors group/btn"
+                    className="flex items-center text-sm font-bold text-signal-text hover:text-signal-text transition-colors group/btn"
                     >
                     {t('rec.read_more')}
                     <ChevronRight className="w-4 h-4 ml-1 transition-transform group-hover/btn:translate-x-1" />
