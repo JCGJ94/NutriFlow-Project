@@ -6,7 +6,7 @@ import { generateExercisePlan, ExerciseProfile } from '@/lib/exercise-engine';
 import { translatePlan } from '@/lib/llm/narration';
 import { fetchFullPlan } from '@/lib/plans/fetch-full-plan';
 import type { UserProfile, IngredientData } from '@/lib/diet-engine/types';
-import { PlanStatus } from '@nutriflow/shared';
+import { DietPattern, PlanStatus } from '@nutriflow/shared';
 
 // Vercel max function duration for LLM routes (design decision D4)
 export const maxDuration = 60;
@@ -142,7 +142,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
             heightCm: p.height_cm,
             activityLevel: p.activity_level,
             mealsPerDay: p.meals_per_day ?? 3,
-            dietPattern: p.diet_pattern ?? 'OMNIVORE',
+            dietPattern: p.diet_pattern ?? DietPattern.OMNIVORE,
             weightGoalKg: p.weight_goal_kg,
             allergenIds,
             language: p.language ?? 'es',

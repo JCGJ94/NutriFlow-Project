@@ -1,28 +1,24 @@
 import {
-    Sex,
     ActivityLevel,
-    DietPattern,
     MealType,
     DayOfWeek,
     IngredientCategory,
 } from '@nutriflow/shared';
+import type { ProfileResponse } from '@nutriflow/shared';
 
 // ---- Input Types ----
 
-export interface UserProfile {
-    id: string;
-    age: number;
-    sex: Sex;
-    weightKg: number;
-    heightCm: number;
-    activityLevel: ActivityLevel;
-    mealsPerDay: number;
-    dietPattern: DietPattern;
+// The nutrition-relevant fields come from the shared profile contract so the
+// engine can never drift from what the API validates and persists.
+export type UserProfile = Pick<
+    ProfileResponse,
+    'id' | 'age' | 'sex' | 'weightKg' | 'heightCm' | 'activityLevel' | 'mealsPerDay' | 'dietPattern'
+> & {
     weightGoalKg?: number;
     allergenIds: string[];
     language?: string;
     healthConditions?: string;
-}
+};
 
 export interface IngredientData {
     id: string;

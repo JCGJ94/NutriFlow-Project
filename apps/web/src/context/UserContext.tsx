@@ -5,7 +5,10 @@ import { createClient } from '@/lib/supabase/client';
 import { User } from '@supabase/supabase-js';
 
 // Define the shape of the profile data
-export interface UserProfile {
+// Raw `profiles` row as read straight from Supabase (snake_case). Replaced by the
+// generated Database types in Phase 2; renamed so it no longer collides with the
+// engine and API profile shapes.
+export interface ProfileRow {
   id: string;
   username?: string;
   // fullName field removed from DB
@@ -24,7 +27,7 @@ export interface UserProfile {
 
 interface UserContextType {
   user: User | null;
-  profile: UserProfile | null;
+  profile: ProfileRow | null;
   isLoading: boolean;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -34,7 +37,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const supabase = createClient();
@@ -51,7 +54,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         console.error('Error fetching profile:', error);
         return null;
       }
-      return data as UserProfile;
+      return data as ProfileRow;
     } catch (err) {
       console.error('Unexpected error fetching profile:', err);
       return null;

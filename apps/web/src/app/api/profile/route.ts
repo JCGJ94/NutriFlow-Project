@@ -1,27 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireUser, ApiError } from '@/lib/auth/guards';
-import { z } from 'zod';
-
-// ---- Zod schema --------------------------------------------------------
-
-const UpsertProfileSchema = z.object({
-    username: z.string().optional(),
-    age: z.number().int().min(18).max(100).optional(),
-    sex: z.enum(['MALE', 'FEMALE']).optional(),
-    weightKg: z.number().min(30).max(300).optional(),
-    heightCm: z.number().int().min(100).max(250).optional(),
-    activityLevel: z
-        .enum(['SEDENTARY', 'LIGHTLY_ACTIVE', 'MODERATELY_ACTIVE', 'VERY_ACTIVE', 'EXTRA_ACTIVE'])
-        .optional(),
-    mealsPerDay: z.number().int().min(2).max(6).optional(),
-    dietPattern: z
-        .enum(['OMNIVORE', 'VEGETARIAN', 'VEGAN', 'KETO', 'MEDITERRANEAN', 'PALEO'])
-        .optional(),
-    weightGoalKg: z.number().min(30).max(300).optional(),
-    language: z.enum(['es', 'en']).optional(),
-    healthConditions: z.string().optional(),
-});
+import { DietPattern, UpsertProfileSchema } from '@nutriflow/shared';
 
 // ---- DB → DTO mapping --------------------------------------------------
 
@@ -139,7 +119,7 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
                     height_cm: dto.heightCm,
                     activity_level: dto.activityLevel,
                     meals_per_day: dto.mealsPerDay ?? 3,
-                    diet_pattern: dto.dietPattern ?? 'OMNIVORE',
+                    diet_pattern: dto.dietPattern ?? DietPattern.OMNIVORE,
                     weight_goal_kg: dto.weightGoalKg,
                     language: dto.language ?? 'es',
                     health_conditions: dto.healthConditions,

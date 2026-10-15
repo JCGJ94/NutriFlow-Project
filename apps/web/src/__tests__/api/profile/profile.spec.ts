@@ -17,6 +17,7 @@ vi.mock('@/lib/auth/guards', () => ({
     },
 }));
 
+import { ProfileResponseSchema } from '@nutriflow/shared';
 import { createClient } from '@/lib/supabase/server';
 import { requireUser, ApiError } from '@/lib/auth/guards';
 
@@ -46,12 +47,12 @@ describe('GET /api/profile', () => {
             id: 'user-abc',
             username: 'testuser',
             age: 30,
-            sex: 'MALE',
+            sex: 'male',
             weight_kg: 80,
             height_cm: 180,
-            activity_level: 'MODERATELY_ACTIVE',
+            activity_level: 'moderately_active',
             meals_per_day: 3,
-            diet_pattern: 'OMNIVORE',
+            diet_pattern: 'omnivore',
             weight_goal_kg: 75,
             language: 'es',
             health_conditions: null,
@@ -130,12 +131,12 @@ describe('PUT /api/profile', () => {
             id: 'user-abc',
             username: 'testuser',
             age: 30,
-            sex: 'MALE',
+            sex: 'male',
             weight_kg: 75,
             height_cm: 180,
-            activity_level: 'MODERATELY_ACTIVE',
+            activity_level: 'moderately_active',
             meals_per_day: 3,
-            diet_pattern: 'OMNIVORE',
+            diet_pattern: 'omnivore',
             weight_goal_kg: 70,
             language: 'es',
             health_conditions: null,
@@ -163,12 +164,129 @@ describe('PUT /api/profile', () => {
 
         const { PUT } = await import('@/app/api/profile/route');
         const req = makeRequest(
-            { weightKg: 75, age: 30, sex: 'MALE', heightCm: 180, activityLevel: 'MODERATELY_ACTIVE' },
+            { weightKg: 75, age: 30, sex: 'male', heightCm: 180, activityLevel: 'moderately_active' },
             'PUT',
         );
         const res = await PUT(req);
 
         expect(res.status).toBe(200);
+    });
+
+    it('returns a body that satisfies the shared ProfileResponse contract', async () => {
+        vi.mocked(requireUser).mockResolvedValue(mockUser as any);
+
+        const dbProfile = {
+            id: 'user-abc',
+            username: 'testuser',
+            age: 30,
+            sex: 'male',
+            weight_kg: 75,
+            height_cm: 180,
+            activity_level: 'moderately_active',
+            meals_per_day: 3,
+            diet_pattern: 'omnivore',
+            weight_goal_kg: null,
+            language: 'es',
+            health_conditions: null,
+            created_at: '2024-01-01T00:00:00.000Z',
+            updated_at: '2024-01-02T00:00:00.000Z',
+        };
+        const sb = {
+            from: vi.fn().mockReturnValue({
+                select: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                        single: vi.fn().mockResolvedValue({ data: dbProfile, error: null }),
+                    }),
+                }),
+                update: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                        select: vi.fn().mockReturnValue({
+                            single: vi.fn().mockResolvedValue({ data: dbProfile, error: null }),
+                        }),
+                    }),
+                }),
+            }),
+        };
+        vi.mocked(createClient).mockResolvedValue(sb as any);
+
+        const { PUT } = await import('@/app/api/profile/route');
+        const res = await PUT(makeRequest({ weightKg: 75 }, 'PUT'));
+
+        expect(res.status).toBe(200);
+        expect(ProfileResponseSchema.safeParse(await res.json()).success).toBe(true);
+    });
+
+    it('rejects uppercase enum values with 400 and the { error, details } envelope', async () => {
+        vi.mocked(requireUser).mockResolvedValue(mockUser as any);
+        vi.mocked(createClient).mockResolvedValue({} as any);
+
+        const { PUT } = await import('@/app/api/profile/route');
+        const res = await PUT(makeRequest({ sex: 'MALE', activityLevel: 'MODERATELY_ACTIVE' }, 'PUT'));
+
+        expect(res.status).toBe(400);
+        const body = await res.json();
+        expect(body.error).toBe('Invalid input');
+        expect(Array.isArray(body.details)).toBe(true);
+    });
+
+    it('rejects diet patterns the database cannot store', async () => {
+        vi.mocked(requireUser).mockResolvedValue(mockUser as any);
+        vi.mocked(createClient).mockResolvedValue({} as any);
+
+        const { PUT } = await import('@/app/api/profile/route');
+        const res = await PUT(makeRequest({ dietPattern: 'keto' }, 'PUT'));
+
+        expect(res.status).toBe(400);
+    });
+
+    it('inserts lowercase values and defaults diet_pattern to omnivore for a new profile', async () => {
+        vi.mocked(requireUser).mockResolvedValue(mockUser as any);
+
+        const inserted = {
+            id: 'user-abc',
+            age: 30,
+            sex: 'male',
+            weight_kg: 75,
+            height_cm: 180,
+            activity_level: 'moderately_active',
+            meals_per_day: 3,
+            diet_pattern: 'omnivore',
+            created_at: '2024-01-01T00:00:00.000Z',
+            updated_at: '2024-01-01T00:00:00.000Z',
+        };
+        const insert = vi.fn().mockReturnValue({
+            select: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({ data: inserted, error: null }),
+            }),
+        });
+        const sb = {
+            from: vi.fn().mockReturnValue({
+                select: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                        single: vi.fn().mockResolvedValue({ data: null, error: null }),
+                    }),
+                }),
+                insert,
+            }),
+        };
+        vi.mocked(createClient).mockResolvedValue(sb as any);
+
+        const { PUT } = await import('@/app/api/profile/route');
+        const res = await PUT(
+            makeRequest(
+                { age: 30, sex: 'male', weightKg: 75, heightCm: 180, activityLevel: 'moderately_active' },
+                'PUT',
+            ),
+        );
+
+        expect(res.status).toBe(200);
+        expect(insert).toHaveBeenCalledWith(
+            expect.objectContaining({
+                sex: 'male',
+                activity_level: 'moderately_active',
+                diet_pattern: 'omnivore',
+            }),
+        );
     });
 
     it('returns 401 when unauthenticated', async () => {

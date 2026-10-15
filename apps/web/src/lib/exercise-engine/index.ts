@@ -4,13 +4,14 @@ import {
     GeneratedExerciseSet,
     ActivityLevel,
     ExerciseGoal,
+    Sex,
 } from '@nutriflow/shared';
 
 export interface ExerciseProfile {
     activityLevel: ActivityLevel;
     goal: ExerciseGoal;
     age: number;
-    sex: string;
+    sex: Sex;
     language?: 'es' | 'en';
 }
 
