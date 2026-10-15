@@ -5,7 +5,8 @@ import { generateWeeklyPlan } from '@/lib/diet-engine';
 import { generateExercisePlan, ExerciseProfile } from '@/lib/exercise-engine';
 import { translatePlan } from '@/lib/llm/narration';
 import { fetchFullPlan } from '@/lib/plans/fetch-full-plan';
-import type { UserProfile, IngredientData } from '@/lib/diet-engine/types';
+import { loadUserAllergenIds, loadIngredients } from '@/lib/plans/load-diet-inputs';
+import type { UserProfile } from '@/lib/diet-engine/types';
 import { DietPattern, PlanStatus } from '@nutriflow/shared';
 
 // Vercel max function duration for LLM routes (design decision D4)
@@ -105,32 +106,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         }
 
         // ---- Load allergens ---------------------------------------------
-        const { data: allergenData } = await sb
-            .from('user_allergens')
-            .select('allergen_id')
-            .eq('user_id', user.id);
-
-        const allergenIds = (allergenData || []).map((a: any) => a.allergen_id);
+        const allergenIds = await loadUserAllergenIds(sb as any, user.id);
 
         // ---- Load ingredients -------------------------------------------
-        const { data: ingredientData } = await sb
-            .from('ingredients')
-            .select('*');
-
-        const ingredients: IngredientData[] = (ingredientData || []).map((i: any) => ({
-            id: i.id,
-            name: i.name,
-            category: i.category,
-            allergenIds: i.allergen_ids || [],
-            kcalPer100g: i.kcal_per_100g,
-            proteinPer100g: i.protein_per_100g,
-            carbsPer100g: i.carbs_per_100g,
-            fatPer100g: i.fat_per_100g,
-            fiberPer100g: i.fiber_per_100g ?? 0,
-            isVegan: i.is_vegan ?? false,
-            isVegetarian: i.is_vegetarian ?? false,
-            dietPatterns: i.diet_patterns || [],
-        }));
+        const ingredients = await loadIngredients(sb as any);
 
         // ---- Build UserProfile for engine --------------------------------
         const p = profileData as any;

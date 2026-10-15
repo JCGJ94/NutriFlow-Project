@@ -89,7 +89,18 @@ function makeRequest(body?: object): NextRequest {
  * Build a Supabase mock that routes calls per table name.
  * Each table entry can override specific Supabase chain methods.
  */
-function buildSb(existingPlans: object[] = [], profileOverride: object | null = mockDbProfile) {
+interface SbExtras {
+    allergenRows?: object[];
+    allergenError?: { message: string } | null;
+    ingredientRows?: object[];
+    ingredientError?: { message: string } | null;
+}
+
+function buildSb(
+    existingPlans: object[] = [],
+    profileOverride: object | null = mockDbProfile,
+    extras: SbExtras = {},
+) {
     // eq() result supports both .order() (list query) and .single() (fetchFullPlan)
     const eqResult = {
         order: vi.fn().mockResolvedValue({ data: existingPlans, error: null }),
@@ -144,16 +155,22 @@ function buildSb(existingPlans: object[] = [], profileOverride: object | null = 
                 return planSelectChain;
             }
             if (table === 'profiles') return profileSelectChain;
-            if (table === 'user_allergens') {
+            if (table === 'profile_allergens') {
                 return {
                     select: vi.fn().mockReturnValue({
-                        eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+                        eq: vi.fn().mockResolvedValue({
+                            data: extras.allergenError ? null : (extras.allergenRows ?? []),
+                            error: extras.allergenError ?? null,
+                        }),
                     }),
                 };
             }
             if (table === 'ingredients') {
                 return {
-                    select: vi.fn().mockResolvedValue({ data: [], error: null }),
+                    select: vi.fn().mockResolvedValue({
+                        data: extras.ingredientError ? null : (extras.ingredientRows ?? []),
+                        error: extras.ingredientError ?? null,
+                    }),
                 };
             }
             if (table === 'plan_meals') return planMealsSelectChain;
@@ -209,6 +226,83 @@ describe('POST /api/plans/generate-week', () => {
 
         expect(res.status).toBe(201);
         expect(generateWeeklyPlan).toHaveBeenCalled();
+    });
+
+    describe('allergen safety', () => {
+        const ingredientRow = (id: string, allergenIds: string[]) => ({
+            id,
+            name: id,
+            category: 'protein',
+            kcal_per_100g: 100,
+            protein_per_100g: 10,
+            carbs_per_100g: 0,
+            fat_per_100g: 5,
+            ingredient_allergens: allergenIds.map((allergen_id) => ({ allergen_id })),
+        });
+
+        it("passes the user's allergens from profile_allergens to the engine", async () => {
+            vi.mocked(requireUser).mockResolvedValue(mockUser as any);
+            vi.mocked(createClient).mockResolvedValue(
+                buildSb([], mockDbProfile, {
+                    allergenRows: [{ allergen_id: 'gluten' }, { allergen_id: 'nuts' }],
+                }) as any,
+            );
+
+            const { POST } = await import('@/app/api/plans/generate-week/route');
+            const res = await POST(makeRequest({ weekStart: '2024-01-15' }));
+
+            expect(res.status).toBe(201);
+            const profileArg = vi.mocked(generateWeeklyPlan).mock.calls[0][0];
+            expect(profileArg.allergenIds).toEqual(['gluten', 'nuts']);
+        });
+
+        it('maps the ingredient_allergens join onto each ingredient', async () => {
+            vi.mocked(requireUser).mockResolvedValue(mockUser as any);
+            vi.mocked(createClient).mockResolvedValue(
+                buildSb([], mockDbProfile, {
+                    ingredientRows: [ingredientRow('bread', ['gluten']), ingredientRow('rice', [])],
+                }) as any,
+            );
+
+            const { POST } = await import('@/app/api/plans/generate-week/route');
+            await POST(makeRequest({ weekStart: '2024-01-15' }));
+
+            const ingredientsArg = vi.mocked(generateWeeklyPlan).mock.calls[0][1];
+            expect(ingredientsArg.map((i) => [i.id, i.allergenIds])).toEqual([
+                ['bread', ['gluten']],
+                ['rice', []],
+            ]);
+        });
+
+        it('fails with 500 instead of generating a plan when the allergen query errors', async () => {
+            vi.mocked(requireUser).mockResolvedValue(mockUser as any);
+            const sb = buildSb([], mockDbProfile, { allergenError: { message: 'relation does not exist' } });
+            vi.mocked(createClient).mockResolvedValue(sb as any);
+            const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            const { POST } = await import('@/app/api/plans/generate-week/route');
+            const res = await POST(makeRequest({ weekStart: '2024-01-15' }));
+
+            expect(res.status).toBe(500);
+            expect(generateWeeklyPlan).not.toHaveBeenCalled();
+            // The failure must come from the allergen query itself, not from an unrelated crash.
+            expect(String(logged.mock.calls[0][1])).toContain('Failed to load allergens: relation does not exist');
+        });
+
+        it('fails with 500 when the ingredients query errors', async () => {
+            vi.mocked(requireUser).mockResolvedValue(mockUser as any);
+            vi.mocked(createClient).mockResolvedValue(
+                buildSb([], mockDbProfile, { ingredientError: { message: 'boom' } }) as any,
+            );
+            const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+            const { POST } = await import('@/app/api/plans/generate-week/route');
+            const res = await POST(makeRequest({ weekStart: '2024-01-15' }));
+
+            expect(res.status).toBe(500);
+            expect(generateWeeklyPlan).not.toHaveBeenCalled();
+            expect(String(logged.mock.calls[0][1])).toContain('Failed to load ingredients: boom');
+        });
     });
 
     it('auto-archives oldest plan when user has 3 active plans', async () => {
