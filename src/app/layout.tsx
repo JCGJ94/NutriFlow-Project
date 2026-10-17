@@ -103,7 +103,7 @@ export default function RootLayout({
             '@type': 'Organization',
             name: 'NutriFlow',
             url: 'https://nutriflow.app',
-            logo: 'https://nutriflow.app/logo.png',
+            logo: 'https://nutriflow.app/brand/icon-512.png',
             sameAs: [
               'https://twitter.com/nutriflow_app',
               'https://instagram.com/nutriflow_app',
