@@ -28,14 +28,14 @@ const SHOPPING = [
 /** Illustrative product mock-up: one layer per story step, the active one is shown. */
 export function StoryPanel({ active, t }: { active: number; t: (k: string) => string }) {
   const layer = (n: number) =>
-    `absolute inset-0 flex flex-col justify-center gap-5 p-6 sm:p-8 transition-opacity duration-[420ms] ease-[var(--ease-out)] ${
+    `absolute inset-0 flex flex-col justify-center gap-4 p-5 pb-9 sm:gap-5 sm:p-8 transition-opacity duration-[420ms] ease-[var(--ease-out)] ${
       active === n ? 'opacity-100' : 'pointer-events-none opacity-0'
     }`;
-  const pill = 'rounded-full border px-3.5 py-1.5 text-base whitespace-nowrap';
+  const pill = 'rounded-full border px-3 py-1 text-base whitespace-nowrap sm:px-3.5 sm:py-1.5';
 
   return (
     <div
-      className="relative h-60 overflow-hidden rounded-3xl border border-rule bg-paper-2 sm:h-72 lg:h-[30rem]"
+      className="relative h-[17.5rem] shrink-0 overflow-hidden rounded-3xl border border-rule bg-paper-2 sm:h-72 lg:h-[30rem]"
       aria-hidden="true"
     >
       <div className={layer(0)}>

@@ -6,10 +6,10 @@ import { StoryPanel } from './StoryPanel';
 import { useReducedMotion } from './useReducedMotion';
 
 const SCENES = [
-  { src: '/landing/scene-1.webp', origin: '62% 48%' },
-  { src: '/landing/scene-2.webp', origin: '50% 55%' },
-  { src: '/landing/scene-3.webp', origin: '55% 50%' },
-  { src: '/landing/mealprep.webp', origin: '45% 55%' },
+  { src: '/landing/stage-1.webp', origin: '62% 58%' },
+  { src: '/landing/stage-2.webp', origin: '78% 58%' },
+  { src: '/landing/stage-3.webp', origin: '42% 72%' },
+  { src: '/landing/stage-4.webp', origin: '72% 58%' },
 ];
 const N = SCENES.length;
 const XF = 0.2; // overlap between two scenes, in scenes
@@ -129,13 +129,13 @@ export function ScrollWorld({ t }: { t: (k: string) => string }) {
             <Image src={s.src} alt="" fill sizes="100vw" className="object-cover" />
           </div>
         ))}
-        <div aria-hidden="true" className="absolute inset-0 bg-black/45" />
+        <div aria-hidden="true" className="absolute inset-0 bg-black/20" />
         <div aria-hidden="true" className="absolute inset-0 bg-linear-to-r from-black/70 via-black/35 to-transparent" />
         <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/70 to-transparent" />
 
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1200px] flex-col justify-center gap-7 px-5 pb-10 pt-20 sm:px-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16">
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1200px] flex-col justify-center gap-5 px-5 pb-10 pt-16 sm:gap-7 sm:px-8 sm:pt-20 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16">
           <div>
-            <h2 className="text-xl text-muted sm:text-2xl">{t('landing.story_title')}</h2>
+            <h2 className="text-xl text-muted [@media(max-height:700px)_and_(max-width:639px)]:hidden sm:text-2xl">{t('landing.story_title')}</h2>
             <div className="mt-5 grid">
               {[1, 2, 3, 4].map((n, i) => (
                 <div
