@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
 <circle cx="32" cy="32" r="23" fill="#4a53ff" fill-opacity=".14"/><circle cx="32" cy="32" r="23" stroke="currentColor" stroke-opacity=".3" stroke-width="1.2"/>
-<g stroke-width="4.4" stroke-linecap="round"><path d="M 34.02 3.07 A 29 29 0 0 1 53.36 12.38" stroke="#4a53ff"/><path d="M 55.88 15.54 A 29 29 0 0 1 60.65 36.47" stroke="#4a53ff"/><path d="M 59.75 40.41 A 29 29 0 0 1 46.37 57.19" stroke="#4a53ff"/><path d="M 42.73 58.94 A 29 29 0 0 1 21.27 58.94" stroke="#4a53ff"/><path d="M 17.63 57.19 A 29 29 0 0 1 4.25 40.41" stroke="#4a53ff"/><path d="M 3.35 36.47 A 29 29 0 0 1 8.12 15.54" stroke="currentColor" stroke-opacity=".28"/><path d="M 10.64 12.38 A 29 29 0 0 1 29.98 3.07" stroke="currentColor" stroke-opacity=".28"/></g>
+<g stroke-width="4.4" stroke-linecap="round"><path d="M 34.02 3.07 A 29 29 0 0 1 53.36 12.38" stroke="#4a53ff"/><path d="M 55.88 15.54 A 29 29 0 0 1 60.65 36.47" stroke="#4a53ff"/><path d="M 59.75 40.41 A 29 29 0 0 1 46.37 57.19" stroke="#4a53ff"/><path d="M 42.73 58.94 A 29 29 0 0 1 21.27 58.94" stroke="#4a53ff"/><path d="M 17.63 57.19 A 29 29 0 0 1 4.25 40.41" stroke="#4a53ff"/><path d="M 3.35 36.47 A 29 29 0 0 1 8.12 15.54" stroke="#4a53ff"/><path d="M 10.64 12.38 A 29 29 0 0 1 29.98 3.07" stroke="#4a53ff"/></g>
 <g stroke="currentColor" stroke-linecap="round">
 <path d="M32 36.9V27" stroke-width="2.6"/>
 <path d="M24.6 39.5h14.8" stroke-width="3.2"/>
