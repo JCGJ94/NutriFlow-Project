@@ -1,13 +1,18 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Petrona } from 'next/font/google';
 import './globals.css';
 import { Providers } from '../components/Providers';
 import { ToastContainer } from '../components/ui/Toast';
 import { Navbar } from '../components/Navbar';
 import { Footer } from '../components/Footer';
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
-const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
+// One family for the whole site: Petrona, variable weight, used as Light 300 Italic.
+const petrona = Petrona({
+  variable: '--font-petrona',
+  subsets: ['latin', 'latin-ext'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+});
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://nutriflow.app';
 
@@ -87,7 +92,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+    <html lang="es" className={petrona.variable} suppressHydrationWarning>
       <body className="antialiased" suppressHydrationWarning>
         <JsonLd
           data={{

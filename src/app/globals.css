@@ -8,18 +8,19 @@
 /* family with the lightness inverted.           */
 /* ============================================= */
 
-:root {
-  --paper: oklch(97% 0.01 75);
-  --paper-2: oklch(94% 0.012 75);
-  --paper-3: oklch(91% 0.014 75);
-  --rule: oklch(84% 0.01 75);
-  --muted: oklch(42% 0.01 60);
-  --ink: oklch(18% 0.012 55);
-  --signal: oklch(72% 0.165 58);
-  --signal-ink: oklch(20% 0.03 55);
-  --signal-text: oklch(52% 0.15 50);
-  --focus: oklch(55% 0.17 52);
-  --bloom: oklch(72% 0.165 58 / 0.18);
+:root,
+.light {
+  --paper: #ffffff;
+  --paper-2: #f3f5f9;
+  --paper-3: #e8ebf2;
+  --rule: #e5e7eb;
+  --muted: #5b6070;
+  --ink: #000000;
+  --signal: #4a53ff;
+  --signal-ink: #ffffff;
+  --signal-text: #3f47e6;
+  --focus: #4a53ff;
+  --bloom: rgb(74 83 255 / 0.18);
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
@@ -30,17 +31,17 @@
 }
 
 .dark {
-  --paper: oklch(15% 0.012 55);
-  --paper-2: oklch(19% 0.014 55);
-  --paper-3: oklch(23% 0.016 55);
-  --rule: oklch(32% 0.012 55);
-  --muted: oklch(72% 0.01 60);
-  --ink: oklch(95% 0.008 70);
-  --signal: oklch(78% 0.16 62);
-  --signal-ink: oklch(20% 0.03 55);
-  --signal-text: oklch(78% 0.16 62);
-  --focus: oklch(80% 0.16 62);
-  --bloom: oklch(78% 0.16 62 / 0.2);
+  --paper: #000000;
+  --paper-2: #101012;
+  --paper-3: #191919;
+  --rule: #2a2a2e;
+  --muted: #a1a3ad;
+  --ink: #ffffff;
+  --signal: #4a53ff;
+  --signal-ink: #ffffff;
+  --signal-text: #9aa0ff;
+  --focus: #a5aaff;
+  --bloom: rgb(74 83 255 / 0.32);
 }
 
 @theme inline {
@@ -53,9 +54,9 @@
   --color-signal: var(--signal);
   --color-signal-ink: var(--signal-ink);
   --color-signal-text: var(--signal-text);
-  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
-  --font-heading: var(--font-geist-sans), system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: var(--font-petrona), Georgia, 'Times New Roman', serif;
+  --font-heading: var(--font-petrona), Georgia, 'Times New Roman', serif;
+  --font-mono: var(--font-petrona), Georgia, 'Times New Roman', serif;
 }
 
 /*
@@ -63,16 +64,16 @@
   own redesign; the values now follow the new warm identity.
 */
 @theme {
-  --color-primary-50: oklch(97% 0.02 70);
-  --color-primary-100: oklch(94% 0.04 68);
-  --color-primary-200: oklch(89% 0.08 66);
-  --color-primary-300: oklch(84% 0.12 64);
-  --color-primary-400: oklch(79% 0.15 62);
-  --color-primary-500: oklch(74% 0.165 60);
-  --color-primary-600: oklch(60% 0.17 52);
-  --color-primary-700: oklch(52% 0.15 50);
-  --color-primary-800: oklch(44% 0.12 48);
-  --color-primary-900: oklch(36% 0.09 46);
+  --color-primary-50: #f0f1ff;
+  --color-primary-100: #e1e3ff;
+  --color-primary-200: #c8ccff;
+  --color-primary-300: #a5aaff;
+  --color-primary-400: #7d84ff;
+  --color-primary-500: #4a53ff;
+  --color-primary-600: #3f47e6;
+  --color-primary-700: #3138b8;
+  --color-primary-800: #262c91;
+  --color-primary-900: #1c2170;
 
   --color-accent-50: #ecfdf5;
   --color-accent-100: #d1fae5;
@@ -128,12 +129,11 @@
     background-color: var(--paper);
     color: var(--ink);
     font-family: var(--font-sans);
-    font-weight: 400;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 1.0625rem;
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
-  }
-
-  .dark body {
-    font-weight: 350;
   }
 
   h1,
@@ -143,8 +143,9 @@
   h5,
   h6 {
     font-family: var(--font-heading);
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-style: italic;
+    font-weight: 300;
+    letter-spacing: -0.03em;
   }
 
   a {
@@ -228,7 +229,7 @@
 @utility card {
   background: var(--paper-2);
   border: 1px solid var(--rule);
-  border-radius: 1.25rem;
+  border-radius: 1.5rem;
   padding: 1.5rem;
 }
 
@@ -320,6 +321,128 @@
   }
 }
 
+/* Landing: type scale, light arc, scroll reveal */
+@utility type-display {
+  font-size: clamp(3rem, 8.2vw, 6.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+@utility type-display-sm {
+  font-size: clamp(2.5rem, 6.5vw, 4.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee {
+  animation: marquee 70s linear infinite;
+}
+
+.marquee:hover {
+  animation-play-state: paused;
+}
+
+@keyframes stage-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+    filter: blur(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+@keyframes arc-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes sweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.stage-in {
+  animation: stage-in 1100ms var(--ease-out) backwards;
+}
+
+.arc-base {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: arc-draw 700ms var(--ease-out) forwards;
+  animation-delay: calc(var(--i, 0) * 110ms + 250ms);
+}
+
+.arc-fill {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: arc-draw var(--dur, 3400ms) linear forwards;
+}
+
+.arc-fill[data-hold] {
+  stroke-dashoffset: 0;
+  animation: none;
+}
+
+.kb {
+  animation: kenburns 5200ms ease-out forwards;
+}
+
+.hero-sweep {
+  background: conic-gradient(from 0deg, transparent 0 62%, var(--signal) 100%);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  animation: sweep 16s linear infinite;
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 800ms var(--ease-out),
+    transform 800ms var(--ease-out);
+  transition-delay: calc(var(--d, 0) * 90ms);
+}
+
+[data-reveal][data-in] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (scripting: none) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes reveal {
   to {
     opacity: 1;
@@ -408,7 +531,28 @@
   }
 
   .reveal,
-  .arc-lit {
+  .arc-lit,
+  .arc-base {
     animation-delay: 0ms !important;
+  }
+
+  .hero-sweep,
+  .kb,
+  .marquee {
+    animation: none;
+  }
+
+  .marquee-wrap {
+    overflow-x: auto;
+  }
+
+  .arc-base {
+    stroke-dashoffset: 0;
+  }
+
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }
