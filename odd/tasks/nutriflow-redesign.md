@@ -23,6 +23,8 @@ S12. "esta [Image #1] puede valer" - the user's chosen landing reference: a scre
 
 S13. "el diseño del icono- o marca de la empresa me refiero al incocno de nutriflow utilizado en el navbar o en tras paguinas de la web es un poco escueto. hay que rediseñarlo de acorde a la marca colar un icono que refle la identidad, o sea comida+ejercicios algo asi es lo que quiero lograr, para ello genera 3ideas y vemos cual es la mas acorde." - the current week-ring icon (Logo.tsx) is too plain; redesign it so it reflects food + exercise. Three concepts first, the user picks. Assumptions: violet signal accent (S9), must read at 20-32 px in the navbar and in dark and light, uses currentColor for the neutral parts. Favicon, apple-touch-icon and manifest icons are part of the brand set (S1 of L3) and follow the chosen concept.
 
+S14. "seccion \"Todo en un mismo sitio\" / 01 nutircion tarjeta / 02 tarjeta de entrenamiento- estada debe tenr una imagen acorde no un anillo fondo azul y ya esta / 03 traheta de lista de compra no es acorde a lo que debe reflejar porque porque hablamso de lista de la compra y me pones comida no pones un carro del mercado o algo" - in the features section each card needs imagery that matches its topic: 02 Entrenamiento gets a training image instead of the violet card with a ring; 03 Lista de la compra gets shopping imagery (market cart, basket, grocery) instead of food. 01 Nutrición keeps the food photo. Assumptions: free-licence stock again (S11) with provenance in SOURCES.md, no recognisable faces; card text legibility kept with the overlay.
+
 ## Tasks
 
 | ID | Specs | Route | Status | Unit |
@@ -38,6 +40,8 @@ S13. "el diseño del icono- o marca de la empresa me refiero al incocno de nutri
 | R8 | S9,S10,S11,S12,S6,S7 | inline | done locally (hero ring over dish photos, dish strip, scroll-driven pinned story in the spirit of the user's scroll-world link, light features and allergens bands, dark CTA); no video: scroll-world needs paid generation (Monid / Higgsfield, about 11-32 USD) and the user's login, not authorised | Reopens R2: landing rebuilt as the sales page: code-built wow hero (week ring + dish photos + light arc), split black/white bands, photo cards, honest copy, CTA band; ES/EN copy; reduced-motion and no horizontal scroll at 320-1280. |
 
 | R9 | S13 | inline | concepts ready, waiting for the user to pick | Logo redesign: three concepts in odd/tasks/assets/logo-ideas (A plate-bell: the 7-day ring with a dumbbell inside, keeps continuity with the current mark; B apple-kettlebell: apple with a kettlebell handle and a leaf; C leaf athlete: a leaf body with raised arms). After the pick: rewrite src/components/Logo.tsx (delete LogoTitanium.tsx), favicon.ico, favicon-16x16.png, apple-touch-icon.png, manifest.json icons, og-image, and check 20/32/40 px in both themes. |
+
+| R10 | S14 | inline + researcher | noted, not started | Features section (LandingContent.tsx Features and FeatureCard): replace the violet ring card with a training photo (dumbbells, kettlebell, running, gym) and the meal-prep photo with shopping imagery (market cart, basket, grocery shelf); source free stock, view and crop to 4:5, add rows to public/landing/SOURCES.md; check text contrast on both cards at 320-1280. |
 
 ## Log
 
