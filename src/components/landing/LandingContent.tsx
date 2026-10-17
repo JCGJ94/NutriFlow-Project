@@ -84,17 +84,6 @@ function DishStrip({ t }: { t: (k: string) => string }) {
   );
 }
 
-const RING = { cx: 100, cy: 100, r: 78, gap: 8 };
-function arcPath(i: number) {
-  const span = 360 / 7;
-  const rad = (deg: number) => (deg * Math.PI) / 180;
-  const point = (deg: number) =>
-    `${(RING.cx + RING.r * Math.cos(rad(deg))).toFixed(2)} ${(RING.cy + RING.r * Math.sin(rad(deg))).toFixed(2)}`;
-  const start = -90 + i * span + RING.gap / 2;
-  const end = -90 + (i + 1) * span - RING.gap / 2;
-  return `M ${point(start)} A ${RING.r} ${RING.r} 0 0 1 ${point(end)}`;
-}
-
 function FeatureCard({
   index,
   title,
@@ -105,36 +94,20 @@ function FeatureCard({
   index: number;
   title: string;
   desc: string;
-  image?: string;
+  image: string;
   delay: number;
 }) {
   return (
     <Reveal delay={delay}>
-      <article
-        className={`group relative flex aspect-[4/5] flex-col justify-between overflow-hidden rounded-3xl p-6 sm:p-7 ${
-          image ? 'bg-paper-3 text-white' : 'bg-signal text-signal-ink'
-        }`}
-      >
-        {image ? (
-          <>
-            <Image
-              src={image}
-              alt=""
-              fill
-              sizes="(min-width: 768px) 380px, 90vw"
-              className="object-cover transition-transform duration-[900ms] ease-[var(--ease-out)] group-hover:scale-105"
-            />
-            <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-black/85 via-black/20 to-black/35" />
-          </>
-        ) : (
-          <svg viewBox="0 0 200 200" fill="none" aria-hidden="true" className="absolute inset-x-[12%] top-[26%] w-[76%]">
-            <g strokeWidth="9">
-              {DAYS.map((_, i) => (
-                <path key={i} d={arcPath(i)} stroke="currentColor" strokeOpacity={i < 5 ? 1 : 0.3} />
-              ))}
-            </g>
-          </svg>
-        )}
+      <article className="group relative flex aspect-[4/5] flex-col justify-between overflow-hidden rounded-3xl bg-paper-3 p-6 text-white sm:p-7">
+        <Image
+          src={image}
+          alt=""
+          fill
+          sizes="(min-width: 768px) 380px, 90vw"
+          className="object-cover transition-transform duration-[900ms] ease-[var(--ease-out)] group-hover:scale-105"
+        />
+        <div aria-hidden="true" className="absolute inset-0 bg-linear-to-t from-black/85 via-black/20 to-black/35" />
         <div className="relative">
           <span className="text-lg opacity-80">{`0${index}`}</span>
           <h3 className="mt-1 text-3xl leading-tight sm:text-4xl">{title}</h3>
@@ -164,13 +137,14 @@ function Features({ t }: { t: (k: string) => string }) {
             index={2}
             title={t('landing.feat_training_title')}
             desc={t('landing.feat_training_desc')}
+            image="/landing/card-training.webp"
             delay={1}
           />
           <FeatureCard
             index={3}
             title={t('landing.feat_shopping_title')}
             desc={t('landing.feat_shopping_desc')}
-            image="/landing/mealprep.webp"
+            image="/landing/card-market.webp"
             delay={2}
           />
         </div>

@@ -15,5 +15,7 @@ Licences
 | `day-5.webp` | Grilled fish with vegetables | Daniela Elena Tentis | https://www.pexels.com/photo/725991/ | Pexels (free) |
 | `day-6.webp`, `card-paella.webp`, `scene-2.webp` | Seafood paella | David Plaza | https://wordpress.org/photos/photo/511674de77/ | CC0 |
 | `day-7.webp` | Yogurt bowl with fruit and seeds | Stijn Dijkstra | https://www.pexels.com/photo/a-healthy-breakfast-bowl-with-fruit-and-nuts-16744880/ | Pexels (free) |
+| `card-training.webp` | Dumbbells on a gym rack | Ivan S | https://www.pexels.com/photo/black-and-red-dumbbells-4162451/ | Pexels (free) |
+| `card-market.webp` | Farmers market stall with baskets of produce | Sarah O'Shea | https://www.pexels.com/photo/vibrant-farmers-market-stall-with-fresh-produce-30460546/ | Pexels (free) |
 | `mealprep.webp` (also the fourth scroll scene) | Meal-prep containers | Julia M Cameron | https://www.pexels.com/photo/packed-food-in-containers-6995300/ | Pexels (free) |
 | `table.webp` | Breakfast on a dark wood table | Daniela Constantini | https://www.pexels.com/photo/breakfast-meals-beside-a-cup-of-coffee-on-a-wooden-table-5720774/ | Pexels (free) |
