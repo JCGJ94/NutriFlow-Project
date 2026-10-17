@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { 
@@ -23,6 +23,17 @@ export function Navbar() {
   const { t, language, setLanguage } = useLanguage();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const isHome = pathname === '/';
+
+  // The landing opens on a dark hero: the bar is transparent there and turns solid after the first scroll.
+  useEffect(() => {
+    if (!isHome) return;
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isHome]);
 
   const handleLogout = async (e?: React.MouseEvent) => {
     e?.preventDefault();
@@ -51,7 +62,13 @@ export function Navbar() {
   if (isAuthPage) return null;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-rule bg-paper">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-300 ${
+        isHome
+          ? `dark text-ink ${scrolled || isMenuOpen ? 'border-rule bg-paper/85 backdrop-blur-md' : 'border-transparent bg-transparent'}`
+          : 'border-rule bg-paper'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
