@@ -77,6 +77,9 @@ function DishStrip({ t }: { t: (k: string) => string }) {
           ))}
         </ul>
       </div>
+      <p className="mx-auto mt-6 w-full max-w-[1200px] px-5 text-xs uppercase tracking-[0.1em] text-muted sm:px-8">
+        {t('landing.mock_note')}
+      </p>
     </section>
   );
 }

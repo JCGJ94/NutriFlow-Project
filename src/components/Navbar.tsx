@@ -73,7 +73,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 group" data-testid="navbar-logo">
-            <Logo size={40} className="transition-transform group-hover:scale-105" />
+            <Logo size={40} className="transition-transform group-hover:scale-105 [&_svg]:size-8 sm:[&_svg]:size-10" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -98,12 +98,12 @@ export function Navbar() {
           </nav>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {/* Premium Language Toggle */}
             <div className="flex bg-paper-2 p-1 rounded-full items-center relative gap-1 border border-rule">
               <button
                 onClick={() => setLanguage('es')}
-                className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-colors duration-200 z-10 ${
+                className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs font-bold transition-colors duration-200 z-10 ${
                   language === 'es' 
                     ? 'bg-signal text-signal-ink' 
                     : 'text-muted hover:text-ink'
@@ -113,7 +113,7 @@ export function Navbar() {
               </button>
               <button
                 onClick={() => setLanguage('en')}
-                className={`flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold transition-colors duration-200 z-10 ${
+                className={`flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full text-xs font-bold transition-colors duration-200 z-10 ${
                   language === 'en' 
                     ? 'bg-signal text-signal-ink' 
                     : 'text-muted hover:text-ink'

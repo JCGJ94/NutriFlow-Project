@@ -184,7 +184,7 @@
     background-color var(--dur-short) var(--ease-out);
 
   &:hover {
-    background: color-mix(in oklch, var(--signal) 88%, white);
+    background: color-mix(in oklch, var(--signal) 86%, black);
     transform: translateY(-1px);
   }
 

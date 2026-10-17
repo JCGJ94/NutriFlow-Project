@@ -221,7 +221,7 @@ export function HeroOrbit() {
             </span>
           </div>
 
-          <p className="mt-6 text-center text-lg text-ink md:hidden" aria-live="polite">
+          <p className="mt-6 text-center text-lg text-ink md:hidden" aria-live={auto ? 'off' : 'polite'}>
             {dayLabel}
           </p>
 
