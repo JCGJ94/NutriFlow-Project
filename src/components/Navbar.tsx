@@ -73,7 +73,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 group" data-testid="navbar-logo">
-            <Logo size={40} className="transition-transform group-hover:scale-105 [&_svg]:size-8 sm:[&_svg]:size-10" />
+            <Logo size={40} className="transition-transform group-hover:scale-105 [&_img]:size-8 sm:[&_img]:size-10" />
           </Link>
 
           {/* Desktop Navigation */}

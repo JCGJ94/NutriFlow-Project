@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 type LogoProps = {
   className?: string;
@@ -6,25 +7,17 @@ type LogoProps = {
   variant?: 'symbol' | 'full';
 };
 
-/**
- * Seven arcs, one per day of the plan. The first day is lit.
- * `pathLength="7"` lets the dash pattern address one arc per unit.
- */
-function WeekRing({ size }: { size: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none" aria-hidden="true" className="shrink-0">
-      <g transform="rotate(-90 20 20)" strokeWidth="4" strokeLinecap="round">
-        <circle cx="20" cy="20" r="15" pathLength="7" strokeDasharray="0.7 0.3" stroke="var(--rule)" />
-        <circle cx="20" cy="20" r="15" pathLength="7" strokeDasharray="0.7 6.3" stroke="var(--signal)" />
-      </g>
-    </svg>
-  );
-}
-
+/** The NutriFlow emblem (public/brand/logo.webp, 512px source) plus the wordmark. */
 export const Logo: React.FC<LogoProps> = ({ className = '', size = 32, variant = 'full' }) => {
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      <WeekRing size={size} />
+      <Image
+        src="/brand/logo.webp"
+        alt={variant === 'symbol' ? 'NutriFlow' : ''}
+        width={size}
+        height={size}
+        className="shrink-0"
+      />
       {variant === 'full' && (
         <span className="font-heading text-xl font-semibold tracking-tight text-ink">NutriFlow</span>
       )}

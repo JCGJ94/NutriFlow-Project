@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/og-image.jpg', // Ensure this file exists in public/ or is replaced by a dynamic OG image generator route
+        url: '/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'NutriFlow AI Diet Planner',
@@ -75,8 +75,11 @@ export const metadata: Metadata = {
     images: ['/og-image.jpg'],
   },
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
+    icon: [
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+    ],
     apple: '/apple-touch-icon.png',
   },
   manifest: '/manifest.json',
