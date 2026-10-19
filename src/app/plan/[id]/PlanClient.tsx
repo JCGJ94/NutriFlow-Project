@@ -171,7 +171,7 @@ export function PlanClient({ planId, initialPlan, initialExercisePlan }: PlanCli
 
         if (!exercisePlan && planId) {
             let attempts = 0;
-            const maxAttempts = 10; // Max 20-30 seconds waiting
+            const maxAttempts = 3; // generate-week saves the training before it answers, so this only covers a short race
 
             const pollExercise = async () => {
                 setIsLoadingExercise(true);

@@ -58,6 +58,15 @@ class ApiClient {
         // 2. Get Token
         const token = await this.getAuthToken();
 
+        // Server-side the request leaves the visitor's browser, so their session cookies
+        // must be forwarded for the route handler to authenticate them.
+        let cookieHeader: Record<string, string> = {};
+        if (typeof window === 'undefined') {
+            const { cookies } = await import('next/headers');
+            const pairs = (await cookies()).getAll().map((c) => `${c.name}=${c.value}`);
+            if (pairs.length) cookieHeader = { Cookie: pairs.join('; ') };
+        }
+
         // 3. Build Headers
         const authHeaders: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
         const contentHeaders: HeadersInit =
@@ -68,6 +77,7 @@ class ApiClient {
             headers: {
                 ...contentHeaders,
                 ...authHeaders,
+                ...cookieHeader,
                 ...headers,
             },
             ...customConfig,
