@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronRight, Dumbbell, Loader2, Settings, ShoppingCart, Sparkles, Trash2 } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ChevronRight, Loader2, Sparkles } from 'lucide-react';
+import { Icon3D } from '@/components/dashboard/Icon3D';
 import { useToast } from '@/context/ToastContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useUser } from '@/context/UserContext';
@@ -60,6 +62,28 @@ interface DashboardClientProps {
 
 const MEAL_ORDER = ['breakfast', 'lunch', 'snack', 'dinner'];
 
+function useCountUp(target: number) {
+  const reduce = useReducedMotion();
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (reduce) return;
+    let raf = 0;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const k = Math.min(1, (now - start) / 800);
+      setValue(Math.round(target * (1 - Math.pow(1 - k, 3))));
+      if (k < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, reduce]);
+  return reduce ? target : value;
+}
+
+function Count({ value }: { value: number }) {
+  return <>{useCountUp(value)}</>;
+}
+
 function MacroBar({ label, value, target }: { label: string; value: number; target: number }) {
   const pct = target > 0 ? Math.min(100, Math.round((value / target) * 100)) : 0;
   return (
@@ -71,9 +95,40 @@ function MacroBar({ label, value, target }: { label: string; value: number; targ
         </span>
       </div>
       <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-paper-3">
-        <div className="h-full rounded-full bg-signal" style={{ width: `${pct}%` }} />
+        <motion.div
+          key={`${label}-${value}`}
+          className="h-full rounded-full bg-signal"
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        />
       </div>
     </div>
+  );
+}
+
+const rise = {
+  hidden: { opacity: 0, y: 18 },
+  show: (i: number) => ({ opacity: 1, y: 0, transition: { delay: 0.06 * i, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } }),
+};
+
+function Stat({ icon, label, value, hint, i }: { icon: React.ReactNode; label: string; value: React.ReactNode; hint: string; i: number }) {
+  return (
+    <motion.div
+      variants={rise}
+      custom={i}
+      initial="hidden"
+      animate="show"
+      whileHover={{ y: -4 }}
+      className="flex items-center gap-4 rounded-3xl border border-rule bg-paper-2 p-4 sm:p-5"
+    >
+      {icon}
+      <div className="min-w-0">
+        <p className="text-sm uppercase tracking-[0.08em] text-muted">{label}</p>
+        <p className="truncate text-2xl text-ink">{value}</p>
+        <p className="truncate text-sm text-muted">{hint}</p>
+      </div>
+    </motion.div>
   );
 }
 
@@ -153,6 +208,7 @@ export function DashboardClient({ initialPlans, activePlan, training }: Dashboar
     );
   }
 
+
   const summary = initialPlans.find((p) => p.status === 'active');
   const dateOf = (dayIndex: number) => {
     const [y, m, d] = (activePlan ?? summary)!.weekStart.split('-').map(Number);
@@ -165,14 +221,33 @@ export function DashboardClient({ initialPlans, activePlan, training }: Dashboar
   );
   const workout = training?.workoutDays.find((w) => w.dayOfWeek === selected);
   const heading = new Date().toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
+  const name = profile?.username;
+  const trainingValue = !workout ? '—' : workout.isRestDay ? t('dash.rest_today') : workout.name;
+  const trainingHint = !workout
+    ? t('dash.no_training')
+    : workout.isRestDay
+      ? ' '
+      : t('dash.exercises_count')
+          .replace('{{count}}', String(workout.exercises.length))
+          .replace('{{min}}', String(workout.totalDurationMin));
 
   return (
     <div className="min-h-screen bg-page-gradient pt-16" data-testid="dashboard-content">
       <main className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12">
-        <header className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-sm uppercase tracking-[0.1em] text-muted">{heading}</p>
-            <h1 className="type-display-sm mt-1">{t('dash.today')}</h1>
+        <motion.header
+          variants={rise}
+          custom={0}
+          initial="hidden"
+          animate="show"
+          className="flex flex-wrap items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-4">
+            <Icon3D name="sun" size={96} className="[&_img]:size-[72px] sm:[&_img]:size-24" />
+            <div>
+              <p className="text-sm uppercase tracking-[0.1em] text-muted">{heading}</p>
+              <h1 className="type-display-sm mt-1">{t('dash.today')}</h1>
+              {name ? <p className="mt-1 text-lg text-muted">{t('dash.hello').replace('{{name}}', name)}</p> : null}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -181,7 +256,7 @@ export function DashboardClient({ initialPlans, activePlan, training }: Dashboar
               className="btn-secondary inline-flex items-center gap-2"
               aria-label={t('dash.configure_profile')}
             >
-              <Settings className="h-4 w-4" aria-hidden="true" />
+              <Icon3D name="setting" size={28} />
               <span className="hidden sm:inline">{t('dash.configure_profile')}</span>
             </Link>
             <button
@@ -198,11 +273,18 @@ export function DashboardClient({ initialPlans, activePlan, training }: Dashboar
               {t('dash.generate_plan')}
             </button>
           </div>
-        </header>
+        </motion.header>
 
         {!summary || !activePlan ? (
-          <section className="mt-10 rounded-3xl border border-dashed border-rule px-6 py-16 text-center">
-            <h2 className="text-2xl text-ink">{t('dash.no_active_plan')}</h2>
+          <motion.section
+            variants={rise}
+            custom={2}
+            initial="hidden"
+            animate="show"
+            className="mt-10 flex flex-col items-center rounded-3xl border border-dashed border-rule px-6 py-14 text-center"
+          >
+            <Icon3D name="rocket" size={140} />
+            <h2 className="mt-4 text-2xl text-ink">{t('dash.no_active_plan')}</h2>
             <p className="mx-auto mt-2 max-w-sm text-muted">{t('dash.no_plan_subtitle')}</p>
             <button
               onClick={generateNewPlan}
@@ -217,10 +299,45 @@ export function DashboardClient({ initialPlans, activePlan, training }: Dashboar
               )}
               {t('dash.generate_plan')}
             </button>
-          </section>
+          </motion.section>
         ) : (
           <>
-            <nav aria-label={t('dash.plan_week_of')} className="mt-8 grid grid-cols-7 gap-2">
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              <Stat
+                i={1}
+                icon={<Icon3D name="fire" size={64} delay={0.2} />}
+                label={t('dash.stat_calories')}
+                value={
+                  <>
+                    <Count value={Math.round(day?.totalKcal ?? 0)} /> kcal
+                  </>
+                }
+                hint={t('dash.target_of').replace('{{kcal}}', String(Math.round(activePlan.targetKcal)))}
+              />
+              <Stat
+                i={2}
+                icon={<Icon3D name="meals" size={64} delay={0.6} />}
+                label={t('dash.stat_meals')}
+                value={t('dash.meals_count').replace('{{count}}', String(meals.length))}
+                hint={meals.map((m) => getMealTypeName(m.mealType, language)).join(' · ') || ' '}
+              />
+              <Stat
+                i={3}
+                icon={<Icon3D name="gym" size={64} delay={1} />}
+                label={t('dash.stat_training')}
+                value={trainingValue}
+                hint={trainingHint}
+              />
+            </div>
+
+            <motion.nav
+              variants={rise}
+              custom={4}
+              initial="hidden"
+              animate="show"
+              aria-label={t('dash.plan_week_of')}
+              className="mt-8 grid grid-cols-7 gap-2"
+            >
               {[0, 1, 2, 3, 4, 5, 6].map((i) => {
                 const date = dateOf(i);
                 const on = i === selected;
@@ -230,38 +347,46 @@ export function DashboardClient({ initialPlans, activePlan, training }: Dashboar
                     type="button"
                     aria-pressed={on}
                     onClick={() => setSelected(i)}
-                    className={`flex flex-col items-center rounded-2xl border px-1 py-3 transition-colors ${
-                      on
-                        ? 'border-signal bg-signal text-signal-ink'
-                        : 'border-rule bg-paper-2 text-ink hover:border-ink'
+                    className={`relative flex flex-col items-center rounded-2xl border px-1 py-3 transition-colors ${
+                      on ? 'border-transparent text-signal-ink' : 'border-rule bg-paper-2 text-ink hover:border-ink'
                     }`}
                   >
-                    <span className="text-xs uppercase tracking-[0.08em] opacity-80">
+                    {on && (
+                      <motion.span
+                        layoutId="day-pill"
+                        className="absolute inset-0 rounded-2xl bg-signal"
+                        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                      />
+                    )}
+                    <span className="relative text-xs uppercase tracking-[0.08em] opacity-80">
                       {date.toLocaleDateString(locale, { weekday: 'short' }).replace('.', '')}
                     </span>
-                    <span className="mt-0.5 text-xl">{date.getDate()}</span>
+                    <span className="relative mt-0.5 text-xl">{date.getDate()}</span>
                     <span
                       aria-hidden="true"
-                      className={`mt-1 h-1 w-1 rounded-full ${i === todayIndex ? (on ? 'bg-signal-ink' : 'bg-signal') : 'bg-transparent'}`}
+                      className={`relative mt-1 h-1 w-1 rounded-full ${i === todayIndex ? (on ? 'bg-signal-ink' : 'bg-signal') : 'bg-transparent'}`}
                     />
                   </button>
                 );
               })}
-            </nav>
-            {todayIndex === null && (
-              <p className="mt-3 text-sm text-muted">{t('dash.outside_week')}</p>
-            )}
+            </motion.nav>
+            {todayIndex === null && <p className="mt-3 text-sm text-muted">{t('dash.outside_week')}</p>}
 
             <div className="mt-8 grid gap-6 lg:grid-cols-5">
-              <section className="rounded-3xl border border-rule bg-paper-2 p-6 sm:p-8 lg:col-span-3">
-                <div className="flex flex-wrap items-end justify-between gap-3">
-                  <h2 className="text-2xl text-ink">{t('dash.todays_meals')}</h2>
-                  <p className="text-ink">
-                    <span className="text-3xl">{Math.round(day?.totalKcal ?? 0)}</span>{' '}
-                    <span className="text-muted">
-                      {t('dash.target_of').replace('{{kcal}}', String(Math.round(activePlan.targetKcal)))}
-                    </span>
-                  </p>
+              <motion.section
+                key={selected}
+                variants={rise}
+                custom={0}
+                initial="hidden"
+                animate="show"
+                className="rounded-3xl border border-rule bg-paper-2 p-6 sm:p-8 lg:col-span-3"
+              >
+                <div className="flex items-center gap-4">
+                  <Icon3D name="macros" size={56} delay={0.4} />
+                  <div>
+                    <h2 className="text-2xl text-ink">{t('dash.todays_meals')}</h2>
+                    <p className="text-muted">{t('dash.macros')}</p>
+                  </div>
                 </div>
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -274,25 +399,37 @@ export function DashboardClient({ initialPlans, activePlan, training }: Dashboar
                   <p className="mt-8 text-muted">{t('dash.no_meals_day')}</p>
                 ) : (
                   <ul className="mt-8 divide-y divide-rule">
-                    {meals.map((meal) => (
-                      <li key={meal.id} className="flex items-start justify-between gap-4 py-4">
+                    {meals.map((meal, k) => (
+                      <motion.li
+                        key={meal.id}
+                        variants={rise}
+                        custom={k + 2}
+                        initial="hidden"
+                        animate="show"
+                        className="flex items-start justify-between gap-4 py-4"
+                      >
                         <div className="min-w-0">
                           <p className="text-lg text-ink">{getMealTypeName(meal.mealType, language)}</p>
-                          <p className="mt-0.5 text-muted">
-                            {meal.items.map((it) => it.ingredientName).join(' · ')}
-                          </p>
+                          <p className="mt-0.5 text-muted">{meal.items.map((it) => it.ingredientName).join(' · ')}</p>
                         </div>
                         <p className="shrink-0 text-ink">{Math.round(meal.totalKcal)} kcal</p>
-                      </li>
+                      </motion.li>
                     ))}
                   </ul>
                 )}
-              </section>
+              </motion.section>
 
               <div className="flex flex-col gap-6 lg:col-span-2">
-                <section className="rounded-3xl border border-rule bg-paper-2 p-6 sm:p-8">
-                  <h2 className="flex items-center gap-2 text-2xl text-ink">
-                    <Dumbbell className="h-5 w-5 text-signal-text" aria-hidden="true" />
+                <motion.section
+                  key={`w-${selected}`}
+                  variants={rise}
+                  custom={1}
+                  initial="hidden"
+                  animate="show"
+                  className="rounded-3xl border border-rule bg-paper-2 p-6 sm:p-8"
+                >
+                  <h2 className="flex items-center gap-3 text-2xl text-ink">
+                    <Icon3D name="target" size={44} delay={0.8} />
                     {t('dash.training')}
                   </h2>
                   {!workout ? (
@@ -302,11 +439,7 @@ export function DashboardClient({ initialPlans, activePlan, training }: Dashboar
                   ) : (
                     <>
                       <p className="mt-3 text-lg text-ink">{workout.name}</p>
-                      <p className="text-muted">
-                        {t('dash.exercises_count')
-                          .replace('{{count}}', String(workout.exercises.length))
-                          .replace('{{min}}', String(workout.totalDurationMin))}
-                      </p>
+                      <p className="text-muted">{trainingHint}</p>
                       <ul className="mt-4 space-y-1.5 text-ink">
                         {workout.exercises.slice(0, 4).map((e, i) => (
                           <li key={i} className="flex justify-between gap-3">
@@ -319,38 +452,50 @@ export function DashboardClient({ initialPlans, activePlan, training }: Dashboar
                       </ul>
                     </>
                   )}
-                </section>
+                </motion.section>
 
-                <Link
-                  href={`/shopping-list/${summary.id}`}
-                  className="group flex items-center justify-between gap-4 rounded-3xl border border-rule bg-paper-2 p-6 transition-colors hover:border-signal sm:p-8"
-                >
-                  <div>
-                    <p className="flex items-center gap-2 text-2xl text-ink">
-                      <ShoppingCart className="h-5 w-5 text-signal-text" aria-hidden="true" />
-                      {t('dash.shopping_list')}
-                    </p>
-                    <p className="mt-1 text-muted">{t('dash.shopping_hint')}</p>
-                  </div>
-                  <ChevronRight className="h-5 w-5 text-muted transition-colors group-hover:text-signal-text" aria-hidden="true" />
-                </Link>
+                <motion.div variants={rise} custom={2} initial="hidden" animate="show" whileHover={{ y: -4 }}>
+                  <Link
+                    href={`/shopping-list/${summary.id}`}
+                    className="group flex items-center justify-between gap-4 rounded-3xl border border-rule bg-paper-2 p-6 transition-colors hover:border-signal sm:p-8"
+                  >
+                    <div className="flex items-center gap-4">
+                      <Icon3D name="bag" size={56} delay={0.3} />
+                      <div>
+                        <p className="text-2xl text-ink">{t('dash.shopping_list')}</p>
+                        <p className="mt-1 text-muted">{t('dash.shopping_hint')}</p>
+                      </div>
+                    </div>
+                    <ChevronRight
+                      className="h-5 w-5 text-muted transition-all group-hover:translate-x-1 group-hover:text-signal-text"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                </motion.div>
 
-                <div
+                <motion.div
+                  variants={rise}
+                  custom={3}
+                  initial="hidden"
+                  animate="show"
+                  whileHover={{ y: -4 }}
                   onClick={() => router.push(`/plan/${summary.id}`)}
                   data-testid="active-plan-card"
                   className="flex cursor-pointer items-center justify-between gap-4 rounded-3xl border border-rule bg-paper-2 p-6 transition-colors hover:border-signal sm:p-8"
                 >
-                  <div className="min-w-0">
-                    <p className="text-sm uppercase tracking-[0.1em] text-muted">{t('dash.plan_week_of')}</p>
-                    <p className="text-2xl text-ink">
-                      {dateOf(0).toLocaleDateString(locale, { day: 'numeric', month: 'long' })}
-                    </p>
-                    {profile?.weight_kg ? (
-                      <p className="mt-1 text-muted">
-                        {t('dash.weight_goal')}: {profile.weight_kg} kg
-                        {profile.weight_goal_kg ? ` → ${profile.weight_goal_kg} kg` : ''}
+                  <div className="flex min-w-0 items-center gap-4">
+                    <Icon3D name="calendar" size={56} delay={0.5} />
+                    <div className="min-w-0">
+                      <p className="text-sm uppercase tracking-[0.1em] text-muted">{t('dash.plan_week_of')}</p>
+                      <p className="text-2xl text-ink">
+                        {dateOf(0).toLocaleDateString(locale, { day: 'numeric', month: 'long' })}
                       </p>
-                    ) : null}
+                      <p className="mt-1 text-muted">
+                        {profile?.weight_kg
+                          ? `${t('dash.weight_goal')}: ${profile.weight_kg} kg${profile.weight_goal_kg ? ` → ${profile.weight_goal_kg} kg` : ''}`
+                          : t('dash.open_plan')}
+                      </p>
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -361,11 +506,11 @@ export function DashboardClient({ initialPlans, activePlan, training }: Dashboar
                     disabled={isDeleting}
                     title={t('common.delete')}
                     aria-label={t('common.delete')}
-                    className="rounded-xl p-2.5 text-muted transition-colors hover:text-red-500"
+                    className="rounded-xl p-2 transition-transform hover:scale-110"
                   >
-                    {isDeleting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Trash2 className="h-5 w-5" />}
+                    {isDeleting ? <Loader2 className="h-6 w-6 animate-spin text-muted" /> : <Icon3D name="trash" size={40} />}
                   </button>
-                </div>
+                </motion.div>
               </div>
             </div>
           </>
