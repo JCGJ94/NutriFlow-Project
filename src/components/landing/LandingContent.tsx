@@ -56,7 +56,7 @@ function Reveal({
 /** A slow, endless row of the dishes the plan is made of. */
 function DishStrip({ t }: { t: (k: string) => string }) {
   return (
-    <section className="dark bg-paper pb-24 pt-6 text-ink sm:pb-32">
+    <section className="bg-paper pb-24 pt-6 text-ink sm:pb-32">
       <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
         <Reveal>
           <p className="max-w-2xl text-2xl text-muted sm:text-3xl">{t('landing.strip_title')}</p>
@@ -120,7 +120,7 @@ function FeatureCard({
 
 function Features({ t }: { t: (k: string) => string }) {
   return (
-    <section id="features" className="light bg-paper py-24 text-ink sm:py-32">
+    <section id="features" className="bg-paper py-24 text-ink sm:py-32">
       <div className="mx-auto w-full max-w-[1200px] px-5 sm:px-8">
         <Reveal>
           <h2 className="type-display-sm max-w-3xl">{t('landing.features_title')}</h2>
@@ -165,7 +165,7 @@ function Safe({ t }: { t: (k: string) => string }) {
   const names = ALLERGENS.filter((a) => excluded.has(a.key)).map((a) => t(a.key));
 
   return (
-    <section className="light bg-paper-2 py-24 text-ink sm:py-32">
+    <section className="bg-paper-2 py-24 text-ink sm:py-32">
       <div className="mx-auto grid w-full max-w-[1200px] items-center gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:gap-20">
         <Reveal>
           <h2 className="type-display-sm">{t('landing.safe_title')}</h2>
@@ -221,9 +221,9 @@ function Safe({ t }: { t: (k: string) => string }) {
 
 function ClosingCta({ t }: { t: (k: string) => string }) {
   return (
-    <section className="dark relative isolate flex min-h-[78svh] items-end overflow-clip bg-paper text-ink">
+    <section className="relative isolate flex min-h-[78svh] items-end overflow-clip bg-paper text-ink">
       <Image src="/landing/table.webp" alt="" fill sizes="100vw" className="-z-10 object-cover opacity-60" />
-      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-t from-black via-black/70 to-black/30" />
+      <div aria-hidden="true" className="absolute inset-0 -z-10 bg-linear-to-t from-paper via-paper/70 to-paper/30" />
       <div className="mx-auto w-full max-w-[1200px] px-5 py-20 sm:px-8 sm:py-28">
         <Reveal>
           <h2 className="type-display max-w-4xl">{t('landing.cta_title')}</h2>

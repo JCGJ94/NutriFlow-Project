@@ -113,7 +113,7 @@ export function ScrollWorld({ t }: { t: (k: string) => string }) {
     <section
       ref={track}
       id="how-it-works"
-      className="dark relative bg-paper text-ink"
+      className="relative bg-paper text-ink"
       style={{ height: `${N * VH_PER_SCENE + 100}svh` }}
     >
       <div className="sticky top-0 h-[100svh] overflow-hidden">
@@ -129,9 +129,9 @@ export function ScrollWorld({ t }: { t: (k: string) => string }) {
             <Image src={s.src} alt="" fill sizes="100vw" className="object-cover" />
           </div>
         ))}
-        <div aria-hidden="true" className="absolute inset-0 bg-black/20" />
-        <div aria-hidden="true" className="absolute inset-0 bg-linear-to-r from-black/70 via-black/35 to-transparent" />
-        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-black/70 to-transparent" />
+        <div aria-hidden="true" className="absolute inset-0 bg-paper/55 dark:bg-paper/20" />
+        <div aria-hidden="true" className="absolute inset-0 bg-linear-to-r from-paper/85 via-paper/45 to-transparent dark:from-paper/70 dark:via-paper/35" />
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-paper/70 to-transparent" />
 
         <div className="relative z-10 mx-auto flex h-full w-full max-w-[1200px] flex-col justify-center gap-5 px-5 pb-10 pt-16 sm:gap-7 sm:px-8 sm:pt-20 lg:grid lg:grid-cols-2 lg:items-center lg:gap-16">
           <div>

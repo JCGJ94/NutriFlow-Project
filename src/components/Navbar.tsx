@@ -26,7 +26,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const isHome = pathname === '/';
 
-  // The landing opens on a dark hero: the bar is transparent there and turns solid after the first scroll.
+  // The landing opens on a hero: the bar is transparent there and turns solid after the first scroll.
   useEffect(() => {
     if (!isHome) return;
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -65,7 +65,7 @@ export function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 border-b transition-colors duration-300 ${
         isHome
-          ? `dark text-ink ${scrolled || isMenuOpen ? 'border-rule bg-paper/85 backdrop-blur-md' : 'border-transparent bg-transparent'}`
+          ? `text-ink ${scrolled || isMenuOpen ? 'border-rule bg-paper/85 backdrop-blur-md' : 'border-transparent bg-transparent'}`
           : 'border-rule bg-paper'
       }`}
     >

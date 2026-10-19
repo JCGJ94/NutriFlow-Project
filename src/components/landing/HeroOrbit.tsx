@@ -61,7 +61,7 @@ export function HeroOrbit() {
       ref={root}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
-      className="dark relative isolate overflow-clip bg-paper text-ink"
+      className="relative isolate overflow-clip bg-paper text-ink"
     >
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
         <div
@@ -187,7 +187,7 @@ export function HeroOrbit() {
                   }`}
                 />
               ))}
-              <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/15" />
+              <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-ink/15" />
             </div>
 
             <svg
