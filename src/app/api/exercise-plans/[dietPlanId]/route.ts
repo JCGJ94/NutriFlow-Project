@@ -24,7 +24,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext): Promise<
             );
         }
 
-        return NextResponse.json(data);
+        return NextResponse.json((data as { plan_data: unknown }).plan_data);
     } catch (err) {
         if (err instanceof ApiError) {
             return NextResponse.json({ error: err.message }, { status: err.status });

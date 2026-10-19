@@ -204,7 +204,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
                 sex: p.sex,
                 language: p.language as 'es' | 'en',
             };
-            generateExercisePlan(exerciseProfile, weekStart);
+            const exercisePlan = generateExercisePlan(exerciseProfile, weekStart);
+            const { error: exerciseSaveError } = await sb.from('exercise_plans').insert({
+                user_id: user.id,
+                diet_plan_id: (savedPlan as any).id,
+                plan_data: exercisePlan,
+            });
+            if (exerciseSaveError) throw exerciseSaveError;
         } catch (exerciseErr) {
             console.error('Failed to generate linked exercise plan (non-blocking):', exerciseErr);
         }
