@@ -1,28 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import {
-  Calendar,
-  ShoppingCart,
-  ChevronRight,
-  Loader2,
-  Settings,
-  Sparkles,
-  Trash2,
-  Target,
-} from 'lucide-react';
-import { SmartRecommendations } from '@/components/dashboard/SmartRecommendations';
+import { ChevronRight, Dumbbell, Loader2, Settings, ShoppingCart, Sparkles, Trash2 } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useUser } from '@/context/UserContext';
 import { useConfirmation } from '@/context/ConfirmationContext';
-import { usePlans } from '@/context/PlansContext'; // Still used for refresh? Or purely props?
+import { usePlans } from '@/context/PlansContext';
 import { apiClient } from '@/lib/apiClient';
+import { getMealTypeName } from '@/lib/utils';
+import { dayIndexInPlan } from '@/lib/dashboard/today';
 
-// Simplified Plan Interface for Props (match PlanSummary from Context/API)
-interface PlanSummary {
+export interface PlanSummary {
   id: string;
   weekStart: string;
   targetKcal: number;
@@ -30,43 +21,97 @@ interface PlanSummary {
   createdAt: string;
 }
 
-interface DashboardClientProps {
-  initialPlans: PlanSummary[];
+interface DayMeal {
+  id: string;
+  mealType: string;
+  totalKcal: number;
+  items: { id: string; ingredientName: string; grams: number }[];
 }
 
-export function DashboardClient({ initialPlans }: DashboardClientProps) {
+export interface ActivePlan extends PlanSummary {
+  targetProtein: number;
+  targetCarbs: number;
+  targetFat: number;
+  days: {
+    dayOfWeek: number;
+    meals: DayMeal[];
+    totalKcal: number;
+    totalProtein: number;
+    totalCarbs: number;
+    totalFat: number;
+  }[];
+}
+
+export interface TrainingPlan {
+  workoutDays: {
+    dayOfWeek: number;
+    name: string;
+    isRestDay?: boolean;
+    totalDurationMin: number;
+    exercises: { exerciseName: string; sets: number; reps?: number; durationSec?: number }[];
+  }[];
+}
+
+interface DashboardClientProps {
+  initialPlans: PlanSummary[];
+  activePlan: ActivePlan | null;
+  training: TrainingPlan | null;
+}
+
+const MEAL_ORDER = ['breakfast', 'lunch', 'snack', 'dinner'];
+
+function MacroBar({ label, value, target }: { label: string; value: number; target: number }) {
+  const pct = target > 0 ? Math.min(100, Math.round((value / target) * 100)) : 0;
+  return (
+    <div>
+      <div className="flex items-baseline justify-between text-sm">
+        <span className="text-muted">{label}</span>
+        <span className="text-ink">
+          {Math.round(value)} <span className="text-muted">/ {Math.round(target)} g</span>
+        </span>
+      </div>
+      <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-paper-3">
+        <div className="h-full rounded-full bg-signal" style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+export function DashboardClient({ initialPlans, activePlan, training }: DashboardClientProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const { t, language } = useLanguage();
   const { user, profile, isLoading: isUserLoading } = useUser();
-  const { refreshPlans } = usePlans(); // Keep using context refresh to sync other parts of app if needed?
-
-  // Use props for rendering, but allow local override if we want optimistic updates?
-  // For now, rely on router.refresh()
-  const displayPlans = initialPlans;
+  const { refreshPlans } = usePlans();
+  const { confirm } = useConfirmation();
 
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const locale = language === 'es' ? 'es-ES' : 'en-US';
+  const todayIndex = useMemo(
+    () => (activePlan ? dayIndexInPlan(activePlan.weekStart, new Date()) : null),
+    [activePlan],
+  );
+  const [selected, setSelected] = useState<number>(todayIndex ?? 0);
 
   useEffect(() => {
     // Only redirect to onboarding if there IS an authenticated user but no profile.
     // Do NOT redirect when user is null (logging out) — that causes a race with handleLogout.
     if (!isUserLoading && user && (!profile || !profile.id)) {
-        router.push('/onboarding');
+      router.push('/onboarding');
     }
   }, [isUserLoading, user, profile, router]);
 
   const generateNewPlan = async () => {
     setIsGenerating(true);
     try {
-      const plan = await apiClient.post<any>('/plans/generate-week', { useAi: true });
-      
+      const plan = await apiClient.post<{ id?: string }>('/plans/generate-week', { useAi: true });
       if (plan && plan.id) {
-          showToast(t('dash.gen_success'), 'success');
-          // Refresh context just in case other components need it
-          refreshPlans(); 
-          router.push(`/plan/${plan.id}`);
-          router.refresh(); 
+        showToast(t('dash.gen_success'), 'success');
+        refreshPlans();
+        router.push(`/plan/${plan.id}`);
+        router.refresh();
       }
     } catch (error) {
       console.error('Error generating plan:', error);
@@ -76,242 +121,255 @@ export function DashboardClient({ initialPlans }: DashboardClientProps) {
     }
   };
 
-  const { confirm } = useConfirmation();
-
   const deletePlan = async (planId: string) => {
     const isConfirmed = await confirm({
-        title: t('common.delete') || 'Eliminar Plan',
-        description: t('dash.delete_confirm'),
-        confirmText: t('common.delete'),
-        cancelText: t('common.cancel'),
-        variant: 'danger'
+      title: t('common.delete') || 'Eliminar Plan',
+      description: t('dash.delete_confirm'),
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+      variant: 'danger',
     });
-
     if (!isConfirmed) return;
-    
-    setIsDeleting(planId);
+
+    setIsDeleting(true);
     try {
-        await apiClient.delete(`/plans/${planId}`);
-        
-        await refreshPlans();
-        router.refresh(); // Reload server data
-        showToast(t('dash.delete_success'), 'success');
+      await apiClient.delete(`/plans/${planId}`);
+      await refreshPlans();
+      router.refresh();
+      showToast(t('dash.delete_success'), 'success');
     } catch (error) {
-        console.error('Error deleting plan:', error);
-        showToast(t('dash.delete_error'), 'error');
+      console.error('Error deleting plan:', error);
+      showToast(t('dash.delete_error'), 'error');
     } finally {
-        setIsDeleting(null);
+      setIsDeleting(false);
     }
   };
 
   if (isUserLoading) {
     return (
-      <div className="min-h-screen bg-paper-2 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-signal-text animate-spin" />
+      <div className="flex min-h-screen items-center justify-center bg-paper-2">
+        <Loader2 className="h-8 w-8 animate-spin text-signal-text" />
       </div>
     );
   }
 
+  const summary = initialPlans.find((p) => p.status === 'active');
+  const dateOf = (dayIndex: number) => {
+    const [y, m, d] = (activePlan ?? summary)!.weekStart.split('-').map(Number);
+    return new Date(y, m - 1, d + dayIndex);
+  };
+
+  const day = activePlan?.days.find((d) => d.dayOfWeek === selected);
+  const meals = [...(day?.meals ?? [])].sort(
+    (a, b) => MEAL_ORDER.indexOf(a.mealType) - MEAL_ORDER.indexOf(b.mealType),
+  );
+  const workout = training?.workoutDays.find((w) => w.dayOfWeek === selected);
+  const heading = new Date().toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
+
   return (
     <div className="min-h-screen bg-page-gradient pt-16" data-testid="dashboard-content">
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        {/* Welcome */}
-        <div className="mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-heading font-bold text-ink mb-2">
-            {t('dash.welcome')}
-          </h1>
-          <p className="text-sm sm:text-base text-muted">
-            {t('dash.subtitle')}
-          </p>
-        </div>
-        <SmartRecommendations />
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <button
-            onClick={generateNewPlan}
-            disabled={isGenerating}
-            className="group relative overflow-hidden rounded-2xl border border-rule bg-paper-2 p-5 sm:p-6 transition-all hover:shadow-lg hover:border-signal text-left min-h-[120px] sm:min-h-auto"
-            data-testid="quick-action-generate"
-          >
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                <Sparkles className="w-32 h-32 text-signal-text rotate-12" />
-            </div>
-            <div className="relative z-10 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-signal flex items-center justify-center text-signal-ink group-hover:scale-110 transition-transform">
-                {isGenerating ? (
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                ) : (
-                  <Sparkles className="w-6 h-6" />
-                )}
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-heading font-semibold text-ink mb-1 group-hover:text-signal-text transition-colors">
-                  {t('dash.generate_plan')}
-                </h3>
-                <p className="text-muted text-sm">
-                  {t('dash.generate_subtitle')}
-                </p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted group-hover:text-signal-text transition-colors" />
-            </div>
-          </button>
-
-          <Link
-            href="/settings"
-            className="group relative overflow-hidden rounded-2xl border border-rule bg-paper-2 p-5 sm:p-6 transition-all hover:shadow-lg hover:border-rule text-left min-h-[120px] sm:min-h-auto"
-            data-testid="quick-action-profile"
-          >
-            <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                <Settings className="w-32 h-32 text-muted rotate-12" />
-            </div>
-            <div className="relative z-10 flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-paper-3 flex items-center justify-center text-ink group-hover:scale-110 transition-transform">
-                <Settings className="w-6 h-6" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-heading font-semibold text-ink mb-1 group-hover:text-ink transition-colors">
-                  {t('dash.configure_profile')}
-                </h3>
-                <p className="text-muted text-sm">
-                  {t('dash.configure_subtitle')}
-                </p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-muted group-hover:text-ink transition-colors" />
-            </div>
-          </Link>
-        </div>
-
-        {/* Active Plan or CTA */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-heading font-semibold text-ink flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-signal-text" />
-              {t('dash.active_plan')}
-            </h2>
-            <Link 
-              href="/plans"
-              className="text-sm font-medium text-signal-text hover:text-signal-text flex items-center gap-1"
-            >
-              {t('dash.view_history')} <ChevronRight className="w-4 h-4" />
-            </Link>
+      <main className="mx-auto max-w-6xl px-5 py-8 sm:px-8 sm:py-12">
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm uppercase tracking-[0.1em] text-muted">{heading}</p>
+            <h1 className="type-display-sm mt-1">{t('dash.today')}</h1>
           </div>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/settings"
+              data-testid="quick-action-profile"
+              className="btn-secondary inline-flex items-center gap-2"
+              aria-label={t('dash.configure_profile')}
+            >
+              <Settings className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">{t('dash.configure_profile')}</span>
+            </Link>
+            <button
+              onClick={generateNewPlan}
+              disabled={isGenerating}
+              data-testid="quick-action-generate"
+              className="btn-primary inline-flex items-center gap-2"
+            >
+              {isGenerating ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Sparkles className="h-4 w-4" aria-hidden="true" />
+              )}
+              {t('dash.generate_plan')}
+            </button>
+          </div>
+        </header>
 
-          {!displayPlans.find(p => p.status === 'active') ? (
-            <div className="card text-center py-12 border-dashed border-2 border-rule bg-transparent shadow-none">
-              <div className="w-16 h-16 rounded-full bg-paper-2 flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="w-8 h-8 text-muted" />
-              </div>
-              <h3 className="text-lg font-medium text-ink mb-2">
-                {t('dash.no_active_plan')}
-              </h3>
-              <p className="text-muted mb-6 max-w-sm mx-auto">
-                {t('dash.no_plan_subtitle')}
-              </p>
-              <button
-                onClick={generateNewPlan}
-                disabled={isGenerating}
-                className="btn-primary inline-flex items-center gap-2"
-                data-testid="generate-plan-cta"
-              >
-                {isGenerating ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Sparkles className="w-4 h-4" />
-                )}
-                {t('dash.generate_plan')}
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-               {displayPlans.filter(p => p.status === 'active').map((plan) => (
-                <div
-                  key={plan.id}
-                  onClick={() => router.push(`/plan/${plan.id}`)}
-                  className="group relative overflow-hidden rounded-2xl border border-rule bg-paper-2 p-6 md:p-8 transition-all hover:shadow-xl hover:border-signal cursor-pointer"
-                  data-testid="active-plan-card"
-                >
-                  {/* Subtle Background Decoration */}
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-paper-3 rounded-full blur-3xl -mr-32 -mt-32 opacity-50 pointer-events-none"></div>
+        {!summary || !activePlan ? (
+          <section className="mt-10 rounded-3xl border border-dashed border-rule px-6 py-16 text-center">
+            <h2 className="text-2xl text-ink">{t('dash.no_active_plan')}</h2>
+            <p className="mx-auto mt-2 max-w-sm text-muted">{t('dash.no_plan_subtitle')}</p>
+            <button
+              onClick={generateNewPlan}
+              disabled={isGenerating}
+              data-testid="generate-plan-cta"
+              className="btn-primary mt-7 inline-flex items-center gap-2"
+            >
+              {isGenerating ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Sparkles className="h-4 w-4" aria-hidden="true" />
+              )}
+              {t('dash.generate_plan')}
+            </button>
+          </section>
+        ) : (
+          <>
+            <nav aria-label={t('dash.plan_week_of')} className="mt-8 grid grid-cols-7 gap-2">
+              {[0, 1, 2, 3, 4, 5, 6].map((i) => {
+                const date = dateOf(i);
+                const on = i === selected;
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => setSelected(i)}
+                    className={`flex flex-col items-center rounded-2xl border px-1 py-3 transition-colors ${
+                      on
+                        ? 'border-signal bg-signal text-signal-ink'
+                        : 'border-rule bg-paper-2 text-ink hover:border-ink'
+                    }`}
+                  >
+                    <span className="text-xs uppercase tracking-[0.08em] opacity-80">
+                      {date.toLocaleDateString(locale, { weekday: 'short' }).replace('.', '')}
+                    </span>
+                    <span className="mt-0.5 text-xl">{date.getDate()}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`mt-1 h-1 w-1 rounded-full ${i === todayIndex ? (on ? 'bg-signal-ink' : 'bg-signal') : 'bg-transparent'}`}
+                    />
+                  </button>
+                );
+              })}
+            </nav>
+            {todayIndex === null && (
+              <p className="mt-3 text-sm text-muted">{t('dash.outside_week')}</p>
+            )}
 
-                  <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                      <div className="flex items-start gap-6">
-                           {/* Date Box */}
-                          <div className="flex flex-col items-center justify-center w-16 h-16 rounded-2xl bg-paper-2 border border-rule shadow-xs text-ink">
-                             <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
-                               {t('dash.week')}
-                             </span>
-                             <span className="text-2xl font-bold font-heading">{new Date(plan.weekStart).getDate()}</span>
-                          </div>
-                          
-                          <div>
-                            <div className="flex items-center gap-3 mb-2">
-                                <h3 className="font-heading font-bold text-xl md:text-2xl text-ink">
-                                    {t('dash.smart_plan_title')}
-                                </h3>
-                                <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800">
-                                    <span className="relative flex h-2 w-2">
-                                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                    </span>
-                                    <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                                      {t('dash.in_progress')}
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted">
-                                <span className="flex items-center gap-2">
-                                    <Target className="w-4 h-4 text-signal-text" />
-                                    <span className="font-medium text-ink">{plan.targetKcal} kcal</span> {t('dash.daily')}
-                                </span>
-                                <span className="hidden sm:inline w-1 h-1 rounded-full bg-paper-3"></span>
-                                <span>
-                                  {t('dash.created')} {new Date(plan.createdAt).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
-                                </span>
-                            </div>
-                          </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 mt-2 md:mt-0 pl-22 md:pl-0">
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(`/shopping-list/${plan.id}`);
-                            }}
-                            className="relative overflow-hidden inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-paper-2 border border-rule text-ink font-medium shadow-xs hover:border-signal hover:text-signal-text transition-all group/btn"
-                        >
-                            <span className="absolute inset-0 bg-paper-3 opacity-0 group-hover/btn:opacity-100 transition-opacity"></span>
-                            <ShoppingCart className="w-4 h-4" />
-                            <span>{t('dash.shopping_list')}</span>
-                        </button>
-                        
-                         <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                deletePlan(plan.id);
-                            }}
-                            disabled={isDeleting === plan.id}
-                            className="p-2.5 rounded-xl text-muted hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-                            title={t('common.delete')}
-                        >
-                            {isDeleting === plan.id ? (
-                                <Loader2 className="w-5 h-5 animate-spin" />
-                            ) : (
-                                <Trash2 className="w-5 h-5" />
-                            )}
-                        </button>
-                        
-                        <div className="hidden lg:flex items-center justify-center w-10 h-10 rounded-full border border-transparent group-hover:border-rule text-muted group-hover:text-signal-text transition-all">
-                            <ChevronRight className="w-5 h-5" />
-                        </div>
-                      </div>
-                  </div>
+            <div className="mt-8 grid gap-6 lg:grid-cols-5">
+              <section className="rounded-3xl border border-rule bg-paper-2 p-6 sm:p-8 lg:col-span-3">
+                <div className="flex flex-wrap items-end justify-between gap-3">
+                  <h2 className="text-2xl text-ink">{t('dash.todays_meals')}</h2>
+                  <p className="text-ink">
+                    <span className="text-3xl">{Math.round(day?.totalKcal ?? 0)}</span>{' '}
+                    <span className="text-muted">
+                      {t('dash.target_of').replace('{{kcal}}', String(Math.round(activePlan.targetKcal)))}
+                    </span>
+                  </p>
                 </div>
-              ))}
+
+                <div className="mt-6 grid gap-4 sm:grid-cols-3">
+                  <MacroBar label={t('dash.protein')} value={day?.totalProtein ?? 0} target={activePlan.targetProtein} />
+                  <MacroBar label={t('dash.carbs')} value={day?.totalCarbs ?? 0} target={activePlan.targetCarbs} />
+                  <MacroBar label={t('dash.fat')} value={day?.totalFat ?? 0} target={activePlan.targetFat} />
+                </div>
+
+                {meals.length === 0 ? (
+                  <p className="mt-8 text-muted">{t('dash.no_meals_day')}</p>
+                ) : (
+                  <ul className="mt-8 divide-y divide-rule">
+                    {meals.map((meal) => (
+                      <li key={meal.id} className="flex items-start justify-between gap-4 py-4">
+                        <div className="min-w-0">
+                          <p className="text-lg text-ink">{getMealTypeName(meal.mealType, language)}</p>
+                          <p className="mt-0.5 text-muted">
+                            {meal.items.map((it) => it.ingredientName).join(' · ')}
+                          </p>
+                        </div>
+                        <p className="shrink-0 text-ink">{Math.round(meal.totalKcal)} kcal</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+
+              <div className="flex flex-col gap-6 lg:col-span-2">
+                <section className="rounded-3xl border border-rule bg-paper-2 p-6 sm:p-8">
+                  <h2 className="flex items-center gap-2 text-2xl text-ink">
+                    <Dumbbell className="h-5 w-5 text-signal-text" aria-hidden="true" />
+                    {t('dash.training')}
+                  </h2>
+                  {!workout ? (
+                    <p className="mt-3 text-muted">{t('dash.no_training')}</p>
+                  ) : workout.isRestDay ? (
+                    <p className="mt-3 text-lg text-ink">{t('dash.rest_today')}</p>
+                  ) : (
+                    <>
+                      <p className="mt-3 text-lg text-ink">{workout.name}</p>
+                      <p className="text-muted">
+                        {t('dash.exercises_count')
+                          .replace('{{count}}', String(workout.exercises.length))
+                          .replace('{{min}}', String(workout.totalDurationMin))}
+                      </p>
+                      <ul className="mt-4 space-y-1.5 text-ink">
+                        {workout.exercises.slice(0, 4).map((e, i) => (
+                          <li key={i} className="flex justify-between gap-3">
+                            <span className="truncate">{e.exerciseName}</span>
+                            <span className="shrink-0 text-muted">
+                              {e.sets} × {e.reps ?? `${e.durationSec ?? 0}s`}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </section>
+
+                <Link
+                  href={`/shopping-list/${summary.id}`}
+                  className="group flex items-center justify-between gap-4 rounded-3xl border border-rule bg-paper-2 p-6 transition-colors hover:border-signal sm:p-8"
+                >
+                  <div>
+                    <p className="flex items-center gap-2 text-2xl text-ink">
+                      <ShoppingCart className="h-5 w-5 text-signal-text" aria-hidden="true" />
+                      {t('dash.shopping_list')}
+                    </p>
+                    <p className="mt-1 text-muted">{t('dash.shopping_hint')}</p>
+                  </div>
+                  <ChevronRight className="h-5 w-5 text-muted transition-colors group-hover:text-signal-text" aria-hidden="true" />
+                </Link>
+
+                <div
+                  onClick={() => router.push(`/plan/${summary.id}`)}
+                  data-testid="active-plan-card"
+                  className="flex cursor-pointer items-center justify-between gap-4 rounded-3xl border border-rule bg-paper-2 p-6 transition-colors hover:border-signal sm:p-8"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm uppercase tracking-[0.1em] text-muted">{t('dash.plan_week_of')}</p>
+                    <p className="text-2xl text-ink">
+                      {dateOf(0).toLocaleDateString(locale, { day: 'numeric', month: 'long' })}
+                    </p>
+                    {profile?.weight_kg ? (
+                      <p className="mt-1 text-muted">
+                        {t('dash.weight_goal')}: {profile.weight_kg} kg
+                        {profile.weight_goal_kg ? ` → ${profile.weight_goal_kg} kg` : ''}
+                      </p>
+                    ) : null}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deletePlan(summary.id);
+                    }}
+                    disabled={isDeleting}
+                    title={t('common.delete')}
+                    aria-label={t('common.delete')}
+                    className="rounded-xl p-2.5 text-muted transition-colors hover:text-red-500"
+                  >
+                    {isDeleting ? <Loader2 className="h-5 w-5 animate-spin" /> : <Trash2 className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </main>
     </div>
   );
