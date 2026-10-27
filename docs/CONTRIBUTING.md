@@ -1,0 +1,57 @@
+# Contributing to NutriFlow
+
+> 🇪🇸 **[Leer en Español](./CONTRIBUTING.es.md)**
+
+First off, thanks for taking the time to contribute! 🎉
+
+## 🛠️ Development Workflow
+
+This project is a single Next.js app managed with **Bun**.
+
+1.  **Fork and Clone** the repository.
+2.  **Install Dependencies**:
+    ```bash
+    bun install
+    ```
+3.  **Environment Variables**:
+    -   Copy `.env.example` to `.env.local` at the repository root.
+    -   Populate with your Supabase and Google AI credentials.
+
+4.  **Start Development Server**:
+    ```bash
+    bun run dev
+    ```
+
+## 🧩 Code Style & Standards
+
+We enforce high standards to keep the codebase clean and scalable.
+
+-   **TypeScript**: Strict mode is enabled. No `any` types unless absolutely necessary (and commented).
+-   **Design Pattern**:
+    -   **Backend**: Follow SOLID principles. Use Dependency Injection.
+    -   **Frontend**: Use Atomic Design for components. Logic should be separated from UI via Custom Hooks.
+-   **Commits**: We follow [Conventional Commits](https://www.conventionalcommits.org/).
+    -   `feat: add new diet generator algorithm`
+    -   `fix: resolve hydration error in navbar`
+    -   `docs: update architecture diagram`
+
+## 🧪 Testing
+
+Before submitting a PR, ensure all tests pass.
+
+```bash
+bun run test        # Run Unit Tests
+bun run test:e2e    # Run Playwright E2E Tests
+```
+
+## 📦 Pull Request Process
+
+1.  Create a feature branch: `git checkout -b feature/amazing-feature`.
+2.  Commit your changes.
+3.  Push to the branch.
+4.  Open a Pull Request targeting the `main` branch.
+5.  Ensure CI checks pass.
+
+---
+
+*Happy Coding!* 🚀

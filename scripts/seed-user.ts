@@ -8,8 +8,8 @@ import * as fs from 'fs';
 const envPath = path.resolve(__dirname, '../.env.local');
 const envConfig = dotenv.parse(fs.readFileSync(envPath));
 
-const SUPABASE_URL = envConfig.SUPABASE_URL;
-const SUPABASE_SERVICE_KEY = envConfig.SUPABASE_SERVICE_KEY;
+const SUPABASE_URL = envConfig.NEXT_PUBLIC_SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = envConfig.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
     console.error('Missing Supabase credentials in .env.local');

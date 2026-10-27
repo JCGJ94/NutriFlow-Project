@@ -1,0 +1,67 @@
+strict_tdd: true
+context: |
+  NutriFlow is a TypeScript, Next.js, React, Turborepo, Supabase project.
+  Detected markers: package.json, turbo.json, pnpm-workspace.yaml, next.config.js,
+  vitest.config.ts, playwright.config.ts, vercel.json, railway.toml, supabase.
+  Package managers: pnpm.
+  Additional evidence: apps/web Next.js 16 App Router with Route Handlers;
+  packages/shared shared domain contracts; infra/supabase migrations;
+  interrupted NestJS-to-Next full-stack migration in working tree.
+  Primary test command: pnpm test (turbo vitest, 94/94 passing at audit time).
+  Unit tests: vitest (apps/web/src/__tests__).
+  Integration tests: vitest API route tests against Supabase mocks.
+  E2E tests: playwright (57 tests, currently require real Supabase credentials).
+rules:
+  proposal:
+    require_problem_statement: true
+  spec:
+    require_acceptance_criteria: true
+  design:
+    require_tradeoffs: true
+  tasks:
+    protect_review_workload: true
+  apply:
+    test_command: pnpm test
+  verify:
+    test_command: pnpm test
+testing:
+  detected: "2026-09-10"
+  runner:
+    command: pnpm test
+    framework: vitest
+  layers:
+    unit: vitest
+    integration: vitest
+    e2e: playwright
+  commands:
+    unit:
+      - scope: workspace
+        command: pnpm test
+        framework: vitest
+    integration:
+      - scope: workspace
+        command: pnpm test
+        framework: vitest
+    e2e:
+      - scope: workspace
+        command: pnpm exec playwright test
+        framework: playwright
+  coverage:
+    command: ""
+    commands: []
+quality:
+  lint: pnpm lint
+  lint_commands:
+    - scope: workspace
+      command: pnpm lint
+      framework: eslint
+  typecheck: pnpm --filter @nutriflow/shared exec tsc -p tsconfig.build.json --noEmit && pnpm --filter @nutriflow/web exec tsc --noEmit
+  typecheck_commands:
+    - scope: package
+      command: pnpm --filter @nutriflow/shared exec tsc -p tsconfig.build.json --noEmit
+      framework: tsc
+    - scope: package
+      command: pnpm --filter @nutriflow/web exec tsc --noEmit
+      framework: tsc
+  format: ""
+  format_commands: []

@@ -1,0 +1,170 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Twitter, Instagram, Github, Mail } from 'lucide-react';
+import { Logo } from './Logo';
+
+import { useLanguage } from '@/context/LanguageContext';
+
+import { useToast } from '@/context/ToastContext';
+import { useUser } from '@/context/UserContext';
+
+export function Footer() {
+  const pathname = usePathname();
+  const { t } = useLanguage();
+  const { showToast } = useToast();
+  const { user } = useUser();
+  const currentYear = new Date().getFullYear();
+
+  const isAuthPage = pathname === '/login' || pathname === '/register';
+
+  if (isAuthPage) return null;
+
+  const handlePlaceholder = (e: React.MouseEvent) => {
+    e.preventDefault();
+    showToast('Esta función estará disponible pronto', 'info');
+  };
+
+  return (
+    <footer className="bg-paper border-t border-rule">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 lg:py-16">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+          
+          {/* Brand Column - Spans 2 columns on mobile */}
+          <div className="col-span-2 lg:col-span-1 space-y-4">
+            <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2 group w-fit">
+              <Logo size={32} className="transition-transform group-hover:scale-105" />
+            </Link>
+            <p className="text-muted text-sm leading-relaxed max-w-xs">
+              {t('footer.tagline')}
+            </p>
+            <div className="flex items-center gap-4 pt-2">
+              <a 
+                href="https://twitter.com/nutriflow_app" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={handlePlaceholder}
+                className="text-muted hover:text-signal-text transition-colors p-1"
+                aria-label="Twitter"
+              >
+                <Twitter className="w-5 h-5" />
+              </a>
+              <a 
+                href="https://instagram.com/nutriflow_app" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={handlePlaceholder}
+                className="text-muted hover:text-signal-text transition-colors p-1"
+                aria-label="Instagram"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+              {/* GitHub Link - functional if public, otherwise placeholder */}
+              <a 
+                href="https://github.com/JCGJ94/NutriFlow-Project" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-muted hover:text-signal-text transition-colors p-1"
+                aria-label="GitHub"
+              >
+                <Github className="w-5 h-5" />
+              </a>
+            </div>
+          </div>
+
+          {/* Product Links */}
+          <div className="col-span-1">
+            <h3 className="font-mono text-xs text-ink uppercase tracking-widest mb-4">
+              {t('footer.product')}
+            </h3>
+            <ul className="space-y-3">
+              <li>
+                <Link href={user ? "/dashboard" : "/#features"} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
+                  {t('footer.features')}
+                </Link>
+              </li>
+              <li>
+                <Link href={user ? "/dashboard" : "/#how-it-works"} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
+                  {t('footer.how_it_works')}
+                </Link>
+              </li>
+              <li>
+                <a href="#" onClick={handlePlaceholder} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
+                  {t('footer.pricing')}
+                </a>
+              </li>
+              <li>
+                <a href="#" onClick={handlePlaceholder} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
+                  {t('footer.testimonials')}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company/Support */}
+          <div className="col-span-1">
+            <h3 className="font-mono text-xs text-ink uppercase tracking-widest mb-4">
+              {t('footer.company')}
+            </h3>
+            <ul className="space-y-3">
+              <li>
+                <a href="#" onClick={handlePlaceholder} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
+                  {t('footer.about')}
+                </a>
+              </li>
+              <li>
+                <a href="#" onClick={handlePlaceholder} className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
+                  {t('footer.blog')}
+                </a>
+              </li>
+              <li>
+                <a href="mailto:hola@nutriflow.app" className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
+                  {t('footer.contact')}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal / Contact Info - Spans 2 columns on mobile if needed, but let's keep it 1 for grid symmetry or 2 if we want footer-bottom style */}
+          <div className="col-span-2 lg:col-span-1">
+            <h3 className="font-mono text-xs text-ink uppercase tracking-widest mb-4">
+              {t('footer.legal')}
+            </h3>
+            <ul className="space-y-3 mb-6">
+              <li>
+                <Link href="/privacy" className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
+                  {t('footer.privacy')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
+                  {t('footer.terms')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/cookies" className="text-muted hover:text-ink text-sm transition-colors block py-0.5">
+                  {t('footer.cookies')}
+                </Link>
+              </li>
+            </ul>
+            
+            <div className="flex items-center gap-2 text-sm text-muted bg-paper-2 p-3 rounded-xl border border-rule w-fit">
+               <Mail className="w-4 h-4 text-signal-text" />
+               <a href="mailto:hola@nutriflow.app" className="hover:text-ink transition-colors font-medium">hola@nutriflow.app</a>
+            </div>
+          </div>
+        </div>
+        
+        <div className="mt-12 pt-8 border-t border-rule flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-center md:text-left text-muted text-xs">
+            © {currentYear} NutriFlow. {t('footer.rights')}
+          </p>
+          <div className="flex gap-4 text-xs text-muted">
+             <span>v0.3.0 Beta</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}

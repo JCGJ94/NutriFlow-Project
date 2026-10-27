@@ -1,0 +1,645 @@
+'use client';
+
+import { useEffect, useState, useMemo } from 'react';
+
+import { useParams, useRouter } from 'next/navigation';
+import {
+  ArrowLeft,
+  Check,
+  Printer,
+  Plus,
+  Trash2,
+  Share2,
+  Beef,
+  Wheat,
+  Carrot,
+  Apple,
+  Milk,
+  Droplet,
+  Bean,
+  Leaf,
+  Info,
+  Download,
+  ChevronDown,
+  LayoutGrid
+} from 'lucide-react';
+import { IngredientCategory } from '@/lib/contracts';
+import { formatGrams } from '@/lib/utils';
+import { apiClient } from '@/lib/apiClient';
+import { useLanguage } from '@/context/LanguageContext';
+import { usePlans } from '@/context/PlansContext';
+import { useToast } from '@/context/ToastContext';
+import { ShoppingListSkeleton } from '@/components/plan/ShoppingListSkeleton';
+import { drawPdfHeader } from '@/lib/pdf-branding';
+
+
+interface ShoppingListItem {
+  id: string;
+  ingredientId: string | null;
+  ingredientName: string;
+  ingredientNameEn?: string;
+  category: IngredientCategory | string;
+  totalGrams?: number;
+  isChecked: boolean;
+  isCustom: boolean;
+}
+
+interface ShoppingList {
+  planId: string;
+  weekStart: string;
+  items: ShoppingListItem[];
+  generatedAt: string;
+}
+
+// Elegant Color Palette & Icons
+const CATEGORY_STYLES: Record<string, { icon: any, color: string, bg: string, border: string }> = {
+  [IngredientCategory.VEGETABLE]: { icon: Carrot, color: 'text-emerald-600 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-900/10', border: 'border-emerald-100 dark:border-emerald-800/30' },
+  [IngredientCategory.FRUIT]: { icon: Apple, color: 'text-orange-600 dark:text-orange-400', bg: 'bg-orange-50 dark:bg-orange-900/10', border: 'border-orange-100 dark:border-orange-800/30' },
+  [IngredientCategory.PROTEIN]: { icon: Beef, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-900/10', border: 'border-rose-100 dark:border-rose-800/30' },
+  [IngredientCategory.DAIRY]: { icon: Milk, color: 'text-sky-600 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-900/10', border: 'border-sky-100 dark:border-sky-800/30' },
+  [IngredientCategory.GRAIN]: { icon: Wheat, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/10', border: 'border-amber-100 dark:border-amber-800/30' },
+  [IngredientCategory.LEGUME]: { icon: Bean, color: 'text-signal-text', bg: 'bg-teal-50', border: 'border-teal-100' },
+  [IngredientCategory.FAT]: { icon: Droplet, color: 'text-yellow-600 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/10', border: 'border-yellow-100 dark:border-yellow-800/30' },
+  [IngredientCategory.NUT_SEED]: { icon: Leaf, color: 'text-lime-600 dark:text-lime-400', bg: 'bg-lime-50 dark:bg-lime-900/10', border: 'border-lime-100 dark:border-lime-800/30' },
+  [IngredientCategory.CONDIMENT]: { icon: Info, color: 'text-muted', bg: 'bg-slate-50', border: 'border-slate-100' },
+  [IngredientCategory.CARBOHYDRATE]: { icon: Wheat, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-900/10', border: 'border-amber-100 dark:border-amber-800/30' },
+  ['default']: { icon: Info, color: 'text-signal-text', bg: 'bg-paper-3', border: 'border-rule' },
+};
+
+// Logical Display Order
+const CATEGORY_ORDER = [
+  IngredientCategory.VEGETABLE,
+  IngredientCategory.FRUIT,
+  IngredientCategory.PROTEIN,
+  IngredientCategory.DAIRY,
+  IngredientCategory.GRAIN,
+  IngredientCategory.CARBOHYDRATE,
+  IngredientCategory.LEGUME,
+  IngredientCategory.NUT_SEED,
+  IngredientCategory.FAT,
+  IngredientCategory.CONDIMENT,
+];
+
+// Helper to Clean Ingredient Names
+const cleanIngredientName = (name: string, lang: string = 'es'): string => {
+    const terms = lang === 'es' 
+        ? 'cocido|a la plancha|frito|hervido|asado|al horno|vapor|crudo|tostado|en conserva|natural|fresco|semidesnatada|entera|desnatada'
+        : 'cooked|grilled|fried|boiled|roasted|baked|steamed|raw|toasted|canned|natural|fresh|semi-skimmed|whole|skimmed';
+    
+    const regex = new RegExp(`\\s+(${terms})\\b`, 'gi');
+    return name.replace(regex, '').trim();
+};
+
+export default function ShoppingListPage() {
+  const params = useParams();
+  const router = useRouter();
+  const { t, language } = useLanguage();
+  const { getShoppingList, updateShoppingListCache } = usePlans();
+  const { showToast } = useToast();
+  const planId = params.id as string;
+
+  const [shoppingList, setShoppingList] = useState<ShoppingList | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [newItemName, setNewItemName] = useState('');
+  
+  // PDF Preview State
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    const init = async () => {
+        setIsLoading(true);
+        const data = await getShoppingList(planId);
+        if (data) setShoppingList(data);
+        setIsLoading(false);
+    };
+    init();
+  }, [planId, getShoppingList]);
+
+  // Toggle Category Collapse
+  const toggleCategory = (cat: string) => {
+    setCollapsedCategories(prev => ({
+      ...prev,
+      [cat]: !prev[cat]
+    }));
+  };
+
+  // Undo an optimistic update after the server rejected the request. The cache
+  // is restored too, otherwise a later getShoppingList would replay the failed state.
+  const revertTo = (previousList: ShoppingList, error: unknown) => {
+    setShoppingList(previousList);
+    updateShoppingListCache(planId, previousList);
+    showToast(error instanceof Error ? error.message : t('common.error'), 'error');
+  };
+
+  const toggleItem = async (itemId: string, currentChecked: boolean) => {
+    if (!shoppingList) return;
+
+    const previousList = shoppingList;
+    const updatedList = {
+        ...shoppingList,
+        items: shoppingList.items.map(item =>
+            item.id === itemId ? { ...item, isChecked: !currentChecked } : item
+        )
+    };
+    setShoppingList(updatedList);
+    updateShoppingListCache(planId, updatedList);
+
+    try {
+      await apiClient.post(`/shopping-list/${planId}/items/toggle`, {
+        itemId,
+        isChecked: !currentChecked,
+      });
+    } catch (error) {
+      console.error('Error toggling item:', error);
+      revertTo(previousList, error);
+    }
+  };
+
+  const handleDeleteClick = async (item: ShoppingListItem) => {
+      if (item.isCustom) {
+          // Custom items: Delete from DB
+          await deleteCustomItem(item.id);
+      } else {
+          // Standard/Plan items: Just uncheck (Undo Check)
+          // Only if checked (though UI only shows icon if checked)
+          if (item.isChecked) {
+              await toggleItem(item.id, true); // true -> false (uncheck)
+          }
+      }
+  };
+
+  const deleteCustomItem = async (itemId: string) => {
+    if (!shoppingList) return;
+
+    // Optimistic Delete
+    const previousList = shoppingList;
+    const updatedList = {
+        ...shoppingList,
+        items: shoppingList.items.filter(item => item.id !== itemId)
+    };
+    setShoppingList(updatedList);
+    updateShoppingListCache(planId, updatedList);
+
+    try {
+      await apiClient.delete(`/shopping-list/${planId}/items/${itemId}`);
+    } catch (error) {
+      console.error('Error deleting item:', error);
+      revertTo(previousList, error);
+    }
+  };
+
+  const handleAddCustomItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newItemName.trim() || !shoppingList) return;
+    
+    const name = newItemName.trim();
+    setNewItemName('');
+
+    try {
+      const newItem = await apiClient.post<ShoppingListItem>(
+        `/shopping-list/${planId}/items`,
+        { name },
+      );
+
+      const updatedList = {
+          ...shoppingList,
+          items: [...shoppingList.items, newItem]
+      };
+      setShoppingList(updatedList);
+      updateShoppingListCache(planId, updatedList);
+      showToast(t('shop.item_added'), 'success');
+    } catch (error) {
+      console.error('Error adding custom item:', error);
+      showToast(error instanceof Error ? error.message : t('common.error'), 'error');
+    }
+  };
+
+  const generatePDF = async () => {
+    if (!shoppingList) return null;
+    
+    // Dynamic Import
+    const jsPDFModule = (await import('jspdf')).default;
+    const autoTableModule = (await import('jspdf-autotable')).default;
+
+    const doc = new jsPDFModule();
+    
+    // Header with Logo Placeholder & Title
+    doc.setFillColor(15, 23, 42); // slate-900 like
+    doc.rect(0, 0, 210, 40, 'F');
+    // Filter Items: Only Checked OR Custom
+    const itemsToPrint = shoppingList.items.filter(i => i.isChecked || i.isCustom);
+
+    // Call Branding Utility
+    const subtitle = `${t('shop.week')}: ${new Date(shoppingList.weekStart).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US')}`;
+    drawPdfHeader(doc, 'badge', t('shop.title'), subtitle);
+    
+    let yPos = 50;
+
+    if (itemsToPrint.length === 0) {
+        doc.setTextColor(100);
+        doc.setFontSize(12);
+        doc.text(t('shop.no_items_print'), 105, 60, { align: 'center' });
+        return doc;
+    }
+
+    // Ordered Data for PDF
+    const grouped = itemsToPrint.reduce((acc, item) => {
+        const cat = item.category || 'Other';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(item);
+        return acc;
+    }, {} as Record<string, ShoppingListItem[]>);
+
+    const sortedForPDF = Object.entries(grouped).sort(([a], [b]) => {
+        const idxA = CATEGORY_ORDER.indexOf(a as IngredientCategory);
+        const idxB = CATEGORY_ORDER.indexOf(b as IngredientCategory);
+        return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+    });
+
+    sortedForPDF.forEach(([cat, items]) => {
+         // Category Header
+         doc.setFontSize(12);
+         doc.setTextColor(16, 185, 129); // emerald-500
+         doc.setFont('helvetica', 'bold');
+         doc.text(t(`cat.${cat.toUpperCase()}`) || cat, 14, yPos);
+         yPos += 2;
+
+         autoTableModule(doc, {
+            startY: yPos,
+            body: items.map(i => [cleanIngredientName(language === 'en' && i.ingredientNameEn ? i.ingredientNameEn : i.ingredientName, language), i.isCustom ? '(Manual)' : '', i.totalGrams ? formatGrams(i.totalGrams) : '-']),
+            theme: 'grid', // Cleaner grid for print
+            headStyles: { fillColor: [240, 253, 244], textColor: 50 }, // emerald-50
+            styles: { fontSize: 10, cellPadding: 3, textColor: 50 },
+            columnStyles: { 
+                0: { cellWidth: 100 },
+                1: { cellWidth: 30, fontStyle: 'italic' },
+                2: { halign: 'right', cellWidth: 20 } 
+            },
+            margin: { left: 14, right: 14 }
+         });
+         // @ts-ignore
+         yPos = doc.lastAutoTable.finalY + 10;
+    });
+
+    // Footer
+    // @ts-ignore
+    const pageCount = doc.internal.getNumberOfPages();
+    for(let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text(`NutriFlow - ${t('shop.generated_by')}`, 105, 290, { align: 'center' });
+    }
+
+    return doc;
+  };
+
+  const handleDownloadPDF = async () => {
+    const doc = await generatePDF();
+    if (doc) {
+        doc.save('NutriFlow-ShoppingList.pdf');
+        showToast(t('shop.pdf_downloaded'), 'success');
+    }
+  };
+
+  const handlePreviewPDF = async () => {
+    const doc = await generatePDF();
+    if (doc) {
+        // @ts-ignore
+        const blobUrl = doc.output('bloburl');
+        setPdfPreviewUrl(blobUrl.toString());
+        setIsPreviewOpen(true);
+    }
+  };
+
+  const closePreview = () => {
+      setIsPreviewOpen(false);
+      if (pdfPreviewUrl) {
+          URL.revokeObjectURL(pdfPreviewUrl);
+          setPdfPreviewUrl(null);
+      }
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+        try {
+            const doc = await generatePDF();
+            if(doc) {
+                 const blob = doc.output('blob');
+                 const file = new File([blob], 'shopping-list.pdf', { type: 'application/pdf' });
+                 if(navigator.canShare && navigator.canShare({ files: [file] })) {
+                     await navigator.share({
+                         title: t('shop.title'),
+                         files: [file]
+                     });
+                 } else {
+                     await navigator.share({
+                         title: t('shop.title'),
+                         url: window.location.href
+                     });
+                 }
+                 showToast(t('shop.shared_success'), 'success');
+            }
+        } catch (e) { 
+            console.error(e);
+            // Fallback Copy if share fails/cancelled
+            copyToClipboard();
+        }
+    } else {
+        copyToClipboard();
+    }
+  };
+
+  const copyToClipboard = () => {
+      let text = `${t('shop.title')}\n`;
+      shoppingList?.items.forEach(i => text += `- ${cleanIngredientName(language === 'en' && i.ingredientNameEn ? i.ingredientNameEn : i.ingredientName, language)}\n`);
+      navigator.clipboard.writeText(text);
+      showToast(t('shop.copied_clipboard'), 'info');
+  };
+
+  // Grouping Logic
+  const groupedItems = useMemo(() => {
+    if (!shoppingList) return {};
+    return shoppingList.items.reduce((acc, item) => {
+        if (item.isCustom) return acc;
+        const cat = item.category || 'Other';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(item);
+        return acc;
+    }, {} as Record<string, ShoppingListItem[]>);
+  }, [shoppingList]);
+
+  // Sort Categories for Display
+  const sortedCategories = useMemo(() => {
+      return Object.keys(groupedItems).sort((a, b) => {
+          const idxA = CATEGORY_ORDER.indexOf(a as IngredientCategory);
+          const idxB = CATEGORY_ORDER.indexOf(b as IngredientCategory);
+          // Put unknowns at the end
+          return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+      });
+  }, [groupedItems]);
+
+  const customItems = shoppingList?.items.filter(i => i.isCustom) || [];
+
+  if (isLoading) return <ShoppingListSkeleton />;
+  if (!shoppingList) return null;
+
+  const totalItems = shoppingList.items.length;
+  const checkedItems = shoppingList.items.filter(i => i.isChecked).length;
+  const progress = totalItems > 0 ? (checkedItems / totalItems) * 100 : 0;
+
+  return (
+    <div className="min-h-screen bg-paper-2 pb-20 pt-24 transition-colors duration-300">
+      
+      {/* Dynamic Header */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 fade-in-up">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+              <div>
+                  <div className="flex items-center gap-3 mb-2">
+                       <button onClick={() => router.back()} className="p-2 -ml-2 text-muted hover:text-ink transition-colors">
+                           <ArrowLeft className="w-6 h-6" />
+                       </button>
+                       <h1 className="text-3xl font-heading font-bold text-ink">
+                           {t('shop.title')}
+                       </h1>
+                  </div>
+                  <p className="text-muted font-medium">
+                      {t('shop.progress').replace('{{checked}}', checkedItems.toString()).replace('{{total}}', totalItems.toString())}
+                  </p>
+              </div>
+
+              <div className="flex gap-2">
+                   <button 
+                      onClick={handleShare}
+                      className="btn-secondary flex items-center gap-2 bg-paper-2 shadow-xs border border-rule hover:shadow-md transition-all"
+                   >
+                       <Share2 className="w-4 h-4" />
+                       <span>{t('shop.share')}</span>
+                   </button>
+                   <button 
+                      onClick={handlePreviewPDF}
+                      className="btn-primary flex items-center gap-2 bg-ink text-paper hover:scale-[1.02] shadow-lg transition-transform"
+                   >
+                       <Printer className="w-4 h-4" />
+                       <span>PDF</span>
+                   </button>
+              </div>
+          </div>
+
+          {/* Elegant Progress Bar */}
+          <div className="h-2 w-full bg-paper-3 rounded-full overflow-hidden">
+              <div 
+                  className="h-full bg-signal transition-all duration-700 ease-out"
+                  style={{ width: `${progress}%` }}
+              />
+          </div>
+      </div>
+
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          
+          {/* Custom Item Input (Capsule Style) */}
+          <form onSubmit={handleAddCustomItem} className="relative z-10 group max-w-xl mx-auto">
+              <div className="relative flex items-center bg-paper-2 rounded-full shadow-lg dark:shadow-black/20 hover:shadow-xl transition-all duration-300 border border-rule">
+                  <input 
+                      type="text" 
+                      value={newItemName}
+                      onChange={(e) => setNewItemName(e.target.value)}
+                      placeholder={t('shop.add_custom')}
+                      className="w-full bg-transparent border-none text-lg py-3.5 pl-6 pr-14 placeholder:text-ink text-ink focus:ring-0 rounded-full"
+                  />
+                  <div className="absolute right-1.5 top-1.5 bottom-1.5">
+                      <button 
+                          type="submit"
+                          disabled={!newItemName.trim()}
+                          className={`h-full aspect-square rounded-full flex items-center justify-center transition-all duration-300 ${newItemName.trim() 
+                              ? 'bg-signal text-signal-ink shadow-md hover:bg-signal/90 hover:scale-105 rotate-0 opacity-100' 
+                              : 'bg-paper-2 text-muted -rotate-90 opacity-0 pointer-events-none scale-75'
+                          }`}
+                      >
+                          <Plus className="w-5 h-5" />
+                      </button>
+                  </div>
+              </div>
+          </form>
+
+          {/* Masonry Grid Layout */}
+          <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6">
+              
+              {/* Render Categories */}
+              {sortedCategories.map(cat => {
+                  const style = CATEGORY_STYLES[cat] || CATEGORY_STYLES['default'];
+                  const Icon = style.icon;
+                  const items = groupedItems[cat];
+                  const isCollapsed = collapsedCategories[cat];
+                  const completed = items.every(i => i.isChecked);
+
+                  return (
+                      <div key={cat} className={`break-inside-avoid bg-paper-2 rounded-3xl border ${style.border} shadow-xs transition-all duration-300 ${completed ? 'opacity-80 grayscale-[0.3]' : 'hover:shadow-md'}`}>
+                          
+                          {/* Header */}
+                          <div 
+                              onClick={() => toggleCategory(cat)}
+                              className={`cursor-pointer px-5 py-4 flex items-center justify-between border-b ${isCollapsed ? 'border-transparent' : style.border} transition-colors rounded-t-3xl`}
+                          >
+                              <div className="flex items-center gap-3">
+                                  <div className={`p-2.5 rounded-xl ${style.bg} ${style.color}`}>
+                                      <Icon className="w-5 h-5" />
+                                  </div>
+                                  <div>
+                                      <h3 className={`font-bold text-lg leading-none mb-1 ${style.color.split(' ')[0]}`}>
+                                          {t(`cat.${cat.toUpperCase()}`) || cat}
+                                      </h3>
+                                      <p className="text-xs text-muted font-medium">
+                                          {t('common.ingredientes_count').replace('{{count}}', items.length.toString())}
+                                      </p>
+                                  </div>
+                              </div>
+                              <ChevronDown className={`w-5 h-5 text-muted transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`} />
+                          </div>
+
+                          {/* Items */}
+                          <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'max-h-0' : 'max-h-[1000px]'}`}>
+                              <div className="p-2 space-y-1">
+                                  {items.map(item => (
+                                      <div 
+                                          key={item.id}
+                                          onClick={() => toggleItem(item.id, item.isChecked)}
+                                          className={`group flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all ${item.isChecked ? 'bg-paper-2' : 'hover:bg-paper-3 check-mode'}`}
+                                      >
+                                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${item.isChecked ? 'bg-muted border-muted' : 'border-rule group-hover:border-signal'}`}>
+                                              <Check className={`w-3 h-3 text-paper transition-opacity ${item.isChecked ? 'opacity-100' : 'opacity-0'}`} />
+                                          </div>
+                                          
+                                          <div className="flex-1 min-w-0">
+                                              <p className={`font-medium truncate transition-all ${item.isChecked ? 'text-muted line-through' : 'text-ink'}`}>
+                                                  {cleanIngredientName(language === 'en' && item.ingredientNameEn ? item.ingredientNameEn : item.ingredientName, language)}
+                                              </p>
+                                              {item.totalGrams && !item.isChecked && (
+                                                  <p className="text-xs text-muted font-medium">
+                                                      {formatGrams(item.totalGrams)}
+                                                  </p>
+                                              )}
+                                          </div>
+
+                                          {/* Trash Icon Logic: Standard Items -> ONLY if Checked -> Uncheck Action */}
+                                          {item.isChecked && (
+                                              <button 
+                                                  onClick={(e) => { e.stopPropagation(); handleDeleteClick(item); }}
+                                                  className="p-1.5 rounded-lg text-muted hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all opacity-100"
+                                                  title={t('common.delete')} // Actually "Uncheck" effectively
+                                              >
+                                                  <Trash2 className="w-4 h-4" />
+                                              </button>
+                                          )}
+                                      </div>
+                                  ))}
+                              </div>
+                          </div>
+                      </div>
+                  );
+              })}
+
+              {/* Custom Items Section */}
+              {customItems.length > 0 && (
+                  <div className="break-inside-avoid bg-paper-2 rounded-3xl border border-dashed border-rule shadow-xs">
+                      <div className="px-5 py-4 border-b border-rule flex items-center gap-3">
+                          <div className="p-2 bg-paper-2 rounded-xl text-muted">
+                             <Plus className="w-5 h-5" />
+                          </div>
+                          <h3 className="font-bold text-lg text-ink">
+                              {t('shop.custom_section')}
+                          </h3>
+                      </div>
+                      <div className="p-2 space-y-1">
+                          {customItems.map(item => (
+                              <div 
+                                  key={item.id}
+                                  onClick={() => toggleItem(item.id, item.isChecked)}
+                                  className={`group flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-all ${item.isChecked ? 'bg-paper-2' : 'hover:bg-paper-3'}`}
+                              >
+                                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${item.isChecked ? 'bg-muted border-muted' : 'border-rule group-hover:border-signal'}`}>
+                                      <Check className={`w-3 h-3 text-paper transition-opacity ${item.isChecked ? 'opacity-100' : 'opacity-0'}`} />
+                                  </div>
+                                  <p className={`flex-1 font-medium truncate transition-all ${item.isChecked ? 'text-muted line-through' : 'text-ink'}`}>
+                                      {item.ingredientName}
+                                  </p>
+                                  <button 
+                                      onClick={(e) => { e.stopPropagation(); handleDeleteClick(item); }}
+                                      className="p-1.5 rounded-lg text-muted hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all"
+                                  >
+                                      <Trash2 className="w-4 h-4" />
+                                  </button>
+                              </div>
+                          ))}
+                      </div>
+                  </div>
+              )}
+          </div>
+
+          {/* Empty State */}
+          {totalItems === 0 && (
+              <div className="text-center py-20 animate-fade-in">
+                  <div className="w-24 h-24 bg-paper-2 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <LayoutGrid className="w-10 h-10 text-muted" />
+                  </div>
+                  <h2 className="text-xl font-bold text-ink mb-2">{t('shop.empty')}</h2>
+                  <p className="text-muted max-w-sm mx-auto">{t('shop.no_custom')}</p>
+              </div>
+          )}
+
+      </main>
+
+      {/* PDF Preview Modal */}
+      {isPreviewOpen && pdfPreviewUrl && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+              <div className="bg-paper-2 rounded-3xl shadow-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+                  {/* Modal Header */}
+                  <div className="flex items-center justify-between px-6 py-4 border-b border-rule">
+                      <h3 className="text-lg font-bold text-ink flex items-center gap-2">
+                          <Printer className="w-5 h-5 text-signal-text" />
+                          {t('shop.pdf_preview')}
+                      </h3>
+                      <button 
+                          onClick={closePreview}
+                          className="p-2 rounded-full hover:bg-paper-3 transition-colors"
+                      >
+                          <span className="sr-only">Close</span>
+                          <svg className="w-6 h-6 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                      </button>
+                  </div>
+
+                  {/* PDF Viewer (Iframe) */}
+                  <div className="flex-1 bg-paper-2 p-0 overflow-hidden relative group">
+                      <iframe 
+                          src={pdfPreviewUrl} 
+                          className="w-full h-full border-0" 
+                          title="PDF Preview"
+                      />
+                  </div>
+
+                  {/* Modal Footer */}
+                  <div className="p-4 border-t border-rule bg-paper-2 flex justify-end gap-3">
+                      <button 
+                          onClick={closePreview}
+                          className="px-5 py-2.5 rounded-full text-muted font-medium hover:bg-paper-3 transition-colors"
+                      >
+                          {t('common.close')}
+                      </button>
+                      <button 
+                          onClick={() => { handleDownloadPDF(); closePreview(); }}
+                          className="px-6 py-2.5 rounded-full bg-ink text-paper font-bold hover:shadow-lg hover:scale-[1.02] transition-all flex items-center gap-2"
+                      >
+                          <Download className="w-4 h-4" />
+                          {t('common.download')}
+                      </button>
+                  </div>
+              </div>
+          </div>
+      )}
+    </div>
+  );
+}

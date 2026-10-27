@@ -1,6 +1,4 @@
 {
-    "buildCommand": "pnpm turbo run build --filter=@nutriflow/web",
     "framework": "nextjs",
-    "installCommand": "NODE_ENV=development pnpm install --frozen-lockfile",
-    "ignoreCommand": "exit 1"
+    "installCommand": "bun install --frozen-lockfile"
 }

@@ -32,19 +32,19 @@ End-to-end tests simulating real user interactions in the browser.
 
 ### Install browsers (first time)
 ```bash
-pnpm exec playwright install
+bunx playwright install
 ```
 
 ### Run tests (Headless)
 IMPORTANT: Ensure your app is NOT running on port 3000, Playwright will start it (or use `webServer` config).
 Or if it's already running:
 ```bash
-pnpm exec playwright test
+bunx playwright test
 ```
 
 ### Run with UI (Recommended for development)
 ```bash
-pnpm exec playwright test --ui
+bunx playwright test --ui
 ```
 
 ### Flow Coverage
